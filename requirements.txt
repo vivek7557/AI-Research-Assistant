@@ -1,0 +1,12 @@
+
+fastapi
+uvicorn[standard]
+loguru
+rich
+python-dotenv
+anthropic
+tavily
+requests
+prometheus-client
+pydantic
+pyyaml
