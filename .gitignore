@@ -1,0 +1,65 @@
+# -------------------------
+# PYTHON FILES / CACHE
+# -------------------------
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pdb
+*.egg-info/
+*.egg
+
+# -------------------------
+# ENVIRONMENT / VENV
+# -------------------------
+env/
+venv/
+.venv/
+ENV/
+env.bak/
+venv.bak/
+
+# -------------------------
+# IDE / EDITOR FILES
+# -------------------------
+.vscode/
+.idea/
+*.swp
+
+# -------------------------
+# SYSTEM FILES
+# -------------------------
+.DS_Store
+Thumbs.db
+
+# -------------------------
+# SECRETS / SENSITIVE FILES
+# -------------------------
+.env
+*.env
+config.json
+secrets.json
+
+# -------------------------
+# LOGS / OUTPUT
+# -------------------------
+*.log
+logs/
+output/
+outputs/
+*.md.html
+
+# -------------------------
+# CHECKPOINTS / TEMP
+# -------------------------
+*.tmp
+tmp/
+temp/
+.cache/
+
+# -------------------------
+# PROJECT SPECIFIC
+# -------------------------
+memory/
+research_sessions/
+downloads/
