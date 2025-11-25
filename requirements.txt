@@ -10,3 +10,16 @@ pandas
 tiktoken
 langchain
 PyPDF2
+streamlit
+python-dotenv
+requests
+anthropic
+tavily-python
+groq
+beautifulsoup4
+numpy
+pandas
+tiktoken
+langchain
+PyPDF2
+loguru
