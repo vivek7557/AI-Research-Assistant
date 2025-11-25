@@ -354,6 +354,7 @@ st.markdown("""
 # API Keys (Streamlit Cloud)
 try:
     anthropic_key = st.secrets["ANTHROPIC_API_KEY"]
+    GROQ_API_KEY = st.secrets["GROQ_API_KEY"]
     tavily_key = st.secrets["TAVILY_API_KEY"]
     keys_set = True
 except KeyError:
