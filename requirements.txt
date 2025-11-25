@@ -10,3 +10,15 @@ requests
 prometheus-client
 pydantic
 pyyaml
+streamlit
+rich
+```
+
+### 4. **Make sure .gitignore includes:**
+```
+.env
+venv/
+__pycache__/
+outputs/
+*.pyc
+*.log
