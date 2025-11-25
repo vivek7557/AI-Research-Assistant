@@ -351,15 +351,14 @@ st.markdown("""
 
 
 # API Keys
-anthropic_key = os.getenv("ANTHROPIC_API_KEY") or st.secrets.get("ANTHROPIC_API_KEY", "")
-tavily_key = os.getenv("TAVILY_API_KEY") or st.secrets.get("TAVILY_API_KEY", "")
+# API Keys (Streamlit Cloud)
+try:
+    anthropic_key = st.secrets["ANTHROPIC_API_KEY"]
+    tavily_key = st.secrets["TAVILY_API_KEY"]
+    keys_set = True
+except KeyError:
+    keys_set = False
 
-if anthropic_key:
-    os.environ["ANTHROPIC_API_KEY"] = anthropic_key
-if tavily_key:
-    os.environ["TAVILY_API_KEY"] = tavily_key
-
-keys_set = bool(anthropic_key and tavily_key)
 
 # Main Container
 st.markdown('<div class="main-content">', unsafe_allow_html=True)
