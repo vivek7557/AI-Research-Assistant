@@ -2,6 +2,9 @@ import streamlit as st
 import json
 from orchestrator import ResearchOrchestrator
 from evaluation.evaluator import ResearchEvaluator
+from ui.theme import load_theme
+load_theme()
+
 
 def research_page():
     st.markdown("<h1 class='page-title'>New Research</h1>", unsafe_allow_html=True)
