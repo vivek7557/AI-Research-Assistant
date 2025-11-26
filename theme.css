@@ -1,0 +1,247 @@
+/* ========================================================= */
+/*        GLOBAL PREMIUM UI THEME (LIGHT + DARK)             */
+/* ========================================================= */
+
+/* ---------- GLOBAL RESETS ---------- */
+body, html {
+    margin: 0;
+    padding: 0;
+    font-family: 'Inter', sans-serif !important;
+    transition: background 0.3s ease;
+}
+
+/* Fade In Animation for all pages */
+.stApp {
+    animation: fadeIn 0.45s ease-in-out;
+}
+@keyframes fadeIn {
+    0% { opacity: 0; transform: translateY(6px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+
+/* ---------- LIGHT THEME ---------- */
+body[data-theme="light"] {
+    background: #f5f7fa !important;
+    color: #1f2937 !important;
+}
+
+body[data-theme="light"] .block-container {
+    background: transparent !important;
+}
+
+body[data-theme="light"] .page-title {
+    color: #1f2937 !important;
+}
+
+/* ---------- DARK THEME ---------- */
+body[data-theme="dark"] {
+    background: #0d1117 !important;
+    color: #e5e7eb !important;
+}
+
+body[data-theme="dark"] .block-container {
+    background: transparent !important;
+}
+
+/* ========================================================= */
+/*             SIDEBAR — ANIMATED + PREMIUM                  */
+/* ========================================================= */
+
+[data-testid="stSidebar"] {
+    background: rgba(15, 23, 42, 0.6) !important;
+    backdrop-filter: blur(20px);
+    border-right: 1px solid rgba(255,255,255,0.06);
+    padding: 1.2rem 0.8rem !important;
+    animation: slideInLeft 0.45s ease;
+}
+
+@keyframes slideInLeft {
+    from { opacity: 0; transform: translateX(-14px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+/* Sidebar branding */
+.sidebar-header {
+    text-align: left;
+    padding-bottom: 1rem;
+    padding-left: 6px;
+}
+.sidebar-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    background: linear-gradient(90deg, #818cf8, #c084fc);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Sidebar footer */
+.sidebar-footer {
+    margin-top: 1.4rem;
+    font-size: 0.8rem;
+    text-align: center;
+    opacity: 0.7;
+}
+
+/* Theme info text */
+.theme-info {
+    font-size: 0.85rem;
+    color: #cbd5e1;
+    text-align: left;
+    padding-left: 4px;
+}
+
+/* ========================================================= */
+/*                GLASS TOP NAV BAR (OPTIONAL)               */
+/* ========================================================= */
+
+.top-nav {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    padding: 0.8rem 1rem;
+    border-radius: 12px;
+    margin-bottom: 1.2rem;
+}
+
+/* ========================================================= */
+/*              PAGE TITLES — Apple Style                    */
+/* ========================================================= */
+.page-title {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    background: linear-gradient(90deg, #818cf8, #c084fc);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* ========================================================= */
+/*           SEARCH BAR — Premium Minimal Style              */
+/* ========================================================= */
+
+.search-box input {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    border-radius: 12px;
+    border: 1px solid #1e293b;
+    background: #111827;
+    color: #e5e7eb;
+    font-size: 0.95rem;
+    transition: 0.25s;
+}
+
+.search-box input:focus {
+    border-color: #818cf8;
+    box-shadow: 0 0 0 3px rgba(129,140,248,0.25);
+}
+
+/* ========================================================= */
+/*      DATA CARDS (dashboard, library, research, etc.)      */
+/* ========================================================= */
+
+.card {
+    background: #161b22;
+    border: 1px solid #1f2937;
+    border-radius: 14px;
+    padding: 1rem 1.2rem;
+    margin-bottom: 1rem;
+    transition: 0.25s ease;
+}
+
+.card:hover {
+    transform: translateY(-3px);
+    border-color: #818cf8;
+    box-shadow: 0 6px 14px rgba(129, 140, 248, 0.2);
+}
+
+/* ========================================================= */
+/*            METRIC CARDS — Apple Widget Look               */
+/* ========================================================= */
+
+.metric-card {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    padding: 14px;
+    background: #161b22;
+    border: 1px solid #1f2937;
+    border-radius: 14px;
+    transition: 0.25s;
+}
+
+.metric-card:hover {
+    border-color: #818cf8;
+    transform: translateY(-4px);
+}
+
+.metric-icon {
+    font-size: 1.7rem;
+}
+
+.metric-title {
+    color: #94a3b8;
+    font-size: 0.85rem;
+}
+
+.metric-value {
+    color: #e2e8f0;
+    font-size: 1.25rem;
+    font-weight: 700;
+}
+
+/* ========================================================= */
+/*                EVALUATION SCORE BARS                      */
+/* ========================================================= */
+
+.eval-row {
+    display: flex;
+    align-items: center;
+    margin: 10px 0;
+    gap: 12px;
+}
+
+.eval-label {
+    width: 150px;
+    color: #cbd5e1;
+    font-size: 0.9rem;
+}
+
+.eval-bar {
+    flex-grow: 1;
+    background: #1f2937;
+    height: 7px;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.eval-fill {
+    background: #818cf8;
+    height: 100%;
+}
+
+.eval-score {
+    width: 45px;
+    text-align: right;
+    color: #cbd5e1;
+    font-weight: 600;
+}
+
+/* ========================================================= */
+/*               BUTTON CHANGES (Cleaner)                    */
+/* ========================================================= */
+
+.stButton > button {
+    border-radius: 10px;
+    background: linear-gradient(90deg, #6366f1, #8b5cf6);
+    color: white;
+    border: none;
+    padding: 0.6rem 1rem;
+    transition: 0.25s;
+}
+
+.stButton > button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0px 4px 10px rgba(99,102,241,0.25);
+}
+
