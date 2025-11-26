@@ -398,50 +398,8 @@ with tab1:
     # Stats and Search Side by Side
     st.markdown('<div class="content-wrapper">', unsafe_allow_html=True)
     
-    # Left - Stats
-    col_stats = st.container()
-    with col_stats:
-        st.markdown('<div class="stats-panel">', unsafe_allow_html=True)
-        
-        try:
-            memory_bank = MemoryBank()
-            stats = memory_bank.get_statistics()
-
-            st.markdown(f"""
-            <div class="stat-card">
-                <div class="stat-label">📚 Total Research</div>
-                <div class="stat-value">{stats.get('total_memories', 0)}</div>
-            </div>
-            """, unsafe_allow_html=True)
-
-            st.markdown(f"""
-            <div class="stat-card">
-                <div class="stat-label">✅ Completed</div>
-                <div class="stat-value">{stats.get('completed_sessions', 0)}</div>
-            </div>
-            """, unsafe_allow_html=True)
-
-            st.markdown(f"""
-            <div class="stat-card">
-                <div class="stat-label">🔗 Sources</div>
-                <div class="stat-value">{stats.get('total_sources', 0)}</div>
-            </div>
-            """, unsafe_allow_html=True)
-
-            st.markdown(f"""
-            <div class="stat-card">
-                <div class="stat-label">⭐ Quality</div>
-                <div class="stat-value">{stats.get('avg_importance', 0):.1f}</div>
-            </div>
-            """, unsafe_allow_html=True)
-
-        except Exception as e:
-            st.info("Statistics will appear after first research")
-
-        st.markdown('</div>', unsafe_allow_html=True)
-
-    # Right - Search
-    col1, col2 = st.columns([0.35, 0.65])
+    # Right - Search (Full Width)
+    col1, col2 = st.columns([1, 1])
     
     with col2:
         st.markdown('<div class="search-card">', unsafe_allow_html=True)
