@@ -28,6 +28,10 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="expanded"
 )
+# Load custom theme
+with open("theme.css") as f:
+    st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+
 
 # -----------------------------
 # SIDEBAR BRANDING
