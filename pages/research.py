@@ -4,7 +4,6 @@ from orchestrator import ResearchOrchestrator
 from evaluation.evaluator import ResearchEvaluator
 from ui.theme import load_theme
 load_theme()
-st.write("Research page loaded!")
 
 
 # ============================
