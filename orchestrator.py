@@ -54,7 +54,8 @@ class ResearchOrchestrator:
         self,
         query: str,
         output_format: str = "report",
-        session_id: Optional[str] = None
+        session_id: Optional[str] = None,
+        depth: int = 3
     ) -> Dict[str, Any]:
         """
         Main research workflow
@@ -63,6 +64,7 @@ class ResearchOrchestrator:
             query: Research question/topic
             output_format: Desired output format (report/article/summary/presentation)
             session_id: Optional session ID for resuming
+            depth: Depth of research (2 = fast, 3 = normal, 4 = deep)
         
         Returns:
             Complete research results with generated content
@@ -77,7 +79,29 @@ class ResearchOrchestrator:
             
             self.session_manager.create_session(session_id, query)
             logger.info(f"Starting research session: {session_id}")
-            
+
+            # -------------------------------------------------------------
+            # 🔥 DEPTH CONTROL ADDED HERE
+            # -------------------------------------------------------------
+            if depth <= 2:
+                num_iterations = 2
+                num_sources = 3
+            elif depth == 3:
+                num_iterations = 3
+                num_sources = 5
+            else:
+                num_iterations = 5
+                num_sources = 8
+
+            # Pass depth settings to ResearchAgent if supported
+            if hasattr(self.researcher, "set_depth"):
+                self.researcher.set_depth(num_iterations, num_sources)
+
+            logger.info(
+                f"[DEPTH CONFIG] depth={depth} → iterations={num_iterations}, sources={num_sources}"
+            )
+            # -------------------------------------------------------------
+
             # STAGE 1: Query Planning (Sequential Agent)
             logger.info("STAGE 1: Query Planning")
             plan = self._stage_planning(query, session_id)
@@ -134,7 +158,8 @@ class ResearchOrchestrator:
                 "validation": validation_results,
                 "final_content": final_content,
                 "metrics": observability.get_metrics_summary(),
-                "memory_stats": self.memory_bank.get_statistics()
+                "memory_stats": self.memory_bank.get_statistics(),
+                "depth_used": depth
             }
             
             logger.info(f"Research completed successfully: {session_id}")
@@ -321,8 +346,6 @@ class ResearchOrchestrator:
             logger.info("Session already completed")
             return self.session_manager.get_session(session_id)
         
-        # Resume from the current stage
-        # This is a simplified version - in production, you'd have more sophisticated resume logic
         logger.warning("Full resume logic not implemented - restarting research")
         return self.conduct_research(query, session_id=session_id)
 
