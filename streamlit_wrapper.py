@@ -25,192 +25,198 @@ st.set_page_config(
 )
 
 # Custom CSS for modern UI
+# JUST ADD THIS AFTER st.set_page_config() - NOTHING ELSE CHANGES
+
 st.markdown("""
 <style>
+/* ======================== REACT-STYLE UI ======================== */
 
-/* ====================================== */
-/*         PREMIUM SAAS ANIMATIONS        */
-/* ====================================== */
-
-/* Fade + slide for entire page */
-@keyframes fadeInUp {
-    0% { opacity: 0; transform: translateY(14px); }
-    100% { opacity: 1; transform: translateY(0); }
-}
-.fade-in {
-    animation: fadeInUp 0.6s ease both;
+/* Base theme */
+[data-testid="stAppViewContainer"] {
+    background: linear-gradient(135deg, #0f172a 0%, #1a1f35 100%) !important;
 }
 
-/* Apply fade to cards, header, inputs */
-.main-header,
-.input-container,
-.content-card {
-    animation: fadeInUp 0.6s ease both;
+[data-testid="stSidebar"] {
+    background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%) !important;
 }
 
-/* Section stagger effect */
-.section-block {
-    opacity: 0;
-    animation: fadeInUp 0.8s ease forwards;
-}
-.section-block:nth-child(1) { animation-delay: 0.1s; }
-.section-block:nth-child(2) { animation-delay: 0.2s; }
-.section-block:nth-child(3) { animation-delay: 0.3s; }
-.section-block:nth-child(4) { animation-delay: 0.4s; }
-
-/* Smooth hover scaling */
-.hover-scale {
-    transition: transform 0.25s ease;
-}
-.hover-scale:hover {
-    transform: scale(1.015);
-}
-
-/* Glowing border hover */
-@keyframes softGlow {
-    from { box-shadow: 0 0 0 rgba(111,111,245,0.0); }
-    to { box-shadow: 0 0 20px rgba(111,111,245,0.18); }
-}
-.input-container:hover,
-.content-card:hover,
-.eval-right:hover {
-    animation: softGlow 0.4s ease forwards;
-    border-color: #6f6ff5;
-}
-
-/* Animated gradient header text */
-@keyframes gradientFlow {
-    0% { background-position: 0% 50%; }
-    100% { background-position: 100% 50%; }
-}
-.main-header h1 {
-    font-size: 2.2rem;
-    font-weight: 800;
-    background-size: 200% 200%;
-    background: linear-gradient(135deg, #9f8fff 0%, #b88cff 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    animation: gradientFlow 4s ease-in-out infinite alternate;
-}
-
-/* Soft pulse for progress bars */
-@keyframes pulseBar {
-    0% { opacity: 0.85; }
-    50% { opacity: 1; }
-    100% { opacity: 0.85; }
-}
-.stProgress > div > div {
-    animation: pulseBar 1.8s ease-in-out infinite;
-}
-
-/* Evaluation cards slide in */
-@keyframes slideInRight {
-    0% { opacity: 0; transform: translateX(20px); }
-    100% { opacity: 1; transform: translateX(0); }
-}
-.eval-right {
-    animation: slideInRight 0.55s ease both;
-}
-
-/* Button motion */
+/* COMPACT BUTTONS */
 .stButton > button {
-    transition: all 0.25s ease;
+    background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%) !important;
+    border: none !important;
+    color: white !important;
+    font-weight: 600 !important;
+    padding: 6px 14px !important;
+    height: 32px !important;
+    border-radius: 6px !important;
+    font-size: 12px !important;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25) !important;
 }
+
 .stButton > button:hover {
-    transform: scale(1.045);
-    box-shadow: 0 8px 22px rgba(131,131,255,0.22);
+    transform: translateY(-1px) !important;
+    box-shadow: 0 6px 16px rgba(59, 130, 246, 0.35) !important;
 }
 
-/* Subtle tab animation */
-.stTabs [data-baseweb="tab"] {
-    transition: all 0.25s ease;
-}
-.stTabs [data-baseweb="tab"]:hover {
-    transform: translateY(-2px);
-    border-color: #6f6ff5 !important;
-}
-
-
-/* ====================================== */
-/*           BASE THEME STYLING          */
-/* ====================================== */
-
-.main-content {
-    max-width: 1150px;
-    margin: auto;
-    padding: 2rem;
+/* DOWNLOAD BUTTONS */
+.stDownloadButton > button {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+    height: 32px !important;
+    padding: 6px 14px !important;
+    font-size: 12px !important;
+    border-radius: 6px !important;
 }
 
+/* INPUTS */
+input, select {
+    background: rgba(15, 23, 42, 0.6) !important;
+    border: 1px solid rgba(51, 65, 85, 0.5) !important;
+    border-radius: 6px !important;
+    color: #f1f5f9 !important;
+    padding: 6px 10px !important;
+    font-size: 12px !important;
+}
+
+input:focus, select:focus {
+    border-color: #3b82f6 !important;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1) !important;
+}
+
+/* SMALL TITLE */
+h1 {
+    font-size: 18px !important;
+}
+
+h3 {
+    font-size: 14px !important;
+}
+
+/* HEADER STYLING */
 .main-header {
-    background: #1e1e1e;
-    border: 1px solid #2a2a2a;
-    border-radius: 18px;
-    padding: 2rem;
-    box-shadow: 0px 4px 14px rgba(0,0,0,0.35);
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%) !important;
+    border: 1px solid rgba(59, 130, 246, 0.3) !important;
+    border-radius: 12px !important;
+    padding: 16px !important;
+}
+
+.main-header h1 {
+    background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 50%, #06b6d4 100%) !important;
+    font-size: 18px !important;
 }
 
 .main-header p {
-    font-size: 1.05rem;
-    color: #a7a7a7;
+    font-size: 12px !important;
 }
 
-/* Input card */
+/* INPUT CONTAINER */
 .input-container {
-    background: #1b1b1b;
-    border: 1px solid #2c2c2c;
-    padding: 1.6rem;
-    border-radius: 14px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.4);
-}
-
-/* Tabs */
-.stTabs [data-baseweb="tab-list"] {
-    gap: 1rem;
-    justify-content: center;
-}
-.stTabs [data-baseweb="tab"] {
-    background: #1e1e1e !important;
-    padding: 0.8rem 1.6rem !important;
+    background: linear-gradient(135deg, rgba(30, 41, 59, 0.8) 0%, rgba(15, 23, 42, 0.8) 100%) !important;
+    border: 1px solid rgba(59, 130, 246, 0.3) !important;
     border-radius: 10px !important;
-    border: 1px solid #2c2c2c !important;
-    font-weight: 600;
+    padding: 14px !important;
 }
+
+/* TABS */
+.stTabs [data-baseweb="tab-list"] {
+    gap: 8px !important;
+}
+
+.stTabs [data-baseweb="tab"] {
+    background: rgba(59, 130, 246, 0.05) !important;
+    border: 1px solid rgba(59, 130, 246, 0.2) !important;
+    border-radius: 6px !important;
+    padding: 8px 14px !important;
+    font-size: 12px !important;
+}
+
 .stTabs [data-baseweb="tab"][aria-selected="true"] {
-    background: #2a2a2a !important;
-    border-color: #6f6ff5 !important;
+    background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%) !important;
+    border-color: #3b82f6 !important;
 }
 
-/* Sidebar */
-[data-testid="stSidebar"] {
-    background: #111111;
-    border-right: 1px solid #222;
-}
-
-/* Metrics */
+/* METRICS */
 [data-testid="stMetric"] {
-    background: #1b1b1b;
-    padding: 1rem;
-    border: 1px solid #2c2c2c;
-    border-radius: 14px;
-    box-shadow: 0px 4px 12px rgba(0,0,0,0.38);
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.08), rgba(139, 92, 246, 0.08)) !important;
+    border: 1px solid rgba(59, 130, 246, 0.2) !important;
+    border-radius: 8px !important;
+    padding: 10px !important;
 }
 
-/* Cards */
-.content-card {
-    background: #1b1b1b;
-    border: 1px solid #2c2c2c;
-    padding: 1.2rem;
-    border-radius: 14px;
-    box-shadow: 0px 4px 12px rgba(0,0,0,0.35);
+[data-testid="stMetric"] label {
+    font-size: 10px !important;
+    font-weight: 600 !important;
 }
 
-/* Downloads */
-.stDownloadButton > button {
-    background: #2a2a2a !important;
-    color: #e5e5e5 !important;
-    border: 1px solid #3a3a3a !important;
+[data-testid="stMetric"] div {
+    font-size: 16px !important;
+    font-weight: 700 !important;
+    color: #3b82f6 !important;
 }
 
+/* PROGRESS */
+.stProgress > div > div > div {
+    background: linear-gradient(90deg, #3b82f6 0%, #8b5cf6 50%, #06b6d4 100%) !important;
+}
+
+/* SIDEBAR CARDS */
+.sidebar-card {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.1)) !important;
+    border: 1px solid rgba(59, 130, 246, 0.3) !important;
+    border-radius: 8px !important;
+    padding: 12px !important;
+}
+
+.sidebar-title {
+    font-size: 10px !important;
+    font-weight: 600 !important;
+}
+
+.sidebar-value {
+    font-size: 16px !important;
+    font-weight: 700 !important;
+    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* ALERTS */
+[data-testid="stAlert"] {
+    border-radius: 8px !important;
+    font-size: 12px !important;
+}
+
+/* EXPANDER */
+[data-testid="stExpander"] {
+    border-radius: 8px !important;
+    border: 1px solid rgba(59, 130, 246, 0.2) !important;
+}
+
+/* TEXT SIZES */
+p { font-size: 12px !important; }
+
+/* EVAL CARDS */
+.eval-right {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(139, 92, 246, 0.2)) !important;
+    border: 1px solid rgba(59, 130, 246, 0.4) !important;
+    border-radius: 6px !important;
+    padding: 8px !important;
+}
+
+.eval-score {
+    font-size: 14px !important;
+    color: #3b82f6 !important;
+}
+
+/* SCROLLBAR */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: rgba(59, 130, 246, 0.05); }
+::-webkit-scrollbar-thumb { 
+    background: linear-gradient(180deg, #3b82f6, #8b5cf6);
+    border-radius: 4px;
+}
+
+</style>
+""", unsafe_allow_html=True)
 
 </style>
 
