@@ -2,6 +2,8 @@ import streamlit as st
 import PyPDF2
 import json
 from pathlib import Path
+from ui.theme import load_theme
+load_theme()
 
 def upload_page():
     st.markdown("<h1 class='page-title'>Upload Paper</h1>", unsafe_allow_html=True)
