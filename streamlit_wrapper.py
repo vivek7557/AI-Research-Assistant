@@ -519,8 +519,6 @@ with tab1:
         st.markdown('</div>', unsafe_allow_html=True)
 
     st.markdown('</div>', unsafe_allow_html=True)
-
-# Tab 2
 with tab2:
     st.markdown('<div class="content-card">', unsafe_allow_html=True)
     st.markdown("### 🔗 Find Related Research")
