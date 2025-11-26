@@ -1,6 +1,9 @@
 import streamlit as st
 from pathlib import Path
 import json
+from ui.theme import load_theme
+load_theme()
+
 
 FAV_FILE = Path("favorites/fav.json")
 
