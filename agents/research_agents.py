@@ -243,58 +243,75 @@ class ContentGeneratorAgent(BaseAgent):
     def __init__(self):
         super().__init__("ContentGenerator")
 
-        # Much more advanced prompts
+        # Ultra-Deep Research Prompts (MAX LENGTH + MAX QUALITY)
         self.prompts = {
             "report": """
-Write a FULL, DETAILED, PROFESSIONAL RESEARCH REPORT.
+You are an elite research writer. Produce a **full academic research report** with
+minimum **3000–4000 words** and deep analytical depth.
 
-The report MUST include:
+Your report MUST include ALL sections below, each very detailed:
 
-# Title Page  
-# Executive Summary  
-# Background / Introduction (500+ words)
-# Scientific Explanation (CO2 mechanism, human activities)  
-# Data & Evidence (use bullet points + simulated statistics)  
-# Key Findings (5–8 points)  
-# Impacts (Environmental, Economic, Social)  
-# Case Studies (3 examples)  
-# Mitigation Strategies (Renewables, Policy, Tech)  
-# Future Predictions (AI, 2050 scenarios)  
-# Challenges & Limitations  
-# Recommendations  
-# Conclusion  
-# Reference Section (web sources OR general citations)
+=========================================================
+1. TITLE PAGE  
+2. EXECUTIVE SUMMARY (200–300 words)  
+3. INTRODUCTION (600–800 words)  
+4. PROBLEM BACKGROUND  
+   - Historical evolution  
+   - Scientific explanation  
+   - Current global trends with year-wise progression  
+5. DATA & STATISTICAL ANALYSIS  
+   - Include comparative tables  
+   - Include trend graph (ASCII format)  
+   - Include metrics from multiple frameworks  
+6. DETAILED RESEARCH FINDINGS  
+   - 8–12 insights  
+   - Each insight must be 150+ words  
+7. IMPACT ANALYSIS  
+   - Environmental  
+   - Economic  
+   - Geopolitical  
+   - Social + cultural  
+8. CASE STUDIES (3–5 case studies, each 200–300 words)  
+9. TECHNOLOGY & AI INFLUENCE  
+10. POLICY ANALYSIS  
+11. FUTURE SCENARIOS (2030, 2040, 2050)  
+12. RISKS, CHALLENGES & LIMITATIONS  
+13. RECOMMENDATIONS (10 actionable points)  
+14. CONCLUSION (250–350 words)  
+15. REFERENCES (APA-style)  
+=========================================================
 
-CONTENT REQUIREMENTS  
-- Minimum length: **1200+ words**  
-- Use advanced reasoning  
-- Do NOT repeat same lines  
-- Use clean markdown  
+STRICT RULES:
+- Minimum length: **3000+ words**.  
+- NO sentence repetition.  
+- NO vague content.  
+- Each section must be high-depth.  
+- Use bullet points, tables, diagrams.  
+- Academic, polished, expert-level writing.
 """,
 
             "article": """
-Write a long-form expert article (1000+ words) with storytelling,
-case studies, strong evidence, and professional tone.
+Write a 2000+ word expert long-form editorial with deep reasoning,
+case studies, storytelling, and multiple analytical layers.
 """,
 
             "summary": """
-Write a clear, comprehensive summary (400–600 words).
+Write a 700–1000 word executive summary.
 """,
 
             "presentation": """
-Create a structured presentation outline with
-sections, bullet points, and discussion prompts.
+Write a 25–slide outline with talking points and speaker notes.
 """
         }
 
-    def generate(self, synthesis: str, validation: Dict, sources: List, fmt: str, session_id: str):
+    def generate(self, synthesis, validation, sources, fmt, session_id):
 
         prompt = self.prompts.get(fmt, self.prompts["report"])
 
-        response = self.run_llm(
+        result = self.run_llm(
             system=prompt,
             user=f"""
-Produce the final research document based on this synthesis and validation:
+Write a full-length research output using the following:
 
 SYNTHESIS:
 {synthesis}
@@ -302,14 +319,15 @@ SYNTHESIS:
 VALIDATION:
 {json.dumps(validation, indent=2)}
 
-SOURCES:
+TOP SOURCES:
 {json.dumps([s.get('url','') for s in sources], indent=2)}
+
+Your output MUST follow the exact structure and depth requirement.
 """
         )
 
         return {
             "format": fmt,
-            "content": response,
-            "word_count": len(response.split())
+            "content": result,
+            "word_count": len(result.split())
         }
-
