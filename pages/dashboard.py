@@ -12,11 +12,12 @@ def dashboard_page():
     # ---- METRIC CARDS ----
     col1, col2, col3, col4 = st.columns(4)
 
-    col1.markdown(metric_card("📚", "Total Papers", count_json_files("outputs")))
-    col2.markdown(metric_card("🧠", "AI Summaries", count_json_files("summaries")))
-    col3.markdown(metric_card("⭐", "Favorites", count_json_files("favorites")))
-    col4.markdown(metric_card("📅", "This Month", "12"))
+    col1.markdown(metric_card("📚", "Total Papers", count_json_files("outputs")), unsafe_allow_html=True)
+    col2.markdown(metric_card("🧠", "AI Summaries", count_json_files("summaries")), unsafe_allow_html=True)
+    col3.markdown(metric_card("⭐", "Favorites", count_json_files("favorites")), unsafe_allow_html=True)
+    col4.markdown(metric_card("📅", "This Month", "12"), unsafe_allow_html=True)
 
+    # ---- Recent Section Title ----
     st.markdown("<div class='section-title'>Recent Papers</div>", unsafe_allow_html=True)
 
     # ---- RECENT ACTIVITY LIST ----
@@ -33,7 +34,7 @@ def dashboard_page():
             with open(f, "r") as fd:
                 data = json.load(fd)
                 q = data.get("query", "Untitled Research")
-                st.markdown(recent_item(q, f.stem))
+                st.markdown(recent_item(q, f.stem), unsafe_allow_html=True)
         except:
             pass
 
@@ -64,4 +65,3 @@ def count_json_files(folder):
     if not f.exists():
         return 0
     return len(list(f.glob("*.json")))
-
