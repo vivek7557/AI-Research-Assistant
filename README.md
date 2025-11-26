@@ -326,7 +326,7 @@ research-assistant/
 
 ## 🎥 Demo Video
 
-[Link to demo video showcasing the research assistant in action]
+[https://ai-research-assistant-5rydvrthtaqo8tchvkdauq.streamlit.app/]
 
 ## 📈 Performance Metrics
 
