@@ -3,6 +3,9 @@ from streamlit import session_state as state
 import os
 import json
 from pathlib import Path
+from ui.theme import load_theme
+load_theme()
+
 
 # Page imports
 from pages.dashboard import dashboard_page
