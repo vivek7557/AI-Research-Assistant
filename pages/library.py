@@ -2,6 +2,8 @@ import streamlit as st
 from pathlib import Path
 import json
 import os
+from ui.theme import load_theme
+load_theme()
 
 def library_page():
     st.markdown("<h1 class='page-title'>Library</h1>", unsafe_allow_html=True)
