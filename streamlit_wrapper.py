@@ -215,14 +215,7 @@ p { font-size: 12px !important; }
     border-radius: 4px;
 }
 
-</style>
-""", unsafe_allow_html=True)
 
-</style>
-
-
-
-""", unsafe_allow_html=True)
 
 # Sidebar
 with st.sidebar:
