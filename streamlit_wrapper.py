@@ -44,10 +44,6 @@ ENHANCED_CSS = """
     --border: #334155;
     --text-primary: #f1f5f9;
     --text-secondary: #cbd5e1;
-    --cyan: #06b6d4;
-    --teal: #14b8a6;
-    --rose: #f43f5e;
-    --amber: #fbbf24;
 }
 
 /* ANIMATIONS */
@@ -217,23 +213,21 @@ ENHANCED_CSS = """
     background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
     border: none !important;
     color: white !important;
-    font-weight: 600 !important;
-    padding: 8px 16px !important;
-    border-radius: 8px !important;
-    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25) !important;
+    font-weight: 700 !important;
+    padding: 12px 24px !important;
+    border-radius: 12px !important;
+    box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3) !important;
     transition: all 0.3s ease !important;
-    font-size: 0.9rem !important;
-    height: auto !important;
 }
 
 .stDownloadButton > button:hover {
     transform: translateY(-2px) !important;
-    box-shadow: 0 8px 20px rgba(16, 185, 129, 0.4) !important;
+    box-shadow: 0 12px 32px rgba(16, 185, 129, 0.5) !important;
 }
 
 /* PROGRESS BAR */
 .stProgress > div > div > div {
-    background: linear-gradient(90deg, #6366f1 0%, #06b6d4 25%, #14b8a6 50%, #f43f5e 75%, #fbbf24 100%) !important;
+    background: linear-gradient(90deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%) !important;
     background-size: 200% 100%;
     animation: shimmer 2s infinite;
 }
@@ -259,43 +253,17 @@ ENHANCED_CSS = """
     transition: all 0.3s ease !important;
 }
 
-.stTabs [data-baseweb="tab"]:nth-child(1) {
-    background: linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(139, 92, 246, 0.08)) !important;
-    border-color: rgba(99, 102, 241, 0.3) !important;
-}
-
-.stTabs [data-baseweb="tab"]:nth-child(2) {
-    background: linear-gradient(135deg, rgba(6, 182, 212, 0.08), rgba(20, 184, 166, 0.08)) !important;
-    border-color: rgba(6, 182, 212, 0.3) !important;
-}
-
-.stTabs [data-baseweb="tab"]:nth-child(3) {
-    background: linear-gradient(135deg, rgba(244, 63, 94, 0.08), rgba(251, 191, 36, 0.08)) !important;
-    border-color: rgba(244, 63, 94, 0.3) !important;
-}
-
 .stTabs [data-baseweb="tab"]:hover {
+    border-color: #6366f1 !important;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(139, 92, 246, 0.15)) !important;
     transform: translateY(-2px);
 }
 
 .stTabs [data-baseweb="tab"][aria-selected="true"] {
-    color: white !important;
-    box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
-}
-
-.stTabs [data-baseweb="tab"][aria-selected="true"]:nth-child(1) {
     background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%) !important;
     border-color: #6366f1 !important;
-}
-
-.stTabs [data-baseweb="tab"][aria-selected="true"]:nth-child(2) {
-    background: linear-gradient(135deg, #06b6d4 0%, #14b8a6 100%) !important;
-    border-color: #06b6d4 !important;
-}
-
-.stTabs [data-baseweb="tab"][aria-selected="true"]:nth-child(3) {
-    background: linear-gradient(135deg, #f43f5e 0%, #fbbf24 100%) !important;
-    border-color: #f43f5e !important;
+    color: white !important;
+    box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
 }
 
 /* EXPANDER */
