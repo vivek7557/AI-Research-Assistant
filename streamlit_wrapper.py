@@ -89,6 +89,9 @@ st.markdown("""
 /* ==================== CENTERED CONTENT AREA ==================== */
 .content-wrapper {
     display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     gap: 30px;
     margin-bottom: 40px;
     animation: slideInUp 0.7s ease-out;
@@ -104,6 +107,8 @@ st.markdown("""
 .search-panel {
     flex: 1;
     min-width: 0;
+    width: 100%;
+    max-width: 600px;
 }
 
 /* ==================== STATS CARDS ==================== */
@@ -156,6 +161,7 @@ st.markdown("""
     box-shadow: 0 8px 32px rgba(59, 130, 246, 0.12);
     backdrop-filter: blur(10px);
     animation: slideInUp 0.6s ease-out;
+    width: 100%;
 }
 
 .search-card:hover {
