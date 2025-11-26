@@ -25,19 +25,46 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# REACT-STYLE UI CSS
+# ENHANCED REACT-STYLE UI CSS
 st.markdown("""
 <style>
-/* ======================== REACT-STYLE UI ======================== */
+/* ======================== ENHANCED REACT UI ======================== */
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideIn {
+    from { opacity: 0; transform: translateX(-20px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+@keyframes shimmer {
+    0% { background-position: -1000px 0; }
+    100% { background-position: 1000px 0; }
+}
+
+@keyframes glow {
+    0%, 100% { box-shadow: 0 0 10px rgba(59, 130, 246, 0.3); }
+    50% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.6); }
+}
 
 /* Base theme */
 [data-testid="stAppViewContainer"] {
-    background: linear-gradient(135deg, #0f172a 0%, #1a1f35 100%) !important;
+    background: linear-gradient(135deg, #0a0e27 0%, #1a1f35 50%, #0f1729 100%) !important;
+    animation: fadeIn 0.6s ease-out;
 }
 
 [data-testid="stSidebar"] {
-    background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%) !important;
-    border-right: 1px solid rgba(51, 65, 85, 0.3) !important;
+    background: linear-gradient(180deg, #0a0e27 0%, #1a2847 50%, #0f1729 100%) !important;
+    border-right: 2px solid rgba(59, 130, 246, 0.2) !important;
 }
 
 /* COMPACT BUTTONS */
