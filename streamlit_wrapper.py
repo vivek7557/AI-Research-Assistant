@@ -1,7 +1,6 @@
 """
 Streamlit Web Interface for AI Research Assistant
-Modern UI with centered layout and comprehensive analysis
-React-Style UI with Compact Design
+Premium UI - Clean, Modern, Professional
 """
 import streamlit as st
 import os
@@ -25,260 +24,256 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# ENHANCED REACT-STYLE UI CSS
+# PREMIUM UI CSS - CLEAN & MODERN
 st.markdown("""
 <style>
-/* ======================== ENHANCED REACT UI ======================== */
 
-/* Animations */
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
+/* ==================== GLOBAL STYLES ==================== */
 
-@keyframes slideIn {
-    from { opacity: 0; transform: translateX(-20px); }
-    to { opacity: 1; transform: translateX(0); }
-}
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes slideInLeft { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
+@keyframes glow { 0%, 100% { box-shadow: 0 0 15px rgba(59, 130, 246, 0.4); } 50% { box-shadow: 0 0 30px rgba(59, 130, 246, 0.7); } }
+@keyframes shimmer { 0% { background-position: -1000px 0; } 100% { background-position: 1000px 0; } }
 
-@keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.7; }
-}
-
-@keyframes shimmer {
-    0% { background-position: -1000px 0; }
-    100% { background-position: 1000px 0; }
-}
-
-@keyframes glow {
-    0%, 100% { box-shadow: 0 0 10px rgba(59, 130, 246, 0.3); }
-    50% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.6); }
-}
-
-/* Base theme */
+/* Base Theme */
 [data-testid="stAppViewContainer"] {
-    background: linear-gradient(135deg, #0a0e27 0%, #1a1f35 50%, #0f1729 100%) !important;
-    animation: fadeIn 0.6s ease-out;
+    background: linear-gradient(135deg, #0a0e27 0%, #16213e 50%, #0f3460 100%) !important;
 }
 
 [data-testid="stSidebar"] {
-    background: linear-gradient(180deg, #0a0e27 0%, #1a2847 50%, #0f1729 100%) !important;
-    border-right: 2px solid rgba(59, 130, 246, 0.2) !important;
+    background: linear-gradient(180deg, #0f3460 0%, #16213e 100%) !important;
+    border-right: 1px solid rgba(59, 130, 246, 0.2) !important;
 }
 
-/* COMPACT BUTTONS */
+/* ==================== BUTTONS ==================== */
+
 .stButton > button {
-    background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%) !important;
-    border: none !important;
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 50%, #1d4ed8 100%) !important;
+    border: 1px solid rgba(59, 130, 246, 0.5) !important;
     color: white !important;
-    font-weight: 600 !important;
-    padding: 6px 14px !important;
-    height: 32px !important;
-    border-radius: 6px !important;
-    font-size: 12px !important;
-    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25) !important;
-    transition: all 0.2s !important;
+    font-weight: 700 !important;
+    padding: 10px 24px !important;
+    height: 40px !important;
+    border-radius: 8px !important;
+    font-size: 13px !important;
+    box-shadow: 0 4px 20px rgba(59, 130, 246, 0.35) !important;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
 }
 
 .stButton > button:hover {
-    transform: translateY(-1px) !important;
-    box-shadow: 0 6px 16px rgba(59, 130, 246, 0.35) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 32px rgba(59, 130, 246, 0.6) !important;
+    border-color: rgba(59, 130, 246, 0.8) !important;
 }
 
 .stButton > button:active {
-    transform: translateY(0px) !important;
+    transform: translateY(0) !important;
 }
 
-/* DOWNLOAD BUTTONS */
+/* Download Buttons */
 .stDownloadButton > button {
     background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
-    border: none !important;
+    border: 1px solid rgba(16, 185, 129, 0.5) !important;
     color: white !important;
-    font-weight: 600 !important;
-    height: 32px !important;
-    padding: 6px 14px !important;
-    font-size: 12px !important;
-    border-radius: 6px !important;
-    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25) !important;
-    transition: all 0.2s !important;
+    font-weight: 700 !important;
+    height: 40px !important;
+    padding: 10px 24px !important;
+    font-size: 13px !important;
+    border-radius: 8px !important;
+    box-shadow: 0 4px 20px rgba(16, 185, 129, 0.35) !important;
 }
 
 .stDownloadButton > button:hover {
-    transform: translateY(-1px) !important;
-    box-shadow: 0 6px 16px rgba(16, 185, 129, 0.35) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 32px rgba(16, 185, 129, 0.6) !important;
 }
 
-/* INPUTS */
+/* ==================== INPUTS ==================== */
+
 input, select {
-    background: rgba(15, 23, 42, 0.6) !important;
-    border: 1px solid rgba(51, 65, 85, 0.5) !important;
-    border-radius: 6px !important;
+    background: rgba(15, 52, 96, 0.4) !important;
+    border: 1px solid rgba(59, 130, 246, 0.4) !important;
+    border-radius: 8px !important;
     color: #f1f5f9 !important;
-    padding: 6px 10px !important;
-    font-size: 12px !important;
-    transition: all 0.2s !important;
+    padding: 10px 14px !important;
+    font-size: 13px !important;
+    transition: all 0.3s !important;
 }
+
+input::placeholder { color: rgba(203, 213, 225, 0.5) !important; }
 
 input:focus, select:focus {
     border-color: #3b82f6 !important;
-    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1) !important;
-    background: rgba(15, 23, 42, 0.9) !important;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15) !important;
+    background: rgba(15, 52, 96, 0.6) !important;
 }
 
-/* TITLES */
-h1 {
-    font-size: 18px !important;
-    font-weight: 700 !important;
-}
+/* ==================== HEADER ==================== */
 
-h2 {
-    font-size: 14px !important;
-    font-weight: 700 !important;
-}
-
-h3 {
-    font-size: 13px !important;
-    font-weight: 600 !important;
-}
-
-p {
-    font-size: 12px !important;
-}
-
-/* HEADER STYLING */
 .main-header {
-    background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%) !important;
-    border: 1px solid rgba(59, 130, 246, 0.3) !important;
-    border-radius: 12px !important;
-    padding: 16px !important;
-    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1) !important;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(139, 92, 246, 0.15) 100%) !important;
+    border: 1px solid rgba(59, 130, 246, 0.35) !important;
+    border-radius: 16px !important;
+    padding: 24px !important;
+    box-shadow: 0 8px 32px rgba(59, 130, 246, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+    backdrop-filter: blur(10px) !important;
+    animation: slideInLeft 0.6s ease-out;
 }
 
 .main-header h1 {
-    background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 50%, #06b6d4 100%) !important;
+    background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%) !important;
     -webkit-background-clip: text !important;
     -webkit-text-fill-color: transparent !important;
     background-clip: text !important;
-    font-size: 18px !important;
+    font-size: 28px !important;
     margin: 0 !important;
+    font-weight: 800 !important;
 }
 
 .main-header p {
-    font-size: 12px !important;
-    color: #cbd5e1 !important;
-    margin-top: 4px !important;
+    font-size: 13px !important;
+    color: #a5b4fc !important;
+    margin-top: 8px !important;
 }
 
-/* INPUT CONTAINER */
+/* ==================== CARDS ==================== */
+
 .input-container {
-    background: linear-gradient(135deg, rgba(30, 41, 59, 0.8) 0%, rgba(15, 23, 42, 0.8) 100%) !important;
+    background: linear-gradient(135deg, rgba(22, 33, 62, 0.6) 0%, rgba(15, 52, 96, 0.6) 100%) !important;
     border: 1px solid rgba(59, 130, 246, 0.3) !important;
-    border-radius: 10px !important;
-    padding: 14px !important;
-    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1) !important;
+    border-radius: 12px !important;
+    padding: 20px !important;
+    box-shadow: 0 8px 24px rgba(59, 130, 246, 0.12) !important;
+    backdrop-filter: blur(10px) !important;
+    animation: fadeIn 0.7s ease-out;
 }
 
 .input-container:hover {
     border-color: rgba(59, 130, 246, 0.5) !important;
+    box-shadow: 0 12px 32px rgba(59, 130, 246, 0.2) !important;
 }
 
-/* TABS */
+.content-card {
+    background: linear-gradient(135deg, rgba(22, 33, 62, 0.6) 0%, rgba(15, 52, 96, 0.6) 100%) !important;
+    border: 1px solid rgba(59, 130, 246, 0.3) !important;
+    padding: 20px !important;
+    border-radius: 12px !important;
+    box-shadow: 0 8px 24px rgba(59, 130, 246, 0.12) !important;
+    backdrop-filter: blur(10px) !important;
+}
+
+.content-card:hover {
+    border-color: rgba(59, 130, 246, 0.5) !important;
+}
+
+/* ==================== TABS ==================== */
+
 .stTabs [data-baseweb="tab-list"] {
-    gap: 8px !important;
+    gap: 12px !important;
     border-bottom: 1px solid rgba(59, 130, 246, 0.2) !important;
+    padding-bottom: 14px !important;
 }
 
 .stTabs [data-baseweb="tab"] {
-    background: rgba(59, 130, 246, 0.05) !important;
-    border: 1px solid rgba(59, 130, 246, 0.2) !important;
-    border-radius: 6px !important;
-    padding: 8px 14px !important;
+    background: rgba(59, 130, 246, 0.08) !important;
+    border: 1px solid rgba(59, 130, 246, 0.3) !important;
+    border-radius: 8px !important;
+    padding: 10px 18px !important;
     font-size: 12px !important;
-    font-weight: 600 !important;
+    font-weight: 700 !important;
     color: #cbd5e1 !important;
-    transition: all 0.2s !important;
+    transition: all 0.3s ease !important;
 }
 
 .stTabs [data-baseweb="tab"]:hover {
-    border-color: rgba(59, 130, 246, 0.5) !important;
-    transform: translateY(-1px);
+    border-color: rgba(59, 130, 246, 0.6) !important;
+    background: rgba(59, 130, 246, 0.15) !important;
 }
 
 .stTabs [data-baseweb="tab"][aria-selected="true"] {
-    background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%) !important;
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%) !important;
     border-color: #3b82f6 !important;
     color: white !important;
-    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25) !important;
+    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4) !important;
 }
 
-/* METRICS */
+/* ==================== METRICS ==================== */
+
 [data-testid="stMetric"] {
-    background: linear-gradient(135deg, rgba(59, 130, 246, 0.08), rgba(139, 92, 246, 0.08)) !important;
-    border: 1px solid rgba(59, 130, 246, 0.2) !important;
-    border-radius: 8px !important;
-    padding: 10px !important;
-    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.1) !important;
-    transition: all 0.2s !important;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(139, 92, 246, 0.08) 100%) !important;
+    border: 1px solid rgba(59, 130, 246, 0.3) !important;
+    border-radius: 12px !important;
+    padding: 16px !important;
+    box-shadow: 0 4px 16px rgba(59, 130, 246, 0.12) !important;
+    transition: all 0.3s ease !important;
+    animation: fadeIn 0.6s ease-out;
 }
 
 [data-testid="stMetric"]:hover {
     border-color: rgba(59, 130, 246, 0.5) !important;
-    transform: translateY(-2px);
+    transform: translateY(-4px) !important;
+    box-shadow: 0 8px 24px rgba(59, 130, 246, 0.25) !important;
 }
 
 [data-testid="stMetric"] label {
-    font-size: 10px !important;
-    font-weight: 600 !important;
-    color: #cbd5e1 !important;
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    color: #a5b4fc !important;
 }
 
 [data-testid="stMetric"] div {
-    font-size: 16px !important;
-    font-weight: 700 !important;
+    font-size: 20px !important;
+    font-weight: 800 !important;
     background: linear-gradient(135deg, #3b82f6, #8b5cf6) !important;
     -webkit-background-clip: text !important;
     -webkit-text-fill-color: transparent !important;
     background-clip: text !important;
 }
 
-/* PROGRESS */
+/* ==================== PROGRESS ==================== */
+
 .stProgress > div > div > div {
-    background: linear-gradient(90deg, #3b82f6 0%, #8b5cf6 50%, #06b6d4 100%) !important;
+    background: linear-gradient(90deg, #3b82f6 0%, #8b5cf6 25%, #06b6d4 50%, #10b981 75%, #f59e0b 100%) !important;
     background-size: 200% 100%;
-    animation: shimmer 2s infinite;
+    animation: shimmer 2.5s infinite;
 }
 
-@keyframes shimmer {
-    from { background-position: -1000px 0; }
-    to { background-position: 1000px 0; }
+.stProgress > div > div {
+    background: rgba(59, 130, 246, 0.1) !important;
+    border-radius: 10px !important;
 }
 
-/* SIDEBAR CARDS */
+/* ==================== SIDEBAR ==================== */
+
 .sidebar-card {
-    background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.1)) !important;
-    border: 1px solid rgba(59, 130, 246, 0.3) !important;
-    border-radius: 8px !important;
-    padding: 12px !important;
-    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.1) !important;
-    transition: all 0.2s !important;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.12) 0%, rgba(139, 92, 246, 0.12) 100%) !important;
+    border: 1px solid rgba(59, 130, 246, 0.35) !important;
+    border-radius: 12px !important;
+    padding: 16px !important;
+    box-shadow: 0 4px 16px rgba(59, 130, 246, 0.12) !important;
+    transition: all 0.3s ease !important;
+    animation: slideInLeft 0.6s ease-out;
+    margin-bottom: 12px !important;
 }
 
 .sidebar-card:hover {
     border-color: rgba(59, 130, 246, 0.6) !important;
-    transform: translateX(4px);
+    transform: translateX(4px) translateY(-2px) !important;
+    box-shadow: 0 8px 24px rgba(59, 130, 246, 0.2) !important;
 }
 
 .sidebar-title {
-    font-size: 10px !important;
-    font-weight: 600 !important;
-    color: #cbd5e1 !important;
-    margin-bottom: 4px !important;
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    color: #a5b4fc !important;
+    margin-bottom: 8px !important;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .sidebar-value {
-    font-size: 16px !important;
-    font-weight: 700 !important;
+    font-size: 20px !important;
+    font-weight: 800 !important;
     background: linear-gradient(135deg, #3b82f6, #8b5cf6);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -286,114 +281,139 @@ p {
 }
 
 .sidebar-activity-title {
-    font-size: 11px !important;
-    font-weight: 700 !important;
+    font-size: 12px !important;
+    font-weight: 800 !important;
     color: #f1f5f9 !important;
-    margin-top: 12px !important;
-    margin-bottom: 8px !important;
+    margin-top: 16px !important;
+    margin-bottom: 12px !important;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .sidebar-activity-item {
-    font-size: 11px !important;
-    color: #cbd5e1 !important;
-    padding: 4px 6px !important;
-    margin-bottom: 4px !important;
-    border-left: 2px solid rgba(59, 130, 246, 0.4) !important;
-    padding-left: 8px !important;
-    transition: all 0.2s !important;
-    border-radius: 3px !important;
+    font-size: 12px !important;
+    color: #a5b4fc !important;
+    padding: 8px 10px !important;
+    margin-bottom: 8px !important;
+    border-left: 3px solid rgba(59, 130, 246, 0.5) !important;
+    padding-left: 12px !important;
+    transition: all 0.2s ease !important;
+    border-radius: 4px !important;
+    background: rgba(59, 130, 246, 0.05) !important;
 }
 
 .sidebar-activity-item:hover {
     color: #3b82f6 !important;
     border-left-color: #3b82f6 !important;
-    background: rgba(59, 130, 246, 0.05) !important;
+    background: rgba(59, 130, 246, 0.15) !important;
 }
 
-/* ALERTS */
+/* ==================== ALERTS ==================== */
+
 [data-testid="stAlert"] {
-    border-radius: 8px !important;
-    font-size: 12px !important;
-    border-left: 3px solid !important;
-    padding: 10px 12px !important;
+    border-radius: 10px !important;
+    font-size: 13px !important;
+    border-left: 4px solid !important;
+    padding: 14px 16px !important;
+    backdrop-filter: blur(10px) !important;
+    animation: fadeIn 0.4s ease-out;
 }
 
-/* EXPANDER */
+/* ==================== EXPANDER ==================== */
+
 [data-testid="stExpander"] {
-    border-radius: 8px !important;
-    border: 1px solid rgba(59, 130, 246, 0.2) !important;
+    border-radius: 10px !important;
+    border: 1px solid rgba(59, 130, 246, 0.3) !important;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.05), rgba(139, 92, 246, 0.05)) !important;
 }
 
 [data-testid="stExpander"] > div > button {
-    font-size: 12px !important;
+    font-size: 13px !important;
+    font-weight: 700 !important;
+    color: #a5b4fc !important;
 }
 
-/* EVAL CARDS */
+[data-testid="stExpander"] > div > button:hover {
+    background: rgba(59, 130, 246, 0.1) !important;
+}
+
+/* ==================== EVAL CARDS ==================== */
+
 .eval-right {
-    background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(139, 92, 246, 0.2)) !important;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(139, 92, 246, 0.15) 100%) !important;
     border: 1px solid rgba(59, 130, 246, 0.4) !important;
-    border-radius: 6px !important;
-    padding: 8px !important;
+    border-radius: 10px !important;
+    padding: 14px !important;
     text-align: center !important;
-    transition: all 0.2s !important;
+    transition: all 0.3s ease !important;
+    backdrop-filter: blur(10px) !important;
+    animation: fadeIn 0.5s ease-out;
 }
 
 .eval-right:hover {
     border-color: rgba(59, 130, 246, 0.7) !important;
-    transform: translateY(-2px);
+    transform: translateY(-3px) !important;
+    box-shadow: 0 8px 24px rgba(59, 130, 246, 0.25) !important;
 }
 
 .eval-title {
-    font-size: 9px !important;
-    font-weight: 600 !important;
-    color: #cbd5e1 !important;
-    margin-bottom: 4px !important;
+    font-size: 10px !important;
+    font-weight: 700 !important;
+    color: #a5b4fc !important;
+    margin-bottom: 6px !important;
+    text-transform: uppercase;
 }
 
 .eval-score {
-    font-size: 14px !important;
-    font-weight: 700 !important;
-    color: #3b82f6 !important;
+    font-size: 18px !important;
+    font-weight: 800 !important;
+    background: linear-gradient(135deg, #3b82f6, #8b5cf6) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    background-clip: text !important;
 }
 
-/* SCROLLBAR */
+/* ==================== SCROLLBAR ==================== */
+
 ::-webkit-scrollbar {
-    width: 8px;
+    width: 10px;
+    height: 10px;
 }
 
 ::-webkit-scrollbar-track {
     background: rgba(59, 130, 246, 0.05);
-    border-radius: 4px;
+    border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb {
     background: linear-gradient(180deg, #3b82f6, #8b5cf6);
-    border-radius: 4px;
-    transition: all 0.2s;
+    border-radius: 10px;
+    transition: all 0.3s;
 }
 
 ::-webkit-scrollbar-thumb:hover {
     background: linear-gradient(180deg, #8b5cf6, #06b6d4);
 }
 
-/* MAIN CONTENT */
+/* ==================== TEXT & LAYOUT ==================== */
+
+h1 { font-size: 26px !important; font-weight: 800 !important; }
+h2 { font-size: 18px !important; font-weight: 700 !important; }
+h3 { font-size: 14px !important; font-weight: 700 !important; }
+p { font-size: 13px !important; }
+
 .main-content {
-    max-width: 1150px;
+    max-width: 1200px;
     margin: auto;
-    padding: 16px;
+    padding: 20px;
+    animation: fadeIn 0.6s ease-out;
 }
 
-/* CONTENT CARD */
-.content-card {
-    background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.8)) !important;
-    border: 1px solid rgba(59, 130, 246, 0.2) !important;
-    padding: 12px !important;
-    border-radius: 8px !important;
-    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.1) !important;
-}
-
-.content-card:hover {
-    border-color: rgba(59, 130, 246, 0.5) !important;
+hr {
+    border: none;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.3), transparent);
+    margin: 20px 0 !important;
 }
 
 </style>
@@ -450,7 +470,7 @@ with st.sidebar:
                     query = data.get("query", "Untitled")
 
                     st.markdown(
-                        f"<div class='sidebar-activity-item'>• {query[:28]}...</div>",
+                        f"<div class='sidebar-activity-item'>• {query[:32]}...</div>",
                         unsafe_allow_html=True
                     )
 
@@ -607,7 +627,7 @@ with tab1:
                                 st.markdown(f"**{m_name}**")
                                 st.progress(score / 100)
                                 st.markdown(
-                                    f"<p style='font-size:0.85rem; color:#cbd5e1; margin-top:4px;'>"
+                                    f"<p style='font-size:0.85rem; color:#a5b4fc; margin-top:4px;'>"
                                     f"{explanations.get(metric, '')}</p>",
                                     unsafe_allow_html=True,
                                 )
@@ -629,7 +649,7 @@ with tab1:
                         st.markdown(
                             f"""
 <h3>{emoji} Overall Quality Score: {overall:.1f}/100</h3>
-<p style='color:#cbd5e1; font-size:0.9rem;'>
+<p style='color:#a5b4fc; font-size:0.9rem;'>
 {explanations['overall']}
 </p>
 """,
@@ -681,7 +701,7 @@ st.markdown("</div>", unsafe_allow_html=True)
 # Footer
 st.markdown("---")
 st.markdown("""
-<div style='text-align:center; opacity:0.7; padding:12px; font-size:11px; color:#cbd5e1;'>
+<div style='text-align:center; opacity:0.7; padding:14px; font-size:12px; color:#a5b4fc;'>
     AI Research Assistant v2.0 • Multi-Agent System<br>
     Powered by Claude & Tavily
 </div>
