@@ -422,3 +422,4 @@ st.markdown(
     '<div class="footer">AI Research Assistant v2.0 • Multi-Agent System<br>Powered by Claude & Tavily</div>',
     unsafe_allow_html=True
 )
+
