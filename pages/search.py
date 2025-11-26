@@ -1,6 +1,9 @@
 import streamlit as st
 from pathlib import Path
 import json
+from ui.theme import load_theme
+load_theme()
+
 
 def search_page():
     st.markdown("<h1 class='page-title'>Search</h1>", unsafe_allow_html=True)
