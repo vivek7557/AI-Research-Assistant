@@ -243,20 +243,68 @@ class ContentGeneratorAgent(BaseAgent):
     def __init__(self):
         super().__init__("ContentGenerator")
 
+        # Much more advanced prompts
         self.prompts = {
-            "report": "Write a structured research report.",
-            "article": "Write an in-depth article.",
-            "summary": "Write a concise summary.",
-            "presentation": "Write bullet-based presentation notes."
+            "report": """
+Write a FULL, DETAILED, PROFESSIONAL RESEARCH REPORT.
+
+The report MUST include:
+
+# Title Page  
+# Executive Summary  
+# Background / Introduction (500+ words)
+# Scientific Explanation (CO2 mechanism, human activities)  
+# Data & Evidence (use bullet points + simulated statistics)  
+# Key Findings (5–8 points)  
+# Impacts (Environmental, Economic, Social)  
+# Case Studies (3 examples)  
+# Mitigation Strategies (Renewables, Policy, Tech)  
+# Future Predictions (AI, 2050 scenarios)  
+# Challenges & Limitations  
+# Recommendations  
+# Conclusion  
+# Reference Section (web sources OR general citations)
+
+CONTENT REQUIREMENTS  
+- Minimum length: **1200+ words**  
+- Use advanced reasoning  
+- Do NOT repeat same lines  
+- Use clean markdown  
+""",
+
+            "article": """
+Write a long-form expert article (1000+ words) with storytelling,
+case studies, strong evidence, and professional tone.
+""",
+
+            "summary": """
+Write a clear, comprehensive summary (400–600 words).
+""",
+
+            "presentation": """
+Create a structured presentation outline with
+sections, bullet points, and discussion prompts.
+"""
         }
 
     def generate(self, synthesis: str, validation: Dict, sources: List, fmt: str, session_id: str):
 
-        prompt = self.prompts.get(fmt, "Write a research report.")
+        prompt = self.prompts.get(fmt, self.prompts["report"])
 
         response = self.run_llm(
             system=prompt,
-            user=f"Create final output:\n{synthesis}"
+            user=f"""
+Produce the final research document based on this synthesis and validation:
+
+SYNTHESIS:
+{synthesis}
+
+VALIDATION:
+{json.dumps(validation, indent=2)}
+
+SOURCES:
+{json.dumps([s.get('url','') for s in sources], indent=2)}
+"""
         )
 
         return {
@@ -265,10 +313,3 @@ class ContentGeneratorAgent(BaseAgent):
             "word_count": len(response.split())
         }
 
-
-# Utility for safe dict printing
-def savestr(x):
-    try:
-        return json.dumps(x, indent=2)[:4000]
-    except:
-        return str(x)[:4000]
