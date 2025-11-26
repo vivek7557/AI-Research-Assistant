@@ -1,6 +1,7 @@
 """
 Streamlit Web Interface for AI Research Assistant
 Modern UI with centered layout and comprehensive analysis
+FIXED: Depth parameter fully integrated
 """
 import streamlit as st
 import os
@@ -170,10 +171,7 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# =============== REST OF YOUR CODE UNCHANGED ===============
-# (Only the sidebar HTML classes adjusted slightly for consistency)
-
-# Sidebar
+# =============== SIDEBAR ===============
 with st.sidebar:
     st.markdown("### 📊 Research Analytics")
     try:
@@ -211,7 +209,7 @@ with st.sidebar:
     else:
         st.markdown("<div class='sidebar-activity-item'>No activity yet</div>", unsafe_allow_html=True)
 
-# API Keys
+# =============== API KEYS ===============
 try:
     anthropic_key = st.secrets["ANTHROPIC_API_KEY"]
     GROQ_API_KEY = st.secrets["GROQ_API_KEY"]
@@ -220,7 +218,7 @@ try:
 except KeyError:
     keys_set = False
 
-# Main
+# =============== MAIN HEADER ===============
 st.markdown("""
 <div class="main-header">
     <h1>🔍 AI Research Assistant</h1>
@@ -228,8 +226,10 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
+# =============== TABS ===============
 tab1, tab2, tab3 = st.tabs(["🔬 New Research", "🔍 Find Related", "📂 Past Sessions"])
 
+# =============== TAB 1: NEW RESEARCH ===============
 with tab1:
     if not keys_set:
         st.error("⚠️ API Keys missing in .env")
@@ -238,12 +238,24 @@ with tab1:
     _, center, _ = st.columns([1, 8, 1])
     with center:
         st.markdown('<div class="input-container">', unsafe_allow_html=True)
-        query = st.text_input("🔎 Research Query", placeholder="e.g., Impact of AI on healthcare", label_visibility="collapsed")
         
+        # Search Query
+        query = st.text_input(
+            "🔎 Research Query",
+            placeholder="e.g., Impact of AI on healthcare",
+            label_visibility="collapsed"
+        )
+        
+        # Output Format & Evaluation
         col1, col2 = st.columns([3, 2])
-        output_format = col1.selectbox("📄 Output Format", ["report", "article", "summary", "presentation"])
+        output_format = col1.selectbox(
+            "📄 Output Format",
+            ["report", "article", "summary", "presentation"],
+            label_visibility="collapsed"
+        )
         run_evaluation = col2.checkbox("🎯 Run Evaluation", value=True)
         
+        # Advanced Options
         with st.expander("⚙️ Advanced Options"):
             c1, c2 = st.columns(2)
             session_id = c1.text_input("Resume Session ID", placeholder="research_xxxx")
@@ -251,60 +263,86 @@ with tab1:
         
         st.markdown('</div>', unsafe_allow_html=True)
 
+        # =============== START RESEARCH BUTTON ===============
         if st.button("🚀 Start Research", use_container_width=True):
             if not query.strip():
                 st.warning("Please enter a research query.")
             else:
-                # >>> YOUR EXISTING LOGIC BELOW (unchanged) <<<
                 progress_bar = st.progress(0)
                 status_text = st.empty()
+                
                 try:
                     status_text.info("Initializing...")
                     progress_bar.progress(20)
                     orchestrator = ResearchOrchestrator()
+                    
                     status_text.info("Planning research...")
                     progress_bar.progress(40)
-                    status_text.info("Running agents...")
+                    
+                    status_text.info("Running agents with depth level " + str(depth) + "...")
                     progress_bar.progress(60)
+                    
+                    # ✅ DEPTH PARAMETER ADDED HERE
                     results = orchestrator.conduct_research(
                         query=query,
                         output_format=output_format,
                         session_id=session_id or None,
+                        depth=depth
                     )
+                    
                     status_text.info("Finalizing...")
                     progress_bar.progress(100)
                     progress_bar.empty()
                     status_text.empty()
+                    
                     st.success("✅ Research completed successfully!")
 
+                    # =============== METRICS ===============
                     st.markdown("---")
                     st.markdown("### 📊 Research Metrics")
                     final_content = results.get("final_content", {})
                     summary = results.get("research_summary", {})
                     validation = results.get("validation", {})
+                    
                     c1, c2, c3, c4 = st.columns(4)
                     c1.metric("📚 Sources", summary.get("total_sources", 0))
                     c2.metric("🔄 Iterations", summary.get("iterations", 0))
                     c3.metric("🎯 Confidence", f"{validation.get('confidence_score', 0)}%")
                     c4.metric("📝 Format", output_format.title())
 
+                    # =============== RESEARCH CONTENT ===============
                     st.markdown("---")
                     st.markdown("### 📄 Generated Research")
                     content = final_content.get("content", "")
                     st.markdown(content)
 
+                    # =============== DOWNLOAD OPTIONS ===============
                     st.markdown("---")
                     d1, d2, d3 = st.columns(3)
-                    d1.download_button("📥 Markdown", data=content, file_name="research.md")
-                    d2.download_button("📥 JSON", data=json.dumps(results, indent=2), file_name="research.json")
-                    d3.download_button("📥 TXT", data=content, file_name="research.txt")
+                    d1.download_button(
+                        "📥 Markdown",
+                        data=content,
+                        file_name="research.md"
+                    )
+                    d2.download_button(
+                        "📥 JSON",
+                        data=json.dumps(results, indent=2),
+                        file_name="research.json"
+                    )
+                    d3.download_button(
+                        "📥 TXT",
+                        data=content,
+                        file_name="research.txt"
+                    )
 
+                    # =============== EVALUATION ===============
                     if run_evaluation:
                         st.markdown("---")
                         st.markdown("### 📊 Quality Evaluation")
                         try:
                             evaluator = ResearchEvaluator()
                             metrics = evaluator.evaluate_research(query, results)
+                            
                             explanations = {
                                 "completeness": "Measures how fully the research covers all important aspects...",
                                 "accuracy": "Checks how factually correct the statements are...",
@@ -314,23 +352,73 @@ with tab1:
                                 "citations": "Evaluates whether sources are properly referenced...",
                                 "overall": "Weighted average of all metrics — your total quality score.",
                             }
+                            
                             for metric, score in metrics.to_dict().items():
                                 m_name = metric.replace("_", " ").title()
                                 left, right = st.columns([4, 1])
+                                
                                 with left:
                                     st.markdown(f"**{m_name}**")
                                     st.progress(score / 100)
-                                    st.markdown(f"<p style='font-size:0.85rem; color:#94a3b8;'>{explanations.get(metric, '')}</p>", unsafe_allow_html=True)
+                                    st.markdown(
+                                        f"<p style='font-size:0.85rem; color:#94a3b8;'>{explanations.get(metric, '')}</p>",
+                                        unsafe_allow_html=True
+                                    )
+                                
                                 with right:
-                                    st.markdown(f"<div style='text-align:center; padding:0.5rem;'><div style='font-size:0.8rem; color:#94a3b8;'>{m_name}</div><div style='font-size:1.3rem; font-weight:700; color:#e2e8f0;'>{score}</div></div>", unsafe_allow_html=True)
+                                    st.markdown(
+                                        f"<div style='text-align:center; padding:0.5rem;'><div style='font-size:0.8rem; color:#94a3b8;'>{m_name}</div><div style='font-size:1.3rem; font-weight:700; color:#e2e8f0;'>{score}</div></div>",
+                                        unsafe_allow_html=True
+                                    )
+                            
                             st.markdown("---")
                             overall = metrics.overall_score
                             emoji = "🟢" if overall >= 80 else "🟡" if overall >= 60 else "🔴"
-                            st.markdown(f"<h3>{emoji} Overall Quality Score: {overall:.1f}/100</h3><p style='color:#94a3b8; font-size:0.9rem;'>{explanations['overall']}</p>", unsafe_allow_html=True)
+                            st.markdown(
+                                f"<h3>{emoji} Overall Quality Score: {overall:.1f}/100</h3><p style='color:#94a3b8; font-size:0.9rem;'>{explanations['overall']}</p>",
+                                unsafe_allow_html=True
+                            )
+                        
                         except Exception as e:
                             st.warning(f"Evaluation unavailable: {str(e)}")
+                
                 except Exception as e:
                     st.error(f"❌ Error during research: {str(e)}")
 
-# Footer
-st.markdown('<div class="footer">AI Research Assistant v2.0 • Multi-Agent System<br>Powered by Claude & Tavily</div>', unsafe_allow_html=True)
+# =============== TAB 2: FIND RELATED ===============
+with tab2:
+    st.markdown("### 🔗 Find Related Research")
+    search_query = st.text_input("Search related topics", placeholder="Enter a topic...")
+    if search_query:
+        st.info("Related research feature coming soon...")
+
+# =============== TAB 3: PAST SESSIONS ===============
+with tab3:
+    st.markdown("### 📂 Past Research Sessions")
+    output_dir = Path("outputs")
+    
+    if output_dir.exists():
+        files = sorted(output_dir.glob("*.json"), key=os.path.getmtime, reverse=True)
+        if files:
+            for f in files:
+                try:
+                    with open(f) as fd:
+                        data = json.load(fd)
+                    col1, col2 = st.columns([3, 1])
+                    with col1:
+                        st.markdown(f"**{data.get('query', 'Untitled')}**")
+                    with col2:
+                        if st.button("View", key=f"view_{f.stem}"):
+                            st.json(data)
+                except:
+                    pass
+        else:
+            st.info("No past sessions found")
+    else:
+        st.info("No sessions directory yet")
+
+# =============== FOOTER ===============
+st.markdown(
+    '<div class="footer">AI Research Assistant v2.0 • Multi-Agent System<br>Powered by Claude & Tavily</div>',
+    unsafe_allow_html=True
+)
