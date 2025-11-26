@@ -419,69 +419,6 @@ hr {
 </style>
 """, unsafe_allow_html=True)
 
-# Sidebar
-with st.sidebar:
-
-    st.markdown("### 📊 Research Analytics")
-
-    # Memory stats
-    try:
-        memory_bank = MemoryBank()
-        stats = memory_bank.get_statistics()
-
-        st.markdown(f"""
-        <div class="sidebar-card">
-            <div class="sidebar-title">📚 Total Research</div>
-            <div class="sidebar-value">{stats.get('total_memories', 0)}</div>
-        </div>
-
-        <div class="sidebar-card">
-            <div class="sidebar-title">✅ Completed</div>
-            <div class="sidebar-value">{stats.get('completed_sessions', 0)}</div>
-        </div>
-
-        <div class="sidebar-card">
-            <div class="sidebar-title">🔗 Total Sources</div>
-            <div class="sidebar-value">{stats.get('total_sources', 0)}</div>
-        </div>
-
-        <div class="sidebar-card">
-            <div class="sidebar-title">⭐ Avg Quality</div>
-            <div class="sidebar-value">{stats.get('avg_importance', 0):.1f}/10</div>
-        </div>
-        """, unsafe_allow_html=True)
-
-    except Exception as e:
-        st.info("Statistics will appear after first research")
-
-    st.markdown("<div class='sidebar-activity-title'>📝 Recent Activity</div>", unsafe_allow_html=True)
-
-    # Recent Activity
-    output_dir = Path("outputs")
-    if output_dir.exists():
-        json_files = list(output_dir.glob("*.json"))
-
-        if json_files:
-            recent_files = sorted(json_files, key=os.path.getmtime, reverse=True)[:6]
-            for file in recent_files:
-                try:
-                    with open(file, 'r') as f:
-                        data = json.load(f)
-                    query = data.get("query", "Untitled")
-
-                    st.markdown(
-                        f"<div class='sidebar-activity-item'>• {query[:32]}...</div>",
-                        unsafe_allow_html=True
-                    )
-
-                except:
-                    pass
-        else:
-            st.markdown("<div class='sidebar-activity-item'>No recent activity</div>", unsafe_allow_html=True)
-    else:
-        st.markdown("<div class='sidebar-activity-item'>No activity yet</div>", unsafe_allow_html=True)
-
-
 # API Keys
 try:
     anthropic_key = st.secrets["ANTHROPIC_API_KEY"]
@@ -695,6 +632,67 @@ with tab3:
             st.info("No past sessions found")
     else:
         st.info("No sessions directory yet")
+
+# Sidebar - Stats and Recent
+with st.sidebar:
+    st.markdown("### 📊 Research Analytics")
+
+    # Memory stats
+    try:
+        memory_bank = MemoryBank()
+        stats = memory_bank.get_statistics()
+
+        st.markdown(f"""
+        <div class="sidebar-card">
+            <div class="sidebar-title">📚 Total Research</div>
+            <div class="sidebar-value">{stats.get('total_memories', 0)}</div>
+        </div>
+
+        <div class="sidebar-card">
+            <div class="sidebar-title">✅ Completed</div>
+            <div class="sidebar-value">{stats.get('completed_sessions', 0)}</div>
+        </div>
+
+        <div class="sidebar-card">
+            <div class="sidebar-title">🔗 Total Sources</div>
+            <div class="sidebar-value">{stats.get('total_sources', 0)}</div>
+        </div>
+
+        <div class="sidebar-card">
+            <div class="sidebar-title">⭐ Avg Quality</div>
+            <div class="sidebar-value">{stats.get('avg_importance', 0):.1f}/10</div>
+        </div>
+        """, unsafe_allow_html=True)
+
+    except Exception as e:
+        st.info("Statistics will appear after first research")
+
+    st.markdown("<div class='sidebar-activity-title'>📝 Recent Activity</div>", unsafe_allow_html=True)
+
+    # Recent Activity
+    output_dir = Path("outputs")
+    if output_dir.exists():
+        json_files = list(output_dir.glob("*.json"))
+
+        if json_files:
+            recent_files = sorted(json_files, key=os.path.getmtime, reverse=True)[:6]
+            for file in recent_files:
+                try:
+                    with open(file, 'r') as f:
+                        data = json.load(f)
+                    query = data.get("query", "Untitled")
+
+                    st.markdown(
+                        f"<div class='sidebar-activity-item'>• {query[:32]}...</div>",
+                        unsafe_allow_html=True
+                    )
+
+                except:
+                    pass
+        else:
+            st.markdown("<div class='sidebar-activity-item'>No recent activity</div>", unsafe_allow_html=True)
+    else:
+        st.markdown("<div class='sidebar-activity-item'>No activity yet</div>", unsafe_allow_html=True)
 
 st.markdown("</div>", unsafe_allow_html=True)
 
