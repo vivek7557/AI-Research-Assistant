@@ -16,6 +16,9 @@ from rich.panel import Panel
 from rich.markdown import Markdown
 from loguru import logger
 from typing import Dict, List, Optional
+from pages.dashboard import dashboard_page
+from pages.research import research_page
+
 
 
 from orchestrator import ResearchOrchestrator, quick_research
