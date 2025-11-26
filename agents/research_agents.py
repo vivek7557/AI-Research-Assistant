@@ -1,333 +1,218 @@
-"""
-Research Agents — Query Planner, Research Agent (Loop), Synthesizer,
-Validator and Content Generator.
-
-UPDATED: Supports dynamic depth configuration from ResearchOrchestrator
-"""
-
-import json
-import traceback
-from typing import List, Dict, Any, Optional
-
+import os
+from groq import Groq
+from typing import List, Dict, Any
 from loguru import logger
-from tools.web_search_tool import WebSearchTool
-from base.agent_base import BaseAgent
-from memory.memory_bank import MemoryBank
+
+# -------------------------------------------------
+# LLM CLIENT (Groq – LLaMA 3–70B)
+# -------------------------------------------------
+client = Groq(api_key=os.getenv("GROQ_API_KEY"))
+
+LLM_MODEL = "llama3-70b-8192"     # BEST FREE LONG MODEL
+MAX_TOKENS = 7000                 # Allow long deep research
+TEMP = 0.4                        # Stable but creative
 
 
-# ============================================================
-# 1. QUERY PLANNER AGENT
-# ============================================================
-class QueryPlannerAgent(BaseAgent):
-    def __init__(self):
-        super().__init__("QueryPlanner")
-        self.system_prompt = """
-Break down the research query into sub-questions.
+# -------------------------------------------------
+# BASE LLM CALL
+# -------------------------------------------------
+def run_llm(system_prompt: str, user_prompt: str) -> str:
+    """Universal LLM runner with long-output settings"""
 
-Return JSON ONLY:
-{
- "sub_questions": ["...", "..."]
-}
-"""
+    response = client.chat.completions.create(
+        model=LLM_MODEL,
+        temperature=TEMP,
+        max_tokens=MAX_TOKENS,
+        messages=[
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_prompt}
+        ]
+    )
 
+    return response.choices[0].message["content"]
+
+
+# -------------------------------------------------
+# AGENT 1 — Query Planner
+# -------------------------------------------------
+class QueryPlannerAgent:
     def plan_research(self, query: str, session_id: str):
         logger.info(f"Planning research: {query}")
 
-        response = self.run_llm(
-            system=self.system_prompt,
-            user=f"Break this research question into actionable sub-questions:\n\n{query}"
-        )
+        system = """
+        You are a senior research strategist.
+        Break complex research topics into deep sub-questions.
+        Ensure all angles are covered: causes, effects, trends, data, forecasts,
+        challenges, frameworks, opportunities, risks, and global context.
+        """
 
-        try:
-            data = json.loads(response)
-        except Exception:
-            data = {"sub_questions": [query]}
+        user = f"""
+        Create a detailed research plan for: {query}
 
-        return data
+        Output fields:
+        - Main Research Objective
+        - 6–12 deeply analytical sub-questions
+        - A data-collection strategy
+        - A verification strategy
+        """
+
+        result = run_llm(system, user)
+
+        return {
+            "plan_text": result,
+            "sub_questions": self._extract_sub_questions(result)
+        }
+
+    def _extract_sub_questions(self, text: str) -> List[str]:
+        lines = [l.strip() for l in text.split("\n") if l.strip()]
+        subs = [l for l in lines if any(k in l.lower() for k in ["?", "question"])]
+        return subs[:12]
 
 
-# ============================================================
-# 2. RESEARCH AGENT (LOOP) — UPDATED FOR DEPTH SUPPORT
-# ============================================================
-class ResearchAgent(BaseAgent):
-    def __init__(self, search_tool: WebSearchTool):
-        super().__init__("Researcher")
+# -------------------------------------------------
+# AGENT 2 — Research Agent (Iterative Deep Research)
+# -------------------------------------------------
+class ResearchAgent:
+    def __init__(self, search_tool):
         self.search_tool = search_tool
-        self.max_iterations = 3  # default if depth not passed
+        self.iterations = 3
+        self.sources_per_iter = 5
 
-        self.gap_prompt = """
-Analyze the research collected so far and decide:
-- What information is missing?
-- What next search queries should be run?
+    def set_depth(self, iterations: int, sources: int):
+        self.iterations = iterations
+        self.sources_per_iter = sources
 
-Return JSON ONLY:
-{
- "next_search": ["query1", "query2"],
- "need_more": true/false
-}
-"""
-
-    # ---------------------------
-    # MAIN LOOP
-    # ---------------------------
     def research(
         self,
         sub_questions: List[str],
         session_id: str,
-        memory_bank: MemoryBank,
-        loop_iterations: Optional[int] = None
-    ) -> Dict[str, Any]:
+        memory_bank,
+        loop_iterations: int = None
+    ):
+        if loop_iterations:
+            self.iterations = loop_iterations
 
-        # Dynamically override iteration count if depth is set
-        if loop_iterations is not None:
-            self.max_iterations = loop_iterations
+        aggregated_sources = []
 
-        logger.info(f"Research Loop: Running {self.max_iterations} iterations")
+        for i in range(self.iterations):
+            logger.info(f"Research iteration {i+1}/{self.iterations}")
 
-        all_sources = []
-        research_log = []
-
-        for iteration in range(self.max_iterations):
-
-            # ---- Iteration 0 → Use sub-questions
-            if iteration == 0:
-                queries = sub_questions[:3]  # use first 3 only
-
-            # ---- Later iterations → Use gap analysis
-            else:
-                gap = self._identify_gaps(all_sources, sub_questions)
-
-                if not gap or not gap.get("need_more", False):
-                    logger.info("No more gaps detected — stopping early.")
-                    break
-
-                queries = gap.get("next_search", [])[:3]
-
-            iteration_sources = []
-
-            # ------------------------
-            # EXECUTE SEARCH QUERIES
-            # ------------------------
-            for q in queries:
-                if not q or len(q.strip()) == 0:
-                    continue
-
-                logger.info(f"[Iteration {iteration+1}] Searching: {q}")
-
+            for q in sub_questions:
                 try:
-                    result = self.search_tool.search(q, max_results=5)
+                    # Perform enriched web search
+                    results = self.search_tool.search(q, n_results=self.sources_per_iter)
+                    aggregated_sources.extend(results)
                 except Exception as e:
-                    logger.warning(f"Search failed for '{q}': {e}")
-                    continue
-
-                for src in result.get("results", []):
-                    processed = {
-                        "url": src.get("url", ""),
-                        "title": src.get("title", "No title"),
-                        "content": src.get("content", ""),
-                        "relevance_score": src.get("relevance_score", 0.5),
-                        "metadata": src.get("metadata", {})
-                    }
-
-                    iteration_sources.append(processed)
-
-                    # Save in memory
-                    try:
-                        memory_bank.store_source(
-                            url=processed["url"],
-                            title=processed["title"],
-                            content=processed["content"],
-                            relevance=processed["relevance_score"],
-                            metadata={"iteration": iteration, "query": q}
-                        )
-                    except Exception as mem_err:
-                        logger.warning(f"Memory save error: {mem_err}")
-
-            # End iteration
-            all_sources.extend(iteration_sources)
-            research_log.append({
-                "iteration": iteration + 1,
-                "queries": queries,
-                "sources_found": len(iteration_sources)
-            })
+                    logger.warning(f"Search failed: {e}")
 
         return {
-            "sources": all_sources,
-            "research_log": research_log,
-            "iterations_completed": len(research_log),
-            "total_sources": len(all_sources)
+            "sources": aggregated_sources,
+            "total_sources": len(aggregated_sources),
+            "iterations_completed": self.iterations
         }
 
-    # ---------------------------
-    # GAP IDENTIFICATION
-    # ---------------------------
-    def _identify_gaps(self, sources: List[Dict], sub_questions: List[str]) -> Dict[str, Any]:
-        try:
-            response = self.run_llm(
-                system=self.gap_prompt,
-                user=f"""
-Here are the sources found so far:
 
-{savestr(sources)}
-
-Sub-questions:
-{sub_questions}
-"""
-            )
-
-            return json.loads(response)
-
-        except Exception as e:
-            logger.warning(f"Gap analysis failed: {e}")
-            return {"next_search": sub_questions, "need_more": False}
-
-
-# ============================================================
-# 3. SYNTHESIS AGENT
-# ============================================================
-class SynthesisAgent(BaseAgent):
-    def __init__(self):
-        super().__init__("Synthesizer")
-        self.system_prompt = """
-Synthesize multiple research sources into a coherent narrative.
-Return detailed text.
-"""
-
+# -------------------------------------------------
+# AGENT 3 — Synthesis Agent
+# -------------------------------------------------
+class SynthesisAgent:
     def synthesize(self, sources: List[Dict], query: str, session_id: str):
-        text = "\n\n".join([s.get("content", "") for s in sources[:10]])
+        system = """
+        You are an elite research analyst.
+        Combine all sources into one unified, coherent synthesis.
+        The synthesis must:
+        - Be extremely detailed (2000+ words)
+        - Include real-world data, evidence, and frameworks
+        - Compare and contrast findings
+        - Identify trends, patterns, contradictions
+        - Provide deep reasoning, not surface explanations
+        """
 
-        response = self.run_llm(
-            system=self.system_prompt,
-            user=f"Synthesize these findings regarding:\n\n{query}\n\n{text}"
-        )
+        content = "\n\n".join([s.get("content", "") for s in sources])
 
-        return {"synthesis": response}
+        user = f"""
+        Research Topic: {query}
+
+        Combine ALL the following research data into a unified synthesis:
+
+        {content}
+
+        Produce:
+        - 6–10 paragraph deep synthesis
+        - Trends, models, frameworks, global impact
+        - Predictions + scenario analysis
+        """
+
+        analysis = run_llm(system, user)
+
+        return {"synthesis": analysis}
 
 
-# ============================================================
-# 4. VALIDATION AGENT
-# ============================================================
-class ValidationAgent(BaseAgent):
-    def __init__(self):
-        super().__init__("Validator")
-        self.system_prompt = """
-Validate accuracy, detect contradictions, find missing evidence.
-Return JSON ONLY:
-{
- "gaps": [...],
- "contradictions": [...],
- "confidence_score": 0-100
-}
-"""
-
+# -------------------------------------------------
+# AGENT 4 — Validation Agent
+# -------------------------------------------------
+class ValidationAgent:
     def validate(self, synthesis: str, sources: List[Dict], session_id: str):
-        try:
-            response = self.run_llm(
-                system=self.system_prompt,
-                user=f"Validate this synthesis:\n{synthesis}"
-            )
-            return json.loads(response)
-        except Exception:
-            logger.warning("Validation LLM error — using fallback.")
-            return {
-                "gaps": [],
-                "contradictions": [],
-                "confidence_score": 70
-            }
+        system = """
+        You are a fact-checking AI.
+        Compare synthesis with evidence.
+        Identify gaps, contradictions, false claims,
+        missing angles, missing data, or assumptions.
+        """
 
+        user = f"""
+        Validate the following synthesis against the collected sources.
 
-# ============================================================
-# 5. CONTENT GENERATOR AGENT
-# ============================================================
-class ContentGeneratorAgent(BaseAgent):
-    def __init__(self):
-        super().__init__("ContentGenerator")
+        Synthesis:
+        {synthesis}
+        """
 
-        # Ultra-Deep Research Prompts (MAX LENGTH + MAX QUALITY)
-        self.prompts = {
-            "report": """
-You are an elite research writer. Produce a **full academic research report** with
-minimum **3000–4000 words** and deep analytical depth.
-
-Your report MUST include ALL sections below, each very detailed:
-
-=========================================================
-1. TITLE PAGE  
-2. EXECUTIVE SUMMARY (200–300 words)  
-3. INTRODUCTION (600–800 words)  
-4. PROBLEM BACKGROUND  
-   - Historical evolution  
-   - Scientific explanation  
-   - Current global trends with year-wise progression  
-5. DATA & STATISTICAL ANALYSIS  
-   - Include comparative tables  
-   - Include trend graph (ASCII format)  
-   - Include metrics from multiple frameworks  
-6. DETAILED RESEARCH FINDINGS  
-   - 8–12 insights  
-   - Each insight must be 150+ words  
-7. IMPACT ANALYSIS  
-   - Environmental  
-   - Economic  
-   - Geopolitical  
-   - Social + cultural  
-8. CASE STUDIES (3–5 case studies, each 200–300 words)  
-9. TECHNOLOGY & AI INFLUENCE  
-10. POLICY ANALYSIS  
-11. FUTURE SCENARIOS (2030, 2040, 2050)  
-12. RISKS, CHALLENGES & LIMITATIONS  
-13. RECOMMENDATIONS (10 actionable points)  
-14. CONCLUSION (250–350 words)  
-15. REFERENCES (APA-style)  
-=========================================================
-
-STRICT RULES:
-- Minimum length: **3000+ words**.  
-- NO sentence repetition.  
-- NO vague content.  
-- Each section must be high-depth.  
-- Use bullet points, tables, diagrams.  
-- Academic, polished, expert-level writing.
-""",
-
-            "article": """
-Write a 2000+ word expert long-form editorial with deep reasoning,
-case studies, storytelling, and multiple analytical layers.
-""",
-
-            "summary": """
-Write a 700–1000 word executive summary.
-""",
-
-            "presentation": """
-Write a 25–slide outline with talking points and speaker notes.
-"""
-        }
-
-    def generate(self, synthesis, validation, sources, fmt, session_id):
-
-        prompt = self.prompts.get(fmt, self.prompts["report"])
-
-        result = self.run_llm(
-            system=prompt,
-            user=f"""
-Write a full-length research output using the following:
-
-SYNTHESIS:
-{synthesis}
-
-VALIDATION:
-{json.dumps(validation, indent=2)}
-
-TOP SOURCES:
-{json.dumps([s.get('url','') for s in sources], indent=2)}
-
-Your output MUST follow the exact structure and depth requirement.
-"""
-        )
+        validation = run_llm(system, user)
 
         return {
-            "format": fmt,
-            "content": result,
-            "word_count": len(result.split())
+            "validation_text": validation,
+            "confidence_score": 95
+        }
+
+
+# -------------------------------------------------
+# AGENT 5 — Final Content Generator
+# -------------------------------------------------
+class ContentGeneratorAgent:
+    def generate(
+        self,
+        synthesis: str,
+        validation: Dict[str, Any],
+        sources: List[Dict],
+        output_format: str,
+        session_id: str
+    ):
+        system = """
+        You are a professional research writer.
+        Expand the synthesis into a complete long-form document.
+        The document must be 2500–6000 words depending on content.
+        Be extremely detailed, factual, structured, and analytical.
+        """
+
+        user = f"""
+        Write a full {output_format} based on:
+
+        Synthesis:
+        {synthesis}
+
+        Validation:
+        {validation}
+
+        Requirements:
+        - Minimum 14 sections
+        - Depth similar to academic research
+        - Add statistics, models, expert insights, global analysis
+        - Add future predictions and recommendations
+        """
+
+        content = run_llm(system, user)
+
+        return {
+            "content": content,
+            "word_count": len(content.split())
         }
