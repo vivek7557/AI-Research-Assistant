@@ -1,6 +1,7 @@
 """
 Streamlit Web Interface for AI Research Assistant
 Modern UI with centered layout and comprehensive analysis
+Enhanced with modern animations, gradients, and premium styling
 """
 import streamlit as st
 import os
@@ -24,22 +25,11 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Custom CSS for modern UI
-st.markdown("""
-<style>
-
-"""
-Enhanced Custom CSS Styling for AI Research Assistant
-Modern gradient themes, smooth animations, and premium UI effects
-"""
-
+# Enhanced Custom CSS for modern UI
 ENHANCED_CSS = """
 <style>
 
-/* ====================================== */
-/*     COLOR PALETTE & VARIABLES         */
-/* ====================================== */
-
+/* COLOR PALETTE */
 :root {
     --primary: #6366f1;
     --primary-dark: #4f46e5;
@@ -56,52 +46,25 @@ ENHANCED_CSS = """
     --text-secondary: #cbd5e1;
 }
 
-/* ====================================== */
-/*      PREMIUM ANIMATIONS              */
-/* ====================================== */
-
+/* ANIMATIONS */
 @keyframes fadeInUp {
-    0% { 
-        opacity: 0; 
-        transform: translateY(20px); 
-    }
-    100% { 
-        opacity: 1; 
-        transform: translateY(0); 
-    }
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes slideInLeft {
-    0% { 
-        opacity: 0; 
-        transform: translateX(-30px); 
-    }
-    100% { 
-        opacity: 1; 
-        transform: translateX(0); 
-    }
+    from { opacity: 0; transform: translateX(-30px); }
+    to { opacity: 1; transform: translateX(0); }
 }
 
 @keyframes slideInRight {
-    0% { 
-        opacity: 0; 
-        transform: translateX(30px); 
-    }
-    100% { 
-        opacity: 1; 
-        transform: translateX(0); 
-    }
+    from { opacity: 0; transform: translateX(30px); }
+    to { opacity: 1; transform: translateX(0); }
 }
 
 @keyframes scaleIn {
-    0% { 
-        opacity: 0; 
-        transform: scale(0.95); 
-    }
-    100% { 
-        opacity: 1; 
-        transform: scale(1); 
-    }
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
 }
 
 @keyframes gradientShift {
@@ -111,8 +74,8 @@ ENHANCED_CSS = """
 }
 
 @keyframes shimmer {
-    0% { background-position: -1000px 0; }
-    100% { background-position: 1000px 0; }
+    from { background-position: -1000px 0; }
+    to { background-position: 1000px 0; }
 }
 
 @keyframes pulse {
@@ -120,19 +83,7 @@ ENHANCED_CSS = """
     50% { opacity: 0.5; }
 }
 
-@keyframes glow {
-    0%, 100% { 
-        box-shadow: 0 0 5px rgba(99, 102, 241, 0.3);
-    }
-    50% { 
-        box-shadow: 0 0 20px rgba(99, 102, 241, 0.6);
-    }
-}
-
-/* ====================================== */
-/*       GLOBAL THEME & LAYOUT          */
-/* ====================================== */
-
+/* GLOBAL THEME */
 [data-testid="stAppViewContainer"] {
     background: linear-gradient(135deg, #0f172a 0%, #1a1f35 100%);
 }
@@ -148,33 +99,16 @@ ENHANCED_CSS = """
     animation: fadeInUp 0.7s ease-out;
 }
 
-/* ====================================== */
-/*        HEADER STYLING                 */
-/* ====================================== */
-
+/* HEADER STYLING */
 .main-header {
     background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
-    border: 2px solid;
-    border-image: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%) 1;
+    border: 2px solid rgba(99, 102, 241, 0.3);
     border-radius: 20px;
     padding: 3rem 2rem;
     margin-bottom: 2rem;
     backdrop-filter: blur(10px);
     box-shadow: 0 8px 32px rgba(99, 102, 241, 0.15);
     animation: fadeInUp 0.8s ease-out;
-    position: relative;
-    overflow: hidden;
-}
-
-.main-header::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    right: -50%;
-    width: 200%;
-    height: 200%;
-    background: radial-gradient(circle, rgba(139, 92, 246, 0.1) 0%, transparent 70%);
-    animation: pulse 4s ease-in-out infinite;
 }
 
 .main-header h1 {
@@ -187,22 +121,15 @@ ENHANCED_CSS = """
     background-clip: text;
     animation: gradientShift 4s ease infinite;
     margin: 0;
-    position: relative;
-    z-index: 1;
 }
 
 .main-header p {
     font-size: 1.1rem;
-    color: var(--text-secondary);
-    position: relative;
-    z-index: 1;
+    color: #cbd5e1;
     margin-top: 0.5rem;
 }
 
-/* ====================================== */
-/*      INPUT CONTAINER STYLING         */
-/* ====================================== */
-
+/* INPUT CONTAINER */
 .input-container {
     background: linear-gradient(135deg, rgba(30, 41, 59, 0.8) 0%, rgba(15, 23, 42, 0.8) 100%);
     border: 2px solid rgba(99, 102, 241, 0.3);
@@ -221,16 +148,12 @@ ENHANCED_CSS = """
     transform: translateY(-2px);
 }
 
-/* ====================================== */
-/*     STREAMLIT COMPONENTS OVERRIDE    */
-/* ====================================== */
-
-/* Text Input */
+/* TEXT INPUT */
 [data-testid="stTextInput"] input {
     background: rgba(15, 23, 42, 0.6) !important;
     border: 2px solid rgba(99, 102, 241, 0.3) !important;
     border-radius: 12px !important;
-    color: var(--text-primary) !important;
+    color: #f1f5f9 !important;
     padding: 12px 16px !important;
     font-size: 1rem !important;
     transition: all 0.3s ease !important;
@@ -242,7 +165,7 @@ ENHANCED_CSS = """
     background: rgba(15, 23, 42, 0.9) !important;
 }
 
-/* Selectbox */
+/* SELECTBOX */
 [data-testid="stSelectbox"] {
     animation: slideInRight 0.8s ease-out 0.1s both;
 }
@@ -253,7 +176,7 @@ ENHANCED_CSS = """
     border-radius: 12px !important;
 }
 
-/* Checkbox */
+/* CHECKBOX */
 [data-testid="stCheckbox"] {
     animation: slideInRight 0.8s ease-out 0.15s both;
 }
@@ -262,7 +185,7 @@ ENHANCED_CSS = """
     accent-color: #6366f1 !important;
 }
 
-/* Buttons */
+/* BUTTONS */
 .stButton > button {
     background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
     border: none;
@@ -273,8 +196,6 @@ ENHANCED_CSS = """
     transition: all 0.3s ease !important;
     box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3) !important;
     font-size: 1.05rem !important;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
 }
 
 .stButton > button:hover {
@@ -286,7 +207,7 @@ ENHANCED_CSS = """
     transform: translateY(-1px) !important;
 }
 
-/* Download Button */
+/* DOWNLOAD BUTTON */
 .stDownloadButton > button {
     background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
     border: none !important;
@@ -303,7 +224,7 @@ ENHANCED_CSS = """
     box-shadow: 0 12px 32px rgba(16, 185, 129, 0.5) !important;
 }
 
-/* Progress Bar */
+/* PROGRESS BAR */
 .stProgress > div > div > div {
     background: linear-gradient(90deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%) !important;
     background-size: 200% 100%;
@@ -314,7 +235,7 @@ ENHANCED_CSS = """
     animation: pulse 2s ease-in-out infinite;
 }
 
-/* Tabs */
+/* TABS */
 .stTabs [data-baseweb="tab-list"] {
     gap: 1rem;
     border-bottom: 2px solid rgba(99, 102, 241, 0.2);
@@ -326,7 +247,7 @@ ENHANCED_CSS = """
     border: 2px solid rgba(99, 102, 241, 0.2) !important;
     border-radius: 12px !important;
     padding: 12px 24px !important;
-    color: var(--text-secondary) !important;
+    color: #cbd5e1 !important;
     font-weight: 600 !important;
     transition: all 0.3s ease !important;
 }
@@ -344,7 +265,7 @@ ENHANCED_CSS = """
     box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
 }
 
-/* Expander */
+/* EXPANDER */
 [data-testid="stExpander"] {
     border: 2px solid rgba(99, 102, 241, 0.2) !important;
     border-radius: 12px !important;
@@ -361,10 +282,7 @@ ENHANCED_CSS = """
     background: rgba(99, 102, 241, 0.1) !important;
 }
 
-/* ====================================== */
-/*       METRICS & CARDS                 */
-/* ====================================== */
-
+/* METRICS */
 [data-testid="stMetric"] {
     background: linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(139, 92, 246, 0.08));
     border: 2px solid rgba(99, 102, 241, 0.2);
@@ -383,7 +301,7 @@ ENHANCED_CSS = """
 }
 
 [data-testid="stMetric"] label {
-    color: var(--text-secondary) !important;
+    color: #cbd5e1 !important;
     font-weight: 600;
 }
 
@@ -393,7 +311,7 @@ ENHANCED_CSS = """
     font-size: 2rem !important;
 }
 
-/* Content Cards */
+/* CONTENT CARDS */
 .content-card {
     background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.8));
     border: 2px solid rgba(99, 102, 241, 0.2);
@@ -410,10 +328,7 @@ ENHANCED_CSS = """
     box-shadow: 0 12px 32px rgba(99, 102, 241, 0.25);
 }
 
-/* ====================================== */
-/*      SIDEBAR STYLING                 */
-/* ====================================== */
-
+/* SIDEBAR */
 [data-testid="stSidebar"] {
     background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
     border-right: 2px solid rgba(99, 102, 241, 0.2);
@@ -440,10 +355,8 @@ ENHANCED_CSS = """
 .sidebar-title {
     font-size: 0.9rem;
     font-weight: 700;
-    color: var(--text-secondary);
+    color: #cbd5e1;
     margin-bottom: 0.5rem;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
 }
 
 .sidebar-value {
@@ -459,16 +372,14 @@ ENHANCED_CSS = """
     margin-top: 1.5rem;
     font-size: 1rem;
     font-weight: 700;
-    color: var(--text-primary);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+    color: #f1f5f9;
     padding-bottom: 0.8rem;
     border-bottom: 2px solid rgba(99, 102, 241, 0.3);
 }
 
 .sidebar-activity-item {
     font-size: 0.85rem;
-    color: var(--text-secondary);
+    color: #cbd5e1;
     padding: 0.6rem;
     margin-bottom: 0.4rem;
     border-left: 3px solid rgba(99, 102, 241, 0.4);
@@ -484,10 +395,7 @@ ENHANCED_CSS = """
     padding-left: 1.2rem;
 }
 
-/* ====================================== */
-/*      EVALUATION SECTION              */
-/* ====================================== */
-
+/* EVALUATION SECTION */
 .eval-right {
     background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(139, 92, 246, 0.2));
     border: 2px solid rgba(99, 102, 241, 0.4);
@@ -506,10 +414,8 @@ ENHANCED_CSS = """
 
 .eval-title {
     font-size: 0.75rem;
-    color: var(--text-secondary);
+    color: #cbd5e1;
     font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.3px;
     margin-bottom: 0.5rem;
 }
 
@@ -519,10 +425,7 @@ ENHANCED_CSS = """
     color: #6366f1;
 }
 
-/* ====================================== */
-/*      ALERTS & MESSAGES              */
-/* ====================================== */
-
+/* ALERTS */
 [data-testid="stAlert"] {
     border-radius: 12px !important;
     border: 2px solid !important;
@@ -530,58 +433,7 @@ ENHANCED_CSS = """
     animation: slideInLeft 0.5s ease-out;
 }
 
-[data-testid="stAlert"][kind="success"] {
-    background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(16, 185, 129, 0.05)) !important;
-    border-color: rgba(16, 185, 129, 0.4) !important;
-}
-
-[data-testid="stAlert"][kind="warning"] {
-    background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(245, 158, 11, 0.05)) !important;
-    border-color: rgba(245, 158, 11, 0.4) !important;
-}
-
-[data-testid="stAlert"][kind="error"] {
-    background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(239, 68, 68, 0.05)) !important;
-    border-color: rgba(239, 68, 68, 0.4) !important;
-}
-
-[data-testid="stAlert"][kind="info"] {
-    background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1)) !important;
-    border-color: rgba(99, 102, 241, 0.4) !important;
-}
-
-/* ====================================== */
-/*         FOOTER                        */
-/* ====================================== */
-
-footer {
-    border-top: 2px solid rgba(99, 102, 241, 0.2);
-    padding: 2rem 0 !important;
-}
-
-/* ====================================== */
-/*      RESPONSIVE DESIGN               */
-/* ====================================== */
-
-@media (max-width: 768px) {
-    .main-header h1 {
-        font-size: 1.8rem;
-    }
-    
-    .main-content {
-        padding: 1rem;
-    }
-    
-    .stTabs [data-baseweb="tab"] {
-        padding: 10px 16px !important;
-        font-size: 0.9rem;
-    }
-}
-
-/* ====================================== */
-/*         SCROLLBAR STYLING            */
-/* ====================================== */
-
+/* SCROLLBAR */
 ::-webkit-scrollbar {
     width: 10px;
 }
@@ -601,15 +453,20 @@ footer {
     background: linear-gradient(180deg, #8b5cf6, #ec4899);
 }
 
+/* RESPONSIVE */
+@media (max-width: 768px) {
+    .main-header h1 {
+        font-size: 1.8rem;
+    }
+    .main-content {
+        padding: 1rem;
+    }
+}
+
 </style>
 """
 
-# Usage in your Streamlit app:
-# st.markdown(ENHANCED_CSS, unsafe_allow_html=True)
-
-
-
-""", unsafe_allow_html=True)
+st.markdown(ENHANCED_CSS, unsafe_allow_html=True)
 
 # Sidebar
 with st.sidebar:
@@ -674,77 +531,7 @@ with st.sidebar:
         st.markdown("<div class='sidebar-activity-item'>No activity yet</div>", unsafe_allow_html=True)
 
 
-st.markdown("""
-<style>
-    /* ===================== */
-/* SIDEBAR FIXED LAYOUT  */
-/* ===================== */
-
-[data-testid="stSidebar"] {
-    background: #111111 !important;
-    border-right: 1px solid #222;
-    padding: 1rem 0.6rem;
-}
-
-/* Compact cards */
-.sidebar-card {
-    background: #1a1a1a;
-    border: 1px solid #2d2d2d;
-    border-radius: 12px;
-    padding: 0.8rem 1rem;
-    margin-bottom: 1rem;
-    box-shadow: 0px 3px 8px rgba(0,0,0,0.35);
-    transition: 0.25s ease;
-}
-
-.sidebar-card:hover {
-    transform: scale(1.015);
-    border-color: #6f6ff5;
-}
-
-/* Titles */
-.sidebar-title {
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: #cfcfcf;
-    margin-bottom: 4px;
-}
-
-/* Values */
-.sidebar-value {
-    font-size: 1.4rem;
-    font-weight: 700;
-    color: white;
-}
-
-/* Recent Activity Title */
-.sidebar-activity-title {
-    margin-top: 1.5rem;
-    font-size: 0.95rem !important;
-    font-weight: 700 !important;
-    color: #dcdcdc;
-}
-
-/* Each recent item */
-.sidebar-activity-item {
-    font-size: 0.85rem;
-    color: #bdbdbd;
-    margin-bottom: 6px;
-    transition: 0.2s ease;
-}
-
-.sidebar-activity-item:hover {
-    color: #ffffff;
-    margin-left: 4px;
-}
-
-</style>
-""", unsafe_allow_html=True)
-
-
-
 # API Keys
-# API Keys (Streamlit Cloud)
 try:
     anthropic_key = st.secrets["ANTHROPIC_API_KEY"]
     GROQ_API_KEY = st.secrets["GROQ_API_KEY"]
@@ -887,7 +674,7 @@ with tab1:
                                 st.markdown(f"**{m_name}**")
                                 st.progress(score / 100)
                                 st.markdown(
-                                    f"<p style='font-size:0.85rem; color:#cccccc; margin-top:4px;'>"
+                                    f"<p style='font-size:0.85rem; color:#cbd5e1; margin-top:4px;'>"
                                     f"{explanations.get(metric, '')}</p>",
                                     unsafe_allow_html=True,
                                 )
@@ -909,7 +696,7 @@ with tab1:
                         st.markdown(
                             f"""
 <h3>{emoji} Overall Quality Score: {overall:.1f}/100</h3>
-<p style='color:#cfcfcf; font-size:0.9rem;'>
+<p style='color:#cbd5e1; font-size:0.9rem;'>
 {explanations['overall']}
 </p>
 """,
@@ -921,15 +708,51 @@ with tab1:
             except Exception as e:
                 st.error(f"❌ Error during research: {str(e)}")
 
-# Tabs 2 & 3 unchanged because no UI errors exist
-# (Ask if you want them upgraded too.)
+
+# Tab 2 - Find Related
+with tab2:
+    st.markdown('<div class="input-container">', unsafe_allow_html=True)
+    st.markdown("### 🔗 Find Related Research")
+    search_query = st.text_input("Search related topics", placeholder="Enter a topic...")
+    st.markdown('</div>', unsafe_allow_html=True)
+    
+    if search_query:
+        st.info("Related research feature coming soon...")
+
+
+# Tab 3 - Past Sessions
+with tab3:
+    st.markdown("### 📂 Past Research Sessions")
+    output_dir = Path("outputs")
+    
+    if output_dir.exists():
+        json_files = list(output_dir.glob("*.json"))
+        if json_files:
+            for file in sorted(json_files, key=os.path.getmtime, reverse=True):
+                try:
+                    with open(file, 'r') as f:
+                        data = json.load(f)
+                    
+                    col1, col2 = st.columns([3, 1])
+                    with col1:
+                        st.markdown(f"**{data.get('query', 'Untitled')}**")
+                    with col2:
+                        if st.button("📖 View", key=f"view_{file.stem}"):
+                            st.json(data)
+                except:
+                    pass
+        else:
+            st.info("No past sessions found")
+    else:
+        st.info("No sessions directory yet")
+
 
 st.markdown("</div>", unsafe_allow_html=True)
 
 # Footer
 st.markdown("---")
 st.markdown("""
-<div style='text-align:center; opacity:0.7; padding:1rem'>
+<div style='text-align:center; opacity:0.7; padding:1rem; color:#cbd5e1;'>
     AI Research Assistant v2.0 • Multi-Agent System<br>
     Powered by Claude & Tavily
 </div>
