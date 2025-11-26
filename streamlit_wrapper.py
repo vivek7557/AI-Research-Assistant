@@ -1,6 +1,7 @@
 """
 Streamlit Web Interface for AI Research Assistant
 Modern UI with centered layout and comprehensive analysis
+React-Style UI with Compact Design
 """
 import streamlit as st
 import os
@@ -24,9 +25,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Custom CSS for modern UI
-# JUST ADD THIS AFTER st.set_page_config() - NOTHING ELSE CHANGES
-
+# REACT-STYLE UI CSS
 st.markdown("""
 <style>
 /* ======================== REACT-STYLE UI ======================== */
@@ -38,6 +37,7 @@ st.markdown("""
 
 [data-testid="stSidebar"] {
     background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%) !important;
+    border-right: 1px solid rgba(51, 65, 85, 0.3) !important;
 }
 
 /* COMPACT BUTTONS */
@@ -51,6 +51,7 @@ st.markdown("""
     border-radius: 6px !important;
     font-size: 12px !important;
     box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25) !important;
+    transition: all 0.2s !important;
 }
 
 .stButton > button:hover {
@@ -58,13 +59,27 @@ st.markdown("""
     box-shadow: 0 6px 16px rgba(59, 130, 246, 0.35) !important;
 }
 
+.stButton > button:active {
+    transform: translateY(0px) !important;
+}
+
 /* DOWNLOAD BUTTONS */
 .stDownloadButton > button {
     background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+    border: none !important;
+    color: white !important;
+    font-weight: 600 !important;
     height: 32px !important;
     padding: 6px 14px !important;
     font-size: 12px !important;
     border-radius: 6px !important;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25) !important;
+    transition: all 0.2s !important;
+}
+
+.stDownloadButton > button:hover {
+    transform: translateY(-1px) !important;
+    box-shadow: 0 6px 16px rgba(16, 185, 129, 0.35) !important;
 }
 
 /* INPUTS */
@@ -75,20 +90,33 @@ input, select {
     color: #f1f5f9 !important;
     padding: 6px 10px !important;
     font-size: 12px !important;
+    transition: all 0.2s !important;
 }
 
 input:focus, select:focus {
     border-color: #3b82f6 !important;
     box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1) !important;
+    background: rgba(15, 23, 42, 0.9) !important;
 }
 
-/* SMALL TITLE */
+/* TITLES */
 h1 {
     font-size: 18px !important;
+    font-weight: 700 !important;
+}
+
+h2 {
+    font-size: 14px !important;
+    font-weight: 700 !important;
 }
 
 h3 {
-    font-size: 14px !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+}
+
+p {
+    font-size: 12px !important;
 }
 
 /* HEADER STYLING */
@@ -97,15 +125,22 @@ h3 {
     border: 1px solid rgba(59, 130, 246, 0.3) !important;
     border-radius: 12px !important;
     padding: 16px !important;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1) !important;
 }
 
 .main-header h1 {
     background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 50%, #06b6d4 100%) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    background-clip: text !important;
     font-size: 18px !important;
+    margin: 0 !important;
 }
 
 .main-header p {
     font-size: 12px !important;
+    color: #cbd5e1 !important;
+    margin-top: 4px !important;
 }
 
 /* INPUT CONTAINER */
@@ -114,11 +149,17 @@ h3 {
     border: 1px solid rgba(59, 130, 246, 0.3) !important;
     border-radius: 10px !important;
     padding: 14px !important;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1) !important;
+}
+
+.input-container:hover {
+    border-color: rgba(59, 130, 246, 0.5) !important;
 }
 
 /* TABS */
 .stTabs [data-baseweb="tab-list"] {
     gap: 8px !important;
+    border-bottom: 1px solid rgba(59, 130, 246, 0.2) !important;
 }
 
 .stTabs [data-baseweb="tab"] {
@@ -127,11 +168,21 @@ h3 {
     border-radius: 6px !important;
     padding: 8px 14px !important;
     font-size: 12px !important;
+    font-weight: 600 !important;
+    color: #cbd5e1 !important;
+    transition: all 0.2s !important;
+}
+
+.stTabs [data-baseweb="tab"]:hover {
+    border-color: rgba(59, 130, 246, 0.5) !important;
+    transform: translateY(-1px);
 }
 
 .stTabs [data-baseweb="tab"][aria-selected="true"] {
     background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%) !important;
     border-color: #3b82f6 !important;
+    color: white !important;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25) !important;
 }
 
 /* METRICS */
@@ -140,22 +191,40 @@ h3 {
     border: 1px solid rgba(59, 130, 246, 0.2) !important;
     border-radius: 8px !important;
     padding: 10px !important;
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.1) !important;
+    transition: all 0.2s !important;
+}
+
+[data-testid="stMetric"]:hover {
+    border-color: rgba(59, 130, 246, 0.5) !important;
+    transform: translateY(-2px);
 }
 
 [data-testid="stMetric"] label {
     font-size: 10px !important;
     font-weight: 600 !important;
+    color: #cbd5e1 !important;
 }
 
 [data-testid="stMetric"] div {
     font-size: 16px !important;
     font-weight: 700 !important;
-    color: #3b82f6 !important;
+    background: linear-gradient(135deg, #3b82f6, #8b5cf6) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    background-clip: text !important;
 }
 
 /* PROGRESS */
 .stProgress > div > div > div {
     background: linear-gradient(90deg, #3b82f6 0%, #8b5cf6 50%, #06b6d4 100%) !important;
+    background-size: 200% 100%;
+    animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+    from { background-position: -1000px 0; }
+    to { background-position: 1000px 0; }
 }
 
 /* SIDEBAR CARDS */
@@ -164,11 +233,20 @@ h3 {
     border: 1px solid rgba(59, 130, 246, 0.3) !important;
     border-radius: 8px !important;
     padding: 12px !important;
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.1) !important;
+    transition: all 0.2s !important;
+}
+
+.sidebar-card:hover {
+    border-color: rgba(59, 130, 246, 0.6) !important;
+    transform: translateX(4px);
 }
 
 .sidebar-title {
     font-size: 10px !important;
     font-weight: 600 !important;
+    color: #cbd5e1 !important;
+    margin-bottom: 4px !important;
 }
 
 .sidebar-value {
@@ -177,12 +255,40 @@ h3 {
     background: linear-gradient(135deg, #3b82f6, #8b5cf6);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.sidebar-activity-title {
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    color: #f1f5f9 !important;
+    margin-top: 12px !important;
+    margin-bottom: 8px !important;
+}
+
+.sidebar-activity-item {
+    font-size: 11px !important;
+    color: #cbd5e1 !important;
+    padding: 4px 6px !important;
+    margin-bottom: 4px !important;
+    border-left: 2px solid rgba(59, 130, 246, 0.4) !important;
+    padding-left: 8px !important;
+    transition: all 0.2s !important;
+    border-radius: 3px !important;
+}
+
+.sidebar-activity-item:hover {
+    color: #3b82f6 !important;
+    border-left-color: #3b82f6 !important;
+    background: rgba(59, 130, 246, 0.05) !important;
 }
 
 /* ALERTS */
 [data-testid="stAlert"] {
     border-radius: 8px !important;
     font-size: 12px !important;
+    border-left: 3px solid !important;
+    padding: 10px 12px !important;
 }
 
 /* EXPANDER */
@@ -191,8 +297,9 @@ h3 {
     border: 1px solid rgba(59, 130, 246, 0.2) !important;
 }
 
-/* TEXT SIZES */
-p { font-size: 12px !important; }
+[data-testid="stExpander"] > div > button {
+    font-size: 12px !important;
+}
 
 /* EVAL CARDS */
 .eval-right {
@@ -200,22 +307,70 @@ p { font-size: 12px !important; }
     border: 1px solid rgba(59, 130, 246, 0.4) !important;
     border-radius: 6px !important;
     padding: 8px !important;
+    text-align: center !important;
+    transition: all 0.2s !important;
+}
+
+.eval-right:hover {
+    border-color: rgba(59, 130, 246, 0.7) !important;
+    transform: translateY(-2px);
+}
+
+.eval-title {
+    font-size: 9px !important;
+    font-weight: 600 !important;
+    color: #cbd5e1 !important;
+    margin-bottom: 4px !important;
 }
 
 .eval-score {
     font-size: 14px !important;
+    font-weight: 700 !important;
     color: #3b82f6 !important;
 }
 
 /* SCROLLBAR */
-::-webkit-scrollbar { width: 8px; }
-::-webkit-scrollbar-track { background: rgba(59, 130, 246, 0.05); }
-::-webkit-scrollbar-thumb { 
-    background: linear-gradient(180deg, #3b82f6, #8b5cf6);
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(59, 130, 246, 0.05);
     border-radius: 4px;
 }
 
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #3b82f6, #8b5cf6);
+    border-radius: 4px;
+    transition: all 0.2s;
+}
 
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, #8b5cf6, #06b6d4);
+}
+
+/* MAIN CONTENT */
+.main-content {
+    max-width: 1150px;
+    margin: auto;
+    padding: 16px;
+}
+
+/* CONTENT CARD */
+.content-card {
+    background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.8)) !important;
+    border: 1px solid rgba(59, 130, 246, 0.2) !important;
+    padding: 12px !important;
+    border-radius: 8px !important;
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.1) !important;
+}
+
+.content-card:hover {
+    border-color: rgba(59, 130, 246, 0.5) !important;
+}
+
+</style>
+""", unsafe_allow_html=True)
 
 # Sidebar
 with st.sidebar:
@@ -268,7 +423,7 @@ with st.sidebar:
                     query = data.get("query", "Untitled")
 
                     st.markdown(
-                        f"<div class='sidebar-activity-item'>• {query[:32]}...</div>",
+                        f"<div class='sidebar-activity-item'>• {query[:28]}...</div>",
                         unsafe_allow_html=True
                     )
 
@@ -280,77 +435,7 @@ with st.sidebar:
         st.markdown("<div class='sidebar-activity-item'>No activity yet</div>", unsafe_allow_html=True)
 
 
-st.markdown("""
-<style>
-    /* ===================== */
-/* SIDEBAR FIXED LAYOUT  */
-/* ===================== */
-
-[data-testid="stSidebar"] {
-    background: #111111 !important;
-    border-right: 1px solid #222;
-    padding: 1rem 0.6rem;
-}
-
-/* Compact cards */
-.sidebar-card {
-    background: #1a1a1a;
-    border: 1px solid #2d2d2d;
-    border-radius: 12px;
-    padding: 0.8rem 1rem;
-    margin-bottom: 1rem;
-    box-shadow: 0px 3px 8px rgba(0,0,0,0.35);
-    transition: 0.25s ease;
-}
-
-.sidebar-card:hover {
-    transform: scale(1.015);
-    border-color: #6f6ff5;
-}
-
-/* Titles */
-.sidebar-title {
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: #cfcfcf;
-    margin-bottom: 4px;
-}
-
-/* Values */
-.sidebar-value {
-    font-size: 1.4rem;
-    font-weight: 700;
-    color: white;
-}
-
-/* Recent Activity Title */
-.sidebar-activity-title {
-    margin-top: 1.5rem;
-    font-size: 0.95rem !important;
-    font-weight: 700 !important;
-    color: #dcdcdc;
-}
-
-/* Each recent item */
-.sidebar-activity-item {
-    font-size: 0.85rem;
-    color: #bdbdbd;
-    margin-bottom: 6px;
-    transition: 0.2s ease;
-}
-
-.sidebar-activity-item:hover {
-    color: #ffffff;
-    margin-left: 4px;
-}
-
-</style>
-""", unsafe_allow_html=True)
-
-
-
 # API Keys
-# API Keys (Streamlit Cloud)
 try:
     anthropic_key = st.secrets["ANTHROPIC_API_KEY"]
     GROQ_API_KEY = st.secrets["GROQ_API_KEY"]
@@ -393,7 +478,8 @@ with tab1:
 
         col_format, col_eval = st.columns([3, 2])
         output_format = col_format.selectbox("📄 Output Format",
-                                             ["report", "article", "summary", "presentation"])
+                                             ["report", "article", "summary", "presentation"],
+                                             label_visibility="collapsed")
         run_evaluation = col_eval.checkbox("🎯 Run Evaluation", value=True)
 
         with st.expander("⚙️ Advanced Options"):
@@ -456,13 +542,14 @@ with tab1:
 
                 st.markdown("---")
                 d1, d2, d3 = st.columns(3)
-                d1.download_button("📥 Markdown", data=content, file_name="research.md")
+                d1.download_button("📥 Markdown", data=content, file_name="research.md", use_container_width=True)
                 d2.download_button(
                     "📥 JSON",
                     data=json.dumps(results, indent=2),
                     file_name="research.json",
+                    use_container_width=True
                 )
-                d3.download_button("📥 TXT", data=content, file_name="research.txt")
+                d3.download_button("📥 TXT", data=content, file_name="research.txt", use_container_width=True)
 
                 # Evaluation Section
                 if run_evaluation:
@@ -493,7 +580,7 @@ with tab1:
                                 st.markdown(f"**{m_name}**")
                                 st.progress(score / 100)
                                 st.markdown(
-                                    f"<p style='font-size:0.85rem; color:#cccccc; margin-top:4px;'>"
+                                    f"<p style='font-size:0.85rem; color:#cbd5e1; margin-top:4px;'>"
                                     f"{explanations.get(metric, '')}</p>",
                                     unsafe_allow_html=True,
                                 )
@@ -515,7 +602,7 @@ with tab1:
                         st.markdown(
                             f"""
 <h3>{emoji} Overall Quality Score: {overall:.1f}/100</h3>
-<p style='color:#cfcfcf; font-size:0.9rem;'>
+<p style='color:#cbd5e1; font-size:0.9rem;'>
 {explanations['overall']}
 </p>
 """,
@@ -527,15 +614,47 @@ with tab1:
             except Exception as e:
                 st.error(f"❌ Error during research: {str(e)}")
 
-# Tabs 2 & 3 unchanged because no UI errors exist
-# (Ask if you want them upgraded too.)
+# Tab 2 - Find Related
+with tab2:
+    st.markdown('<div class="content-card">', unsafe_allow_html=True)
+    st.markdown("### 🔗 Find Related Research")
+    search_query = st.text_input("Search related topics", placeholder="Enter a topic...", label_visibility="collapsed")
+    if search_query:
+        st.info("Related research feature coming soon...")
+    st.markdown('</div>', unsafe_allow_html=True)
+
+# Tab 3 - Past Sessions
+with tab3:
+    st.markdown("### 📂 Past Research Sessions")
+    output_dir = Path("outputs")
+    
+    if output_dir.exists():
+        json_files = list(output_dir.glob("*.json"))
+        if json_files:
+            for file in sorted(json_files, key=os.path.getmtime, reverse=True):
+                try:
+                    with open(file, 'r') as f:
+                        data = json.load(f)
+                    
+                    col1, col2 = st.columns([3, 1])
+                    with col1:
+                        st.markdown(f"**{data.get('query', 'Untitled')}**")
+                    with col2:
+                        if st.button("📖 View", key=f"view_{file.stem}", use_container_width=True):
+                            st.json(data)
+                except:
+                    pass
+        else:
+            st.info("No past sessions found")
+    else:
+        st.info("No sessions directory yet")
 
 st.markdown("</div>", unsafe_allow_html=True)
 
 # Footer
 st.markdown("---")
 st.markdown("""
-<div style='text-align:center; opacity:0.7; padding:1rem'>
+<div style='text-align:center; opacity:0.7; padding:12px; font-size:11px; color:#cbd5e1;'>
     AI Research Assistant v2.0 • Multi-Agent System<br>
     Powered by Claude & Tavily
 </div>
