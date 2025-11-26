@@ -4,18 +4,32 @@ def load_theme():
     st.markdown("""
     <style>
 
-    /* --- GLOBAL PAGE CLEANUP --- */
-    .block-container {
-        padding-top: 1rem !important;
-        padding-bottom: 2rem !important;
-        max-width: 1100px;
+    /* =============== GLOBAL =============== */
+    .stApp {
+        animation: fadeIn 0.8s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to   { opacity: 1; transform: translateY(0px); }
     }
 
     body, .stApp {
         background: #0d1117 !important;
     }
 
-    /* --- PAGE TITLES --- */
+    .block-container {
+        padding-top: 1.2rem !important;
+        max-width: 1100px;
+        animation: slideUp 0.5s ease-out;
+    }
+
+    @keyframes slideUp {
+        from { transform: translateY(15px); opacity: 0; }
+        to   { transform: translateY(0px); opacity: 1; }
+    }
+
+    /* =============== TITLES =============== */
     .page-title {
         font-size: 2.1rem;
         font-weight: 700;
@@ -23,6 +37,12 @@ def load_theme():
         background: linear-gradient(90deg, #818cf8, #c084fc);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
+        animation: glowIn 1s ease-out;
+    }
+
+    @keyframes glowIn {
+        0%   { letter-spacing: -2px; opacity: 0; }
+        100% { letter-spacing: 0px; opacity: 1; }
     }
 
     .section-title {
@@ -33,7 +53,7 @@ def load_theme():
         margin-bottom: 0.4rem;
     }
 
-    /* --- METRIC CARD --- */
+    /* =============== METRIC CARDS =============== */
     .metric-card {
         display: flex;
         gap: 12px;
@@ -43,27 +63,22 @@ def load_theme():
         border-radius: 12px;
         box-shadow: 0 2px 8px rgba(0,0,0,0.25);
         align-items: center;
-        transition: 0.25s;
-    }
-    .metric-card:hover {
-        transform: translateY(-3px);
-        border-color: #818cf8;
-        box-shadow: 0 4px 14px rgba(129,140,248,0.35);
-    }
-    .metric-icon {
-        font-size: 1.8rem;
-    }
-    .metric-title {
-        font-size: 0.88rem;
-        color: #94a3b8;
-    }
-    .metric-value {
-        font-size: 1.3rem;
-        font-weight: 700;
-        color: #e2e8f0;
+        transition: 0.25s ease-in-out;
+        animation: cardPop 0.4s ease-out;
     }
 
-    /* --- RECENT LIST ITEM --- */
+    @keyframes cardPop {
+        0%   { transform: scale(0.9); opacity: 0; }
+        100% { transform: scale(1); opacity: 1; }
+    }
+
+    .metric-card:hover {
+        transform: translateY(-4px) scale(1.02);
+        border-color: #818cf8;
+        box-shadow: 0 6px 20px rgba(129,140,248,0.35);
+    }
+
+    /* =============== RECENT ITEM LIST =============== */
     .recent-item {
         background: #161b22;
         border: 1px solid #1f2937;
@@ -72,48 +87,71 @@ def load_theme():
         display: flex;
         justify-content: space-between;
         margin-bottom: 6px;
-        transition: 0.25s;
+
+        transition: transform 0.2s ease, background 0.3s ease;
+        animation: fadeSlide 0.5s ease;
     }
+
+    @keyframes fadeSlide {
+        from { opacity: 0; transform: translateX(-10px); }
+        to   { opacity: 1; transform: translateX(0); }
+    }
+
     .recent-item:hover {
-        border-color: #818cf8;
+        transform: translateX(6px);
         background: #1e2637;
+        border-color: #818cf8;
     }
-    .recent-text {
-        color: #cbd5e1;
-        font-size: 0.9rem;
-    }
+
     .recent-btn {
-        background: #818cf8;
+        background: linear-gradient(90deg, #6366f1, #8b5cf6);
         color: white !important;
-        padding: 4px 10px;
+        padding: 4px 12px;
         border-radius: 6px;
         font-size: 0.8rem;
         text-decoration: none;
+        transition: 0.25s ease;
     }
 
-    /* --- EVALUATION BARS --- */
+    .recent-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 3px 10px rgba(129,140,248,0.35);
+    }
+
+    /* =============== EVALUATION BARS =============== */
     .eval-row {
         display: flex;
         align-items: center;
         gap: 10px;
         margin: 8px 0;
+        animation: barIn 0.6s ease;
     }
-    .eval-label {
-        width: 150px;
-        color: #cbd5e1;
-        font-size: 0.9rem;
+
+    @keyframes barIn {
+        from { opacity: 0; transform: translateX(-10px); }
+        to   { opacity: 1; transform: translateX(0); }
     }
+
     .eval-bar {
         flex-grow: 1;
         background: #1f2937;
-        height: 6px;
-        border-radius: 4px;
+        height: 8px;
+        border-radius: 6px;
         overflow: hidden;
+        position: relative;
     }
+
     .eval-fill {
-        background: #818cf8;
+        background: linear-gradient(90deg, #6366f1, #8b5cf6);
         height: 100%;
+        animation: barFill 1.5s ease-out;
     }
+
+    @keyframes barFill {
+        from { width: 0%; }
+        to   { width: inherit; }
+    }
+
     .eval-score {
         color: #e2e8f0;
         font-weight: 600;
@@ -121,6 +159,11 @@ def load_theme():
         text-align: right;
     }
 
+    /* SIDEBAR HOVER EFFECT */
+    .css-1d391kg:hover, .css-1y4p8pa:hover {
+        background-color: rgba(129,140,248,0.15) !important;
+        transition: 0.3s;
+    }
+
     </style>
     """, unsafe_allow_html=True)
-
