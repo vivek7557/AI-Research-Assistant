@@ -24,31 +24,28 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Custom CSS for modern, compact, React-inspired UI
+# Custom CSS - Lighter, colorful, compact React-style UI
 st.markdown("""
 <style>
 
 /* ====================================== */
-/*         REFINED COMPACT ANIMATIONS     */
+/*         LIGHT & COLORFUL ANIMATIONS    */
 /* ====================================== */
 
-/* Fade + slide for entire page */
 @keyframes fadeInUp {
-    0% { opacity: 0; transform: translateY(8px); }
+    0% { opacity: 0; transform: translateY(6px); }
     100% { opacity: 1; transform: translateY(0); }
 }
 .fade-in {
-    animation: fadeInUp 0.5s ease both;
+    animation: fadeInUp 0.45s ease both;
 }
 
-/* Apply fade to cards, header, inputs */
 .main-header,
 .input-container,
 .content-card {
-    animation: fadeInUp 0.5s ease both;
+    animation: fadeInUp 0.45s ease both;
 }
 
-/* Section stagger effect - faster */
 .section-block {
     opacity: 0;
     animation: fadeInUp 0.6s ease forwards;
@@ -56,205 +53,263 @@ st.markdown("""
 .section-block:nth-child(1) { animation-delay: 0.05s; }
 .section-block:nth-child(2) { animation-delay: 0.1s; }
 .section-block:nth-child(3) { animation-delay: 0.15s; }
-.section-block:nth-child(4) { animation-delay: 0.2s; }
 
-/* Subtle hover scaling */
-.hover-scale {
-    transition: transform 0.2s ease;
-}
-.hover-scale:hover {
-    transform: scale(1.01);
-}
-
-/* Soft glowing border hover */
+/* Soft glow on hover */
 @keyframes softGlow {
-    from { box-shadow: 0 0 0 rgba(111,111,245,0.0); }
-    to { box-shadow: 0 0 12px rgba(111,111,245,0.15); }
+    from { box-shadow: 0 0 0 rgba(129, 140, 248, 0); }
+    to { box-shadow: 0 0 10px rgba(129, 140, 248, 0.2); }
 }
 .input-container:hover,
 .content-card:hover,
 .eval-right:hover {
     animation: softGlow 0.3s ease forwards;
-    border-color: #6f6ff5;
+    border-color: #818cf8;
 }
 
-/* Animated gradient header text - slightly smaller */
+/* Gradient header - refreshed colors */
 @keyframes gradientFlow {
     0% { background-position: 0% 50%; }
     100% { background-position: 100% 50%; }
 }
 .main-header h1 {
-    font-size: 2.0rem;            /* Reduced from 2.2rem */
-    font-weight: 700;             /* Slightly lighter */
+    font-size: 1.95rem;
+    font-weight: 700;
+    background: linear-gradient(120deg, #818cf8, #c084fc);
     background-size: 200% 200%;
-    background: linear-gradient(135deg, #8b7bff 0%, #a78cff 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    animation: gradientFlow 5s ease-in-out infinite alternate;
+    animation: gradientFlow 6s ease-in-out infinite alternate;
 }
 
-/* Soft pulse for progress bars */
-@keyframes pulseBar {
-    0% { opacity: 0.85; }
-    50% { opacity: 1; }
-    100% { opacity: 0.85; }
-}
+/* Thinner progress */
 .stProgress > div > div {
+    height: 5px !important;
+    background-color: #818cf8 !important;
     animation: pulseBar 2s ease-in-out infinite;
-    height: 6px !important;      /* Thinner progress bar */
+}
+@keyframes pulseBar {
+    0%, 100% { opacity: 0.7; }
+    50% { opacity: 1; }
 }
 
-/* Evaluation cards slide in */
+/* Evaluation slide */
 @keyframes slideInRight {
-    0% { opacity: 0; transform: translateX(12px); }
+    0% { opacity: 0; transform: translateX(10px); }
     100% { opacity: 1; transform: translateX(0); }
 }
 .eval-right {
     animation: slideInRight 0.4s ease both;
 }
 
-/* BUTTONS: SMALLER & COMPACT */
+
+/* ====================================== */
+/*           LIGHT BUTTONS & CONTROLS     */
+/* ====================================== */
+
+/* Primary Action Button - LIGHTER & SMALLER */
 .stButton > button {
-    height: 2.6rem !important;       /* Reduced height */
-    padding: 0 1.4rem !important;    /* Less padding */
-    font-size: 0.92rem !important;   /* Smaller text */
+    height: 2.3rem !important;
+    padding: 0 1.25rem !important;
+    font-size: 0.9rem !important;
     font-weight: 600 !important;
-    border-radius: 8px !important;   /* Slightly rounder */
-    transition: all 0.2s ease;
+    border-radius: 7px !important;
+    background: linear-gradient(to right, #6366f1, #8b5cf6) !important;
+    border: none !important;
+    color: white !important;
+    box-shadow: 0 2px 6px rgba(99, 102, 241, 0.25) !important;
+    transition: all 0.18s ease;
 }
 .stButton > button:hover {
-    transform: scale(1.03);          /* Less exaggeration */
-    box-shadow: 0 4px 14px rgba(131,131,255,0.20) !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(99, 102, 241, 0.35) !important;
+    background: linear-gradient(to right, #4f46e5, #7c3aed) !important;
 }
 
-/* DOWNLOAD BUTTONS: SMALLER */
+/* Download Buttons - subtle & small */
 .stDownloadButton > button {
-    height: 2.4rem !important;
-    font-size: 0.88rem !important;
-    padding: 0 1.2rem !important;
-    background: #2a2a2a !important;
-    color: #e5e5e5 !important;
-    border: 1px solid #3a3a3a !important;
-    border-radius: 7px !important;
+    height: 2.2rem !important;
+    font-size: 0.85rem !important;
+    padding: 0 1.1rem !important;
+    border-radius: 6px !important;
+    background: #1e293b !important;
+    color: #cbd5e1 !important;
+    border: 1px solid #334155 !important;
+    transition: all 0.15s ease;
+}
+.stDownloadButton > button:hover {
+    background: #334155 !important;
+    color: white !important;
+    transform: translateY(-1px);
+    border-color: #475569 !important;
 }
 
-/* Tabs: Compact & Clean */
+/* Tabs - colorful & compact */
 .stTabs [data-baseweb="tab-list"] {
-    gap: 0.8rem;                    /* Less gap */
+    gap: 0.7rem;
     justify-content: center;
 }
 .stTabs [data-baseweb="tab"] {
-    background: #1e1e1e !important;
-    padding: 0.65rem 1.3rem !important;  /* Less padding */
-    border-radius: 9px !important;
-    border: 1px solid #2c2c2c !important;
+    background: #1e293b !important;
+    padding: 0.6rem 1.2rem !important;
+    border-radius: 8px !important;
+    border: 1px solid #334155 !important;
     font-weight: 600;
-    font-size: 0.95rem !important;       /* Slightly smaller */
+    font-size: 0.92rem !important;
+    color: #cbd5e1 !important;
 }
 .stTabs [data-baseweb="tab"][aria-selected="true"] {
-    background: #2a2a2a !important;
-    border-color: #6f6ff5 !important;
+    background: #334155 !important;
+    border-color: #818cf8 !important;
+    color: white !important;
+    box-shadow: 0 2px 6px rgba(129, 140, 248, 0.2) !important;
 }
 
-/* Subtle tab animation */
-.stTabs [data-baseweb="tab"] {
-    transition: all 0.2s ease;
-}
-.stTabs [data-baseweb="tab"]:hover {
-    transform: translateY(-1px);
-    border-color: #6f6ff5 !important;
-}
-
-
-/* ====================================== */
-/*           COMPACT THEME STYLING        */
-/* ====================================== */
-
-.main-content {
-    max-width: 1100px;              /* Slightly narrower */
-    margin: auto;
-    padding: 1.5rem;                /* Reduced padding */
-}
-
-.main-header {
-    background: #1e1e1e;
-    border: 1px solid #2a2a2a;
-    border-radius: 16px;            /* Slightly rounder */
-    padding: 1.6rem;                /* Less padding */
-    box-shadow: 0px 3px 12px rgba(0,0,0,0.32);
-}
-
-.main-header p {
-    font-size: 1.0rem;              /* Slightly smaller */
-    color: #a7a7a7;
-    margin-top: 0.4rem;
-}
-
-/* Input card - compact */
-.input-container {
-    background: #1b1b1b;
-    border: 1px solid #2c2c2c;
-    padding: 1.3rem;                /* Reduced padding */
-    border-radius: 12px;            /* Rounder */
-    box-shadow: 0 3px 9px rgba(0,0,0,0.38);
-}
-
-/* Sidebar - compact */
-[data-testid="stSidebar"] {
-    background: #111111;
-    border-right: 1px solid #222;
-    padding: 1rem 0.8rem !important; /* Tighter padding */
-}
-
-/* Metrics - compact cards */
-[data-testid="stMetric"] {
-    background: #1b1b1b;
-    padding: 0.85rem;               /* Less padding */
-    border: 1px solid #2c2c2c;
-    border-radius: 12px;
-    box-shadow: 0px 3px 10px rgba(0,0,0,0.35);
-    height: 80px;                   /* Fixed height for alignment */
-}
-
-/* Content cards */
-.content-card {
-    background: #1b1b1b;
-    border: 1px solid #2c2c2c;
-    padding: 1.0rem;                /* Reduced padding */
-    border-radius: 12px;
-    box-shadow: 0px 3px 10px rgba(0,0,0,0.32);
-}
-
-/* Text inputs and selects - compact */
+/* Inputs - light border, clean */
 input, textarea, select {
-    font-size: 0.95rem !important;
+    font-size: 0.92rem !important;
+    background: #1e293b !important;
+    border: 1px solid #334155 !important;
+    color: #e2e8f0 !important;
+    border-radius: 6px !important;
 }
 .stTextInput > div > div > input,
 .stTextArea > div > div > textarea {
-    padding: 0.55rem 0.75rem !important;
-    height: auto !important;
+    padding: 0.5rem 0.75rem !important;
 }
 
-/* Expander - compact */
+/* Expander */
 .streamlit-expanderHeader {
-    padding: 0.45rem 0.9rem !important;
-    font-size: 0.95rem !important;
+    background: #1e293b !important;
+    border: 1px solid #334155 !important;
+    border-radius: 7px !important;
+    padding: 0.4rem 0.8rem !important;
+    font-size: 0.92rem !important;
+    color: #cbd5e1 !important;
 }
 
-/* Evaluation score display */
+
+/* ====================================== */
+/*           BASE STYLING (COLORFUL)      */
+/* ====================================== */
+
+.main-content {
+    max-width: 1080px;
+    margin: auto;
+    padding: 1.4rem;
+}
+
+.main-header {
+    background: #0f172a;
+    border: 1px solid #1e293b;
+    border-radius: 14px;
+    padding: 1.5rem;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.25);
+}
+
+.main-header p {
+    font-size: 0.98rem;
+    color: #94a3b8;
+    margin-top: 0.4rem;
+}
+
+.input-container {
+    background: #0f172a;
+    border: 1px solid #1e293b;
+    padding: 1.2rem;
+    border-radius: 12px;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.28);
+}
+
+/* Sidebar */
+[data-testid="stSidebar"] {
+    background: #0b111f !important;
+    border-right: 1px solid #1e293b;
+}
+
+/* Metrics */
+[data-testid="stMetric"] {
+    background: #0f172a;
+    padding: 0.8rem;
+    border: 1px solid #1e293b;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+    height: 76px;
+}
+
+/* Content card */
+.content-card {
+    background: #0f172a;
+    border: 1px solid #1e293b;
+    padding: 0.95rem;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+}
+
+/* Evaluation score */
 .eval-title {
-    font-size: 0.8rem;
-    color: #b0b0b0;
-    margin-bottom: 4px;
+    font-size: 0.78rem;
+    color: #94a3b8;
 }
 .eval-score {
-    font-size: 1.4rem;
+    font-size: 1.35rem;
     font-weight: 700;
-    color: white;
+    color: #e2e8f0;
 }
 
 </style>
 """, unsafe_allow_html=True)
+
+# Sidebar styling (compact + colorful)
+st.markdown("""
+<style>
+[data-testid="stSidebar"] {
+    background: #0b111f !important;
+    padding: 1rem 0.7rem !important;
+}
+
+.sidebar-card {
+    background: #121d2f;
+    border: 1px solid #1e293b;
+    border-radius: 9px;
+    padding: 0.65rem 0.85rem;
+    margin-bottom: 0.85rem;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+.sidebar-title {
+    font-size: 0.8rem;
+    color: #94a3b8;
+    margin-bottom: 3px;
+}
+
+.sidebar-value {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #e2e8f0;
+}
+
+.sidebar-activity-title {
+    margin-top: 1.2rem;
+    font-size: 0.9rem !important;
+    font-weight: 700 !important;
+    color: #cbd5e1;
+}
+
+.sidebar-activity-item {
+    font-size: 0.8rem;
+    color: #94a3b8;
+    margin-bottom: 4px;
+}
+
+.sidebar-activity-item:hover {
+    color: #e2e8f0;
+    margin-left: 2px;
+}
+</style>
+""", unsafe_allow_html=True)
+
+
+# =============== REST OF YOUR CODE UNCHANGED ===============
 
 # Sidebar
 with st.sidebar:
@@ -319,77 +374,7 @@ with st.sidebar:
         st.markdown("<div class='sidebar-activity-item'>No activity yet</div>", unsafe_allow_html=True)
 
 
-st.markdown("""
-<style>
-    /* ===================== */
-/* SIDEBAR FIXED LAYOUT  */
-/* ===================== */
-
-[data-testid="stSidebar"] {
-    background: #111111 !important;
-    border-right: 1px solid #222;
-    padding: 1rem 0.6rem;
-}
-
-/* Compact cards */
-.sidebar-card {
-    background: #1a1a1a;
-    border: 1px solid #2d2d2d;
-    border-radius: 10px;           /* Slightly rounder */
-    padding: 0.7rem 0.9rem;        /* Less padding */
-    margin-bottom: 0.9rem;         /* Less gap */
-    box-shadow: 0px 2px 7px rgba(0,0,0,0.32);
-    transition: 0.2s ease;
-}
-
-.sidebar-card:hover {
-    transform: scale(1.01);
-    border-color: #6f6ff5;
-}
-
-/* Titles */
-.sidebar-title {
-    font-size: 0.82rem;            /* Slightly smaller */
-    font-weight: 600;
-    color: #cfcfcf;
-    margin-bottom: 4px;
-}
-
-/* Values */
-.sidebar-value {
-    font-size: 1.3rem;             /* Slightly smaller */
-    font-weight: 700;
-    color: white;
-}
-
-/* Recent Activity Title */
-.sidebar-activity-title {
-    margin-top: 1.3rem;
-    font-size: 0.92rem !important;
-    font-weight: 700 !important;
-    color: #dcdcdc;
-}
-
-/* Each recent item */
-.sidebar-activity-item {
-    font-size: 0.82rem;            /* Smaller text */
-    color: #bdbdbd;
-    margin-bottom: 5px;            /* Less spacing */
-    transition: 0.15s ease;
-}
-
-.sidebar-activity-item:hover {
-    color: #ffffff;
-    margin-left: 3px;
-}
-
-</style>
-""", unsafe_allow_html=True)
-
-
-
 # API Keys
-# API Keys (Streamlit Cloud)
 try:
     anthropic_key = st.secrets["ANTHROPIC_API_KEY"]
     GROQ_API_KEY = st.secrets["GROQ_API_KEY"]
@@ -532,7 +517,7 @@ with tab1:
                                 st.markdown(f"**{m_name}**")
                                 st.progress(score / 100)
                                 st.markdown(
-                                    f"<p style='font-size:0.85rem; color:#cccccc; margin-top:4px;'>"
+                                    f"<p style='font-size:0.85rem; color:#94a3b8; margin-top:4px;'>"
                                     f"{explanations.get(metric, '')}</p>",
                                     unsafe_allow_html=True,
                                 )
@@ -554,7 +539,7 @@ with tab1:
                         st.markdown(
                             f"""
 <h3>{emoji} Overall Quality Score: {overall:.1f}/100</h3>
-<p style='color:#cfcfcf; font-size:0.9rem;'>
+<p style='color:#94a3b8; font-size:0.9rem;'>
 {explanations['overall']}
 </p>
 """,
@@ -565,15 +550,13 @@ with tab1:
             except Exception as e:
                 st.error(f"❌ Error during research: {str(e)}")
 
-# Tabs 2 & 3 unchanged because no UI errors exist
-# (Ask if you want them upgraded too.)
-
+# Tabs 2 & 3 unchanged
 st.markdown("</div>", unsafe_allow_html=True)
 
 # Footer
 st.markdown("---")
 st.markdown("""
-<div style='text-align:center; opacity:0.7; padding:1rem'>
+<div style='text-align:center; opacity:0.7; padding:1rem; color: #94a3b8;'>
     AI Research Assistant v2.0 • Multi-Agent System<br>
     Powered by Claude & Tavily
 </div>
