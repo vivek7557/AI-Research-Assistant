@@ -1,93 +1,226 @@
 import streamlit as st
-from streamlit import session_state as state
+import time
+import uuid
 import json
-from ui.theme import load_theme
+import requests
+from pathlib import Path
 
-# Page imports
-from pages.dashboard import dashboard_page
-from pages.research import research_page
-from pages.library import library_page
-from pages.favorites import favorites_page
-from pages.search import search_page
-from pages.upload import upload_page
+from orchestrator import ResearchOrchestrator  # your existing file
 
-
-# ----------------------------- #
-# PAGE CONFIG MUST COME FIRST
-# ----------------------------- #
+# ==============================================================
+# PAGE SETTINGS
+# ==============================================================
 st.set_page_config(
     page_title="AI Research Assistant",
     page_icon="🔍",
     layout="wide",
-    initial_sidebar_state="expanded"
 )
 
-# Load Theme
-load_theme()
+# ==============================================================
+# THEME & GLOBAL CSS
+# ==============================================================
+st.markdown("""
+<style>
+
+body, .stApp {
+    background-color: #0d1117 !important;
+}
+
+/* Remove top padding */
+.block-container {
+    padding-top: 1rem !important;
+    max-width: 1150px;
+}
+
+/* -------------------------
+   BEAUTIFUL PAGE TITLE
+-------------------------- */
+.page-title {
+    font-size: 2.3rem;
+    font-weight: 700;
+    background: linear-gradient(90deg, #818cf8, #c084fc);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* -------------------------
+   FLOATING CHAT BUBBLE
+-------------------------- */
+.chat-bubble {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    width: 62px;
+    height: 62px;
+    background: #6c47ff;
+    border-radius: 50%;
+    box-shadow: 0 6px 16px rgba(120,80,255,0.35);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    transition:0.2s;
+}
+
+.chat-bubble:hover {
+    transform: scale(1.08);
+}
+
+/* Chat icon */
+.chat-bubble-icon {
+    font-size: 28px;
+    color:white;
+}
+
+/* -----------------------------
+   CHAT PANEL (SLIDE-IN)
+------------------------------ */
+#chat-panel {
+    position: fixed;
+    top: 0;
+    right: -420px;
+    width: 400px;
+    height: 100vh;
+    background: #111827;
+    border-left: 1px solid #1f2937;
+    padding: 20px;
+    transition: right 0.35s ease;
+    overflow-y:auto;
+}
+
+.chat-panel-open {
+    right: 0 !important;
+}
+
+/* Chat message bubbles */
+.chat-msg-user {
+    background: #2563eb;
+    color:white;
+    padding: 10px;
+    border-radius: 10px;
+    margin-bottom:8px;
+    max-width:80%;
+}
+
+.chat-msg-ai {
+    background: #374151;
+    color:white;
+    padding: 10px;
+    border-radius: 10px;
+    margin-bottom:8px;
+    max-width:80%;
+}
+
+/* Research Input Container */
+.research-box {
+    background:#111827;
+    padding:20px;
+    border-radius:12px;
+    border:1px solid #1f2937;
+    margin-top:10px;
+}
+
+</style>
+
+<script>
+// toggle chat panel
+function toggleChat() {
+    let panel=document.getElementById("chat-panel");
+    panel.classList.toggle("chat-panel-open");
+}
+</script>
+""", unsafe_allow_html=True)
 
 
-# ----------------------------- #
-# SIDEBAR BRANDING (FIXED)
-# ----------------------------- #
-st.sidebar.markdown(
-    """
-    <div class="sidebar-header">
-        <div class="sidebar-title">AI Research Assistant</div>
-    </div>
-    """,
-    unsafe_allow_html=True
-)
+# ==============================================================
+# FLOATING CHAT BUBBLE HTML
+# ==============================================================
+st.markdown("""
+<div class="chat-bubble" onclick="toggleChat()">
+   <div class="chat-bubble-icon">💬</div>
+</div>
+
+<div id="chat-panel">
+    <h3 style="color:white;">AI Chat Assistant</h3>
+    <div id="chat-container"></div>
+</div>
+""", unsafe_allow_html=True)
 
 
-# ----------------------------- #
-# THEME TOGGLE
-# ----------------------------- #
-if "theme" not in state:
-    state.theme = "light"
+# ==============================================================
+# PAGE HEADER
+# ==============================================================
+st.markdown("<div class='page-title'>AI Research Assistant</div>", unsafe_allow_html=True)
 
-def toggle_theme():
-    state.theme = "dark" if state.theme == "light" else "light"
+# RESEARCH INPUT AREA
+st.markdown("<h2 style='color:#e5e7eb;'>New Research</h2>", unsafe_allow_html=True)
 
-st.sidebar.button("🌗 Toggle Theme", on_click=toggle_theme)
-st.sidebar.markdown(
-    f"<div class='theme-info'>Active Theme: <b>{state.theme.title()}</b></div>",
-    unsafe_allow_html=True
-)
+with st.container():
+    st.markdown("<div class='research-box'>", unsafe_allow_html=True)
 
+    query = st.text_input("Enter research topic:")
+    col1, col2 = st.columns(2)
+    output_format = col1.selectbox("Output Format", ["report","article","summary","presentation"])
+    depth = col2.slider("Research Depth", 1, 5, 3)
 
-# ----------------------------- #
-# NAVIGATION
-# ----------------------------- #
+    st.markdown("</div>", unsafe_allow_html=True)
 
-if "page" not in state:
-    state.page = "Dashboard"
+run = st.button("🚀 Start Research", use_container_width=True)
 
-state.page = st.sidebar.radio(
-    "Navigation",
-    list(PAGES.keys()),
-    format_func=lambda x: PAGES[x],
-)
+if run:
+    if not query.strip():
+        st.warning("Enter a topic first.")
+        st.stop()
 
+    st.info("Running research...")
+    orchestrator = ResearchOrchestrator()
 
-# ----------------------------- #
-# ROUTING
-# ----------------------------- #
-def router():
-    if state.page == "Dashboard":
-        dashboard_page()
-    elif state.page == "Research":
-        research_page()
-    elif state.page == "Library":
-        library_page()
-    elif state.page == "Favorites":
-        favorites_page()
-    elif state.page == "Search":
-        search_page()
-    elif state.page == "Upload":
-        upload_page()
+    results = orchestrator.conduct_research(
+        query=query,
+        output_format=output_format,
+        depth=depth
+    )
 
+    st.success("Research completed!")
 
-router()
+    st.markdown("### 📄 Final Research")
+    st.markdown(results["final_content"]["content"])
 
-from components.chat_agent import chat_agent
-chat_agent()
+    # Citations
+    st.markdown("### 🔗 Citations")
+    for src in results["research_summary"].get("sources", []):
+        st.markdown(f"- [{src.get('title','source')}]({src.get('url','')})")
+
+    # Download
+    st.download_button("📥 Download Markdown", results["final_content"]["content"], "research.md")
+
+st.markdown("### ")
+
+user_msg = st.text_input("Chat with AI:", key="chatbox")
+
+if "chat_history" not in st.session_state:
+    st.session_state.chat_history = []
+
+if user_msg:
+    st.session_state.chat_history.append({"role":"user","content":user_msg})
+
+    # Call GROQ Mixtral
+    r = requests.post(
+        "https://api.groq.com/openai/v1/chat/completions",
+        headers={"Authorization":f"Bearer {st.secrets['GROQ_API_KEY']}"},
+        json={
+            "model": "mixtral-8x7b-32768",
+            "messages": st.session_state.chat_history
+        }
+    )
+
+    ai_reply = r.json()["choices"][0]["message"]["content"]
+    st.session_state.chat_history.append({"role":"assistant","content":ai_reply})
+
+# Render chat
+for msg in st.session_state.chat_history:
+    if msg["role"] == "user":
+        st.markdown(f"<div class='chat-msg-user'>{msg['content']}</div>", unsafe_allow_html=True)
+    else:
+        st.markdown(f"<div class='chat-msg-ai'>{msg['content']}</div>", unsafe_allow_html=True)
+
