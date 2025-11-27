@@ -58,14 +58,6 @@ st.sidebar.markdown(
 # ----------------------------- #
 # NAVIGATION
 # ----------------------------- #
-PAGES = {
-    "Dashboard": "📊 Dashboard",
-    "Research": "🧪 Research",
-    "Library": "📚 Library",
-    "Favorites": "⭐ Favorites",
-    "Search": "🔍 Search",
-    "Upload": "📤 Upload Paper"
-}
 
 if "page" not in state:
     state.page = "Dashboard"
