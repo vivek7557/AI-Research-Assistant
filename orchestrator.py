@@ -24,7 +24,7 @@ from agents.research_agents import (
 from tools.web_search_tool import WebSearchTool
 from memory.memory_bank import SessionManager, MemoryBank, ContextCompactor
 from observability.logger import observability
-from agents.brochure_agent import BrochureAgent
+from agents.BrochureAgent import BrochureAgent
 
 
 
