@@ -24,3 +24,7 @@ langchain
 PyPDF2
 loguru
 fpdf2
+requests
+loguru
+fpdf2
+
