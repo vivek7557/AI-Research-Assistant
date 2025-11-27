@@ -18,7 +18,7 @@ from agents.research_agents import (
     SynthesisAgent,
     ValidationAgent,
     ContentGeneratorAgent,
-    BrochureAgent         # NEW agent you added
+           # NEW agent you added
 )
 
 from tools.web_search_tool import WebSearchTool
