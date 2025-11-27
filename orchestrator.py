@@ -56,6 +56,7 @@ class ResearchOrchestrator:
     # ===================================================================
     # MAIN RESEARCH FUNCTION
     # ===================================================================
+    timeline = []
     def conduct_research(
         self,
         query: str,
