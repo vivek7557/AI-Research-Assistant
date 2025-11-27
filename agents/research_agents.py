@@ -3,22 +3,19 @@ from groq import Groq
 from typing import List, Dict, Any
 from loguru import logger
 
-# -------------------------------------------------
-# LLM CLIENT (Groq – LLaMA 3–70B)
-# -------------------------------------------------
+# ======================================================================
+# LLM CONFIG  (Groq — LLaMA 3–70B)
+# ======================================================================
+
 client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
-LLM_MODEL = "llama3-70b-8192"     # BEST FREE LONG MODEL
-MAX_TOKENS = 7000                 # Allow long deep research
-TEMP = 0.4                        # Stable but creative
+LLM_MODEL = "llama3-70b-8192"   # FREE long-context model
+MAX_TOKENS = 7000               # Allow large research output
+TEMP = 0.4
 
 
-# -------------------------------------------------
-# BASE LLM CALL
-# -------------------------------------------------
 def run_llm(system_prompt: str, user_prompt: str) -> str:
-    """Universal LLM runner with long-output settings"""
-
+    """Universal LLM runner"""
     response = client.chat.completions.create(
         model=LLM_MODEL,
         temperature=TEMP,
@@ -28,32 +25,31 @@ def run_llm(system_prompt: str, user_prompt: str) -> str:
             {"role": "user", "content": user_prompt}
         ]
     )
-
     return response.choices[0].message["content"]
 
 
-# -------------------------------------------------
-# AGENT 1 — Query Planner
-# -------------------------------------------------
+# ======================================================================
+# AGENT 1 — QUERY PLANNER
+# ======================================================================
+
 class QueryPlannerAgent:
     def plan_research(self, query: str, session_id: str):
+
         logger.info(f"Planning research: {query}")
 
         system = """
         You are a senior research strategist.
-        Break complex research topics into deep sub-questions.
-        Ensure all angles are covered: causes, effects, trends, data, forecasts,
-        challenges, frameworks, opportunities, risks, and global context.
+        Break topics into deep sub-questions.
         """
 
         user = f"""
-        Create a detailed research plan for: {query}
+        Create a research plan for: {query}
 
-        Output fields:
-        - Main Research Objective
-        - 6–12 deeply analytical sub-questions
-        - A data-collection strategy
-        - A verification strategy
+        Include:
+        - Main objective
+        - 6–12 deep analytical sub-questions
+        - Data-collection strategy
+        - Verification strategy
         """
 
         result = run_llm(system, user)
@@ -65,14 +61,16 @@ class QueryPlannerAgent:
 
     def _extract_sub_questions(self, text: str) -> List[str]:
         lines = [l.strip() for l in text.split("\n") if l.strip()]
-        subs = [l for l in lines if any(k in l.lower() for k in ["?", "question"])]
+        subs = [l for l in lines if "?" in l.lower()]
         return subs[:12]
 
 
-# -------------------------------------------------
-# AGENT 2 — Research Agent (Iterative Deep Research)
-# -------------------------------------------------
+# ======================================================================
+# AGENT 2 — RESEARCH AGENT  (Iterative deep search)
+# ======================================================================
+
 class ResearchAgent:
+
     def __init__(self, search_tool):
         self.search_tool = search_tool
         self.iterations = 3
@@ -89,6 +87,7 @@ class ResearchAgent:
         memory_bank,
         loop_iterations: int = None
     ):
+
         if loop_iterations:
             self.iterations = loop_iterations
 
@@ -99,8 +98,10 @@ class ResearchAgent:
 
             for q in sub_questions:
                 try:
-                    # Perform enriched web search
-                    results = self.search_tool.search(q, n_results=self.sources_per_iter)
+                    results = self.search_tool.search(
+                        q,
+                        n_results=self.sources_per_iter
+                    )
                     aggregated_sources.extend(results)
                 except Exception as e:
                     logger.warning(f"Search failed: {e}")
@@ -112,79 +113,71 @@ class ResearchAgent:
         }
 
 
-# -------------------------------------------------
-# AGENT 3 — Synthesis Agent
-# -------------------------------------------------
+# ======================================================================
+# AGENT 3 — SYNTHESIS AGENT
+# ======================================================================
+
 class SynthesisAgent:
+
     def synthesize(self, sources: List[Dict], query: str, session_id: str):
+
         system = """
         You are an elite research analyst.
-        Combine all sources into one unified, coherent synthesis.
-        The synthesis must:
-        - Be extremely detailed (2000+ words)
-        - Include real-world data, evidence, and frameworks
-        - Compare and contrast findings
-        - Identify trends, patterns, contradictions
-        - Provide deep reasoning, not surface explanations
+        Combine all collected information into a 2000–2500 word synthesis.
         """
 
-        content = "\n\n".join([s.get("content", "") for s in sources])
+        combined = "\n\n".join([
+            s.get("content", "") for s in sources
+        ])
 
         user = f"""
-        Research Topic: {query}
+        Topic: {query}
 
-        Combine ALL the following research data into a unified synthesis:
+        Use the following research material:
 
-        {content}
+        {combined}
 
         Produce:
-        - 6–10 paragraph deep synthesis
-        - Trends, models, frameworks, global impact
-        - Predictions + scenario analysis
+        - A long 6–10 paragraph synthesis
+        - Trends, frameworks, insights
         """
 
-        analysis = run_llm(system, user)
+        synthesis_text = run_llm(system, user)
 
-        return {"synthesis": analysis}
+        return {"synthesis": synthesis_text}
 
 
-# -------------------------------------------------
-# AGENT 4 — Validation Agent
-# -------------------------------------------------
+# ======================================================================
+# AGENT 4 — VALIDATION AGENT
+# ======================================================================
+
 class ValidationAgent:
+
     def validate(self, synthesis: str, sources: List[Dict], session_id: str):
+
         system = """
         You are a fact-checking AI.
-        Compare synthesis with evidence.
-        Identify gaps, contradictions, false claims,
-        missing angles, missing data, or assumptions.
+        Compare synthesis with provided sources.
         """
 
         user = f"""
-        Validate the following synthesis against the collected sources.
+        Validate the following synthesis:
 
-        Synthesis:
         {synthesis}
         """
 
-        validation = run_llm(system, user)
+        validation_text = run_llm(system, user)
 
         return {
-            "validation_text": validation,
+            "validation_text": validation_text,
             "confidence_score": 95
         }
 
 
-# -------------------------------------------------
-# AGENT 5 — Final Content Generator
-# -------------------------------------------------
-"""
-Content Generator Agent
-Produces final formatted reports/articles/summaries/presentations.
-Now includes clean citation rendering.
-"""
+# ======================================================================
+# AGENT 5 — FINAL CONTENT GENERATOR
+# ======================================================================
 
-from typing import Dict, List
 from agents.llm_model import call_llm
 from tools.citations import CitationFormatter
 
@@ -192,11 +185,8 @@ from tools.citations import CitationFormatter
 class ContentGeneratorAgent:
 
     def __init__(self):
-        self.max_tokens = 5000  # Increased for richer outputs
+        self.max_tokens = 5000
 
-    # ---------------------------------------------------
-    # MAIN ENTRY
-    # ---------------------------------------------------
     def generate(
         self,
         synthesis: str,
@@ -204,104 +194,73 @@ class ContentGeneratorAgent:
         sources: List[Dict],
         output_format: str,
         session_id: str
-    ) -> Dict[str, any]:
+    ):
 
         prompt = self._build_prompt(synthesis, validation, output_format)
 
         response = call_llm(prompt, max_tokens=self.max_tokens)
+        text = response["content"]
 
-        final_text = response["content"]
-
-        # -------------------------------------------
-        # CITATIONS ADDED HERE
-        # -------------------------------------------
+        # Append citations
         citations_md = CitationFormatter.markdown(sources)
 
-        final_text += f"""
-
----
-
-### 📚 Citations
-{citations_md}
-
-"""
+        final = text + f"\n\n---\n\n### 📚 Citations\n{citations_md}\n"
 
         return {
-            "content": final_text,
-            "word_count": len(final_text.split()),
+            "content": final,
+            "word_count": len(final.split()),
             "format": output_format
         }
 
-    # ---------------------------------------------------
+    # -------------------------------------------------------------
     # PROMPT BUILDER
-    # ---------------------------------------------------
-    def _build_prompt(self, synthesis: str, validation: Dict, fmt: str) -> str:
+    # -------------------------------------------------------------
+    def _build_prompt(
+        self,
+        synthesis: str,
+        validation: Dict,
+        fmt: str
+    ) -> str:
 
-        val_score = validation.get("confidence", "Unknown")
-        gaps = validation.get("gaps", [])
-        contradictions = validation.get("contradictions", [])
+        val_text = validation.get("validation_text", "")
 
-        validation_text = f"""
-Validation Summary:
-- Confidence Level: {val_score}
-- Gaps: {", ".join(gaps) if gaps else "None"}
-- Contradictions: {", ".join(contradictions) if contradictions else "None"}
+        base = f"""
+SYNTHESIS:
+{synthesis}
+
+VALIDATION:
+{val_text}
 """
-
-        # ---------------------------
-        # FORMAT SPECIFIC OUTPUTS
-        # ---------------------------
 
         formats = {
             "report": f"""
-Write a detailed research **REPORT** based on the synthesis below.
+Write a detailed professional RESEARCH REPORT.
 
 Requirements:
-- Executive Summary
-- Key Findings (5–10 points)
-- Data-backed explanations
-- Detailed implications
-- Clear recommendations
-- Validation info included
+- Executive summary
+- Key findings
+- Deep analysis
+- Recommendations
 
-SYNTHESIS:
-{synthesis}
-
-{validation_text}
+{base}
 """,
 
             "article": f"""
-Write a full-length **MAGAZINE ARTICLE** based on the synthesis.
+Write a long MAGAZINE ARTICLE in engaging tone.
 
-Requirements:
-- Engaging introduction
-- Professional tone
-- 6–8 long paragraphs
-- Real world examples
-- Human-like storytelling
-
-SYNTHESIS:
-{synthesis}
-
-{validation_text}
+{base}
 """,
 
             "summary": f"""
-Write a **COMPREHENSIVE SUMMARY** based on the synthesis (5–8 short sections)
+Write a structured SUMMARY (5–8 sections).
 
-SYNTHESIS:
-{synthesis}
-
-{validation_text}
+{base}
 """,
 
             "presentation": f"""
-Write a **SLIDE-DECK STYLE PRESENTATION** with bullet points and sections.
+Write a SLIDE DECK style breakdown.
 
-SYNTHESIS:
-{synthesis}
-
-{validation_text}
+{base}
 """
         }
 
