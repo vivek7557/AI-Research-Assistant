@@ -4,6 +4,35 @@ def load_theme():
     st.markdown("""
     <style>
 
+
+    /* Global Fade In */
+.fade-in {
+    animation: fadeIn 0.6s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0px); }
+}
+
+/* Smooth Hover Lift */
+.lift {
+    transition: 0.25s ease;
+}
+.lift:hover {
+    transform: translateY(-4px);
+}
+
+/* Page Transition */
+.page-enter {
+    animation: pageEnter 0.5s ease;
+}
+
+@keyframes pageEnter {
+    0% { opacity: 0; transform: translateY(10px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+
     /* =============== GLOBAL =============== */
     .stApp {
         animation: fadeIn 0.8s ease-in-out;
