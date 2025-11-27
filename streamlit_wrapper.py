@@ -152,6 +152,7 @@ st.markdown("""
 # ==============================================================
 st.markdown("<div class='page-title'>AI Research Assistant</div>", unsafe_allow_html=True)
 
+
 # RESEARCH INPUT AREA
 st.markdown("<h2 style='color:#e5e7eb;'>New Research</h2>", unsafe_allow_html=True)
 
@@ -193,6 +194,7 @@ if run:
 
     # Download
     st.download_button("📥 Download Markdown", results["final_content"]["content"], "research.md")
+
 
 st.markdown("### ")
 
