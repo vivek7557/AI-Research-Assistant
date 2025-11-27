@@ -49,7 +49,7 @@ GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 client = Groq(api_key=GROQ_API_KEY)
 
 # Default stable model
-DEFAULT_MODEL = "llama3-70b-versatile"   # change this anytime
+DEFAULT_MODEL = "llama3-8b-8192"   # change this anytime
 
 def call_llm(prompt, model=DEFAULT_MODEL, max_tokens=4096, temperature=0.7):
     """
