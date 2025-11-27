@@ -270,30 +270,34 @@ class ResearchOrchestrator:
         return final
 
 
-    # ======================================================================
-    # BROCHURE MODE
-    # ======================================================================
-    def _stage_brochure(self, synthesis_results, validation_results, sources, session_id):
+# ======================================================================
+# BROCHURE MODE
+# ======================================================================
+def _stage_brochure(self, synthesis_results, validation_results, sources, session_id):
 
-        pdf_path, pdf_bytes = self.brochure_agent.generate_brochure(
-            synthesis_results["synthesis"],
-            validation_results,
-            sources,
-            session_id
-        )
+    sections = {
+        "Executive Summary": synthesis_results.get("synthesis", "No summary available."),
+        "Validation Results": str(validation_results),
+    }
 
-        self.timeline.append({
-            "stage": "Brochure",
-            "details": "Generated brochure PDF.",
-            "timestamp": time.time()
-        })
+    brochure = self.brochure_agent.generate(
+        title="Research Brochure",
+        sections=sections,
+        sources=sources
+    )
 
-        return {
-            "content": "Brochure PDF generated.",
-            "pdf_path": pdf_path,
-            "pdf_bytes": pdf_bytes,
-            "word_count": len(synthesis_results["synthesis"].split())
-        }
+    self.timeline.append({
+        "stage": "Brochure",
+        "details": "Generated brochure PDF.",
+        "timestamp": time.time()
+    })
+
+    return {
+        "content": "Brochure PDF generated.",
+        "pdf_bytes": brochure["pdf_bytes"],
+        "word_count": len(synthesis_results.get("synthesis", "").split())
+    }
+
 
 
 
