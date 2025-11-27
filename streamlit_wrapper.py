@@ -192,21 +192,37 @@ if run:
     for src in results["research_summary"].get("sources", []):
         st.markdown(f"- [{src.get('title','source')}]({src.get('url','')})")
 
-    # Download
-    st.download_button("📥 Download Markdown", results["final_content"]["content"], "research.md")
+ # =============== DOWNLOAD OPTIONS ===============
+st.markdown("---")
+d1, d2, d3 = st.columns(3)
 
+d1.download_button(
+    "📥 Markdown",
+    data=content,
+    file_name="research.md"
+)
 
+d2.download_button(
+    "📥 JSON",
+    data=json.dumps(results, indent=2),
+    file_name="research.json"
+)
 
-    # =============== BROCHURE DOWNLOAD ===============
-if "brochure" in results and results["brochure"] is not None:
+d3.download_button(
+    "📥 TXT",
+    data=content,
+    file_name="research.txt"
+)
+
+# =============== BROCHURE DOWNLOAD ===============
+if results.get("brochure"):
     st.markdown("### 📄 Brochure PDF")
     st.download_button(
-        label="📥 Download Brochure",
+        "📥 Download Brochure PDF",
         data=results["brochure"]["pdf_bytes"],
         file_name="brochure.pdf",
         mime="application/pdf"
     )
-
 
 
 st.markdown("### ")
