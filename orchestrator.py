@@ -23,6 +23,8 @@ from agents.research_agents import (
 from tools.web_search_tool import WebSearchTool
 from memory.memory_bank import SessionManager, MemoryBank, ContextCompactor
 from observability.logger import observability
+from agents.brochure_agent import BrochureGeneratorAgent
+
 
 
 class ResearchOrchestrator:
@@ -38,6 +40,8 @@ class ResearchOrchestrator:
     def __init__(self):
         # Tools
         self.search_tool = WebSearchTool()
+        self.brochure_agent = BrochureGeneratorAgent()
+
 
         # Agents
         self.query_planner = QueryPlannerAgent()
@@ -352,13 +356,30 @@ class ResearchOrchestrator:
             "timestamp": time.time()
         })
 
-        final_content = self.content_generator.generate(
-            synthesis_results["synthesis"],
-            validation_results,
-            sources,
-            output_format,
-            session_id
-        )
+        if output_format == "brochure":
+            brochure_text = self.brochure_agent.generate_brochure_text(
+                synthesis_results["synthesis"],
+               synthesis_results["synthesis"]
+            )
+
+          pdf_path = self.brochure_agent.generate_pdf(brochure_text)
+
+          return {
+              "content": brochure_text,
+              "pdf_path": pdf_path,
+              "format": "brochure"
+          }
+     else:
+         final_content = self.content_generator.generate(
+             synthesis_results["synthesis"],
+             validation_results,
+             sources,
+             output_format,
+             session_id
+         )
+
+         return final_content
+
 
         self.session_manager.update_session(session_id, {
             "current_stage": "completed",
