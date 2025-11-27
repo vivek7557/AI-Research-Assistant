@@ -213,6 +213,13 @@ class ResearchOrchestrator:
 
         self.session_manager.set_agent_output(session_id, "QueryPlanner", plan)
         return plan
+        
+        self.timeline.append({
+            "stage": "Planning",
+            "details": "Sub-questions generated.",
+            "status": "completed"
+        })
+
 
     # ----------------------------------------------
     def _stage_research(self, plan, session_id, iterations):
@@ -244,6 +251,13 @@ class ResearchOrchestrator:
         self.session_manager.set_agent_output(session_id, "Researcher", results)
         return results
 
+        self.timeline.append({
+            "stage": "Research Loop",
+            "details": f"{results['iterations_completed']} iterations completed.",
+            "status": "completed"
+        })
+
+
     # ----------------------------------------------
     def _stage_synthesis(self, research_results, query, session_id):
         synthesis = self.synthesizer.synthesize(
@@ -264,6 +278,13 @@ class ResearchOrchestrator:
         self.session_manager.set_agent_output(session_id, "Synthesizer", synthesis)
         return synthesis
 
+        self.timeline.append({
+            "stage": "Synthesis",
+            "details": "Findings merged and summarized.",
+            "status": "completed"
+        })
+
+
     # ----------------------------------------------
     def _stage_validation(self, synthesis_results, sources, session_id):
         validation = self.validator.validate(
@@ -279,6 +300,13 @@ class ResearchOrchestrator:
 
         self.session_manager.set_agent_output(session_id, "Validator", validation)
         return validation
+        
+        self.timeline.append({
+            "stage": "Validation",
+            "details": "Information validated; contradictions checked.",
+            "status": "completed"
+        })
+
 
     # ----------------------------------------------
     def _stage_generation(
@@ -311,6 +339,13 @@ class ResearchOrchestrator:
 
         self.session_manager.set_agent_output(session_id, "ContentGenerator", final_content)
         return final_content
+        
+        self.timeline.append({
+            "stage": "Content Generation",
+            "details": "Final report generated.",
+            "status": "completed"
+       })
+
 
 
 # ===================================================================
