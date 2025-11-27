@@ -196,6 +196,19 @@ if run:
     st.download_button("📥 Download Markdown", results["final_content"]["content"], "research.md")
 
 
+
+    # =============== BROCHURE DOWNLOAD ===============
+if "brochure" in results and results["brochure"] is not None:
+    st.markdown("### 📄 Brochure PDF")
+    st.download_button(
+        label="📥 Download Brochure",
+        data=results["brochure"]["pdf_bytes"],
+        file_name="brochure.pdf",
+        mime="application/pdf"
+    )
+
+
+
 st.markdown("### ")
 
 user_msg = st.text_input("Chat with AI:", key="chatbox")
