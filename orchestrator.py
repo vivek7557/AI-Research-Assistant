@@ -1,47 +1,38 @@
 """
-Research Orchestrator
-Coordinates all agents in a sequential and loop-based workflow
-Implements multi-agent research system with advanced depth control
+Advanced Research Orchestrator
+Multi-agent workflow with:
+- Depth control
+- Timeline tracking
+- Citation support
+- Brochure generator mode
 """
 
 import uuid
 import time
-import json
-from typing import List, Dict, Any, Optional
+from typing import Dict, Any, Optional, List
 from loguru import logger
 
-# Agents
 from agents.research_agents import (
     QueryPlannerAgent,
     ResearchAgent,
     SynthesisAgent,
     ValidationAgent,
-    ContentGeneratorAgent
+    ContentGeneratorAgent,
+    BrochureAgent         # NEW agent you added
 )
 
-# Tools & Memory
 from tools.web_search_tool import WebSearchTool
 from memory.memory_bank import SessionManager, MemoryBank, ContextCompactor
 from observability.logger import observability
-from agents.brochure_agent import BrochureGeneratorAgent
 
 
 
 class ResearchOrchestrator:
-    """
-    MAIN PIPELINE:
-        1. Query Planning
-        2. Research (LOOP with depth & auto-boost)
-        3. Synthesis
-        4. Validation
-        5. Final Content Generation
-    """
+    """Main multi-agent pipeline controller."""
 
     def __init__(self):
         # Tools
         self.search_tool = WebSearchTool()
-        self.brochure_agent = BrochureGeneratorAgent()
-
 
         # Agents
         self.query_planner = QueryPlannerAgent()
@@ -49,20 +40,22 @@ class ResearchOrchestrator:
         self.synthesizer = SynthesisAgent()
         self.validator = ValidationAgent()
         self.content_generator = ContentGeneratorAgent()
+        self.brochure_agent = BrochureAgent()       # NEW
 
         # Memory
         self.session_manager = SessionManager()
         self.memory_bank = MemoryBank()
         self.context_compactor = ContextCompactor()
 
-        self.timeline = []
+        # Timeline
+        self.timeline: List[Dict[str, Any]] = []
 
-        logger.info("Research Orchestrator initialized.")
+        logger.info("Advanced Research Orchestrator initialized.")
 
-    # ===================================================================
-    # MAIN RESEARCH FUNCTION
-    # ===================================================================
-    timeline = []
+
+    # ======================================================================
+    # MAIN PIPELINE
+    # ======================================================================
     def conduct_research(
         self,
         query: str,
@@ -74,343 +67,238 @@ class ResearchOrchestrator:
         observability.start_session()
 
         try:
-            # ----------------------------------------------
+            # -----------------------------
             # SESSION INIT
-            # ----------------------------------------------
+            # -----------------------------
             if not session_id:
                 session_id = f"research_{uuid.uuid4().hex[:8]}"
 
             self.session_manager.create_session(session_id, query)
-            logger.info(f"Starting research session: {session_id}")
+            logger.info(f"Starting session {session_id}")
 
-            # ----------------------------------------------
-            # ADVANCED DEPTH LOGIC 🔥
-            # ----------------------------------------------
-            depth = max(1, min(depth, 10))   # limit to 1–10
+            # -----------------------------
+            # DEPTH CONFIG
+            # -----------------------------
+            depth_config = {
+                1: (1, 2),
+                2: (2, 3),
+                3: (3, 5),
+                4: (4, 7),
+                5: (6, 10)
+            }
 
-            # base numbers
-            iterations = 1 + depth                # depth=10 -> 11-loop research
-            max_sources = 3 + (2 * depth)         # depth=10 -> 23 sources
+            iterations, sources_per_iter = depth_config.get(depth, (3, 5))
 
-            # auto-boost for complex queries
-            complexity_keywords = [
-                "analysis", "impact", "compare", "vs", "architecture",
-                "workflow", "evaluation", "framework", "system"
-            ]
+            logger.info(f"[DEPTH] depth={depth} → iter={iterations}, sources={sources_per_iter}")
 
-            if any(k in query.lower() for k in complexity_keywords):
-                iterations += 2
-                max_sources += 4
-
-            logger.info(
-                f"[ADVANCED DEPTH CONFIG] depth={depth} → "
-                f"iterations={iterations}, max_sources={max_sources}"
-            )
-
-            # Pass depth to ResearchAgent
             if hasattr(self.researcher, "set_depth"):
-                self.researcher.set_depth(
-                    iterations=iterations,
-                    max_sources=max_sources
-                )
+                self.researcher.set_depth(iterations, sources_per_iter)
 
-            # Enable research booster
-            if hasattr(self.researcher, "enable_advanced_mode"):
-                self.researcher.enable_advanced_mode(
-                    recursive=True,
-                    contradiction_checks=True,
-                    evidence_weighting=True
-                )
-
-            # ----------------------------------------------
-            # STAGE 1 — Query Planning
-            # ----------------------------------------------
+            # -----------------------------
+            # STAGE 1: PLANNING
+            # -----------------------------
             plan = self._stage_planning(query, session_id)
 
-            # ----------------------------------------------
-            # STAGE 2 — Research Loop (depth-controlled)
-            # ----------------------------------------------
-            research_results = self._stage_research(
-                plan, session_id, iterations
-            )
+            # -----------------------------
+            # STAGE 2: RESEARCH LOOP
+            # -----------------------------
+            research_results = self._stage_research(plan, session_id, iterations)
 
-            # ----------------------------------------------
-            # STAGE 3 — Synthesis
-            # ----------------------------------------------
+            # -----------------------------
+            # STAGE 3: SYNTHESIS
+            # -----------------------------
             synthesis_results = self._stage_synthesis(
-                research_results,
-                query,
-                session_id
+                research_results, query, session_id
             )
 
-            # ----------------------------------------------
-            # STAGE 4 — Validation
-            # ----------------------------------------------
+            # -----------------------------
+            # STAGE 4: VALIDATION
+            # -----------------------------
             validation_results = self._stage_validation(
                 synthesis_results,
                 research_results["sources"],
                 session_id
             )
 
-            # ----------------------------------------------
-            # STAGE 5 — Final Content Generation
-            # ----------------------------------------------
-            final_content = self._stage_generation(
-                synthesis_results,
-                validation_results,
-                research_results["sources"],
-                output_format,
-                session_id
-            )
+            # -----------------------------
+            # STAGE 5: CONTENT GENERATION
+            # -----------------------------
+            if output_format == "brochure":
+                final_content = self._stage_brochure(
+                    synthesis_results,
+                    validation_results,
+                    research_results["sources"],
+                    session_id
+                )
+            else:
+                final_content = self._stage_generation(
+                    synthesis_results,
+                    validation_results,
+                    research_results["sources"],
+                    output_format,
+                    session_id
+                )
 
-            # ----------------------------------------------
-            # FINAL SESSION WRAP-UP
-            # ----------------------------------------------
+            # -----------------------------
+            # FINALIZE SESSION
+            # -----------------------------
             session_data = self.session_manager.get_session(session_id)
-            session_data["duration"] = time.time() - time.mktime(
-                time.strptime(session_data["created_at"], "%Y-%m-%dT%H:%M:%S.%f")
-            )
+            session_data["duration"] = time.time() - time.time()
 
             self.memory_bank.store_research_session(session_data)
             self.session_manager.close_session(session_id, "completed")
+
             observability.end_session("completed")
 
-            # ----------------------------------------------
-            # RETURN RESULTS
-            # ----------------------------------------------
+            # -----------------------------
+            # RETURN RESULT
+            # -----------------------------
             return {
                 "session_id": session_id,
                 "query": query,
                 "plan": plan,
                 "research_summary": {
                     "total_sources": research_results["total_sources"],
-                    "iterations": research_results["iterations_completed"]
+                    "iterations": research_results["iterations_completed"],
                 },
                 "synthesis": synthesis_results["synthesis"],
                 "validation": validation_results,
                 "final_content": final_content,
                 "metrics": observability.get_metrics_summary(),
                 "memory_stats": self.memory_bank.get_statistics(),
-                "depth_used": depth
-                
-                 "timeline": self.timeline
+                "timeline": self.timeline,
+                "depth_used": depth,
             }
 
         except Exception as e:
-            logger.error(f"Research failed: {str(e)}")
+            logger.error(f"Research failed: {e}")
             observability.end_session("failed")
             raise
 
-    # ===================================================================
+
+
+    # ======================================================================
     # STAGE HANDLERS
-    # ===================================================================
-    def _stage_planning(self, query, session_id):
+    # ======================================================================
+
+    def _stage_planning(self, query: str, session_id: str):
         plan = self.query_planner.plan_research(query, session_id)
+
         self.timeline.append({
             "stage": "Planning",
-            "details": "Research plan created",
+            "details": "Research plan created.",
             "timestamp": time.time()
         })
-
 
         self.session_manager.update_session(session_id, {
             "current_stage": "research",
             "sub_queries": plan.get("sub_questions", [])
         })
 
-        self.memory_bank.store_memory(
-            f"Plan created for: {query}",
-            "planning",
-            0.8,
-            {"plan": plan}
-        )
-
-        self.session_manager.set_agent_output(session_id, "QueryPlanner", plan)
         return plan
-        
-        self.timeline.append({
-            "stage": "Planning",
-            "details": "Sub-questions generated.",
-            "status": "completed"
-        })
 
 
-    # ----------------------------------------------
     def _stage_research(self, plan, session_id, iterations):
-        sub_questions = plan.get("sub_questions", [])
-        logger.info(f"Executing research loop with {iterations} iterations")
-        self.timeline.append({
-            "stage": "Research",
-            "details": f"Completed {results['iterations_completed']} research iterations",
-            "timestamp": time.time()
-        })
-
+        sub_q = plan.get("sub_questions", [])
 
         results = self.researcher.research(
-            sub_questions,
-            session_id,
-            self.memory_bank,
+            sub_q, session_id, self.memory_bank,
             loop_iterations=iterations
         )
 
+        self.timeline.append({
+            "stage": "Research",
+            "details": f"Completed {iterations} research iterations.",
+            "timestamp": time.time()
+        })
+
         self.session_manager.update_session(session_id, {
             "current_stage": "synthesis",
-            "sources_found": results["sources"],
-            "research_iterations": results["iterations_completed"]
+            "sources_found": results["sources"]
         })
 
-        # Save top sources in memory
-        for s in results["sources"][:5]:
-            self.memory_bank.store_memory(
-                s.get("content", "")[:600],
-                "source",
-                s.get("relevance_score", 0.5),
-                {"url": s.get("url"), "title": s.get("title")}
-            )
-
-        self.session_manager.set_agent_output(session_id, "Researcher", results)
         return results
 
-        self.timeline.append({
-            "stage": "Research Loop",
-            "details": f"{results['iterations_completed']} iterations completed.",
-            "status": "completed"
-        })
 
-
-    # ----------------------------------------------
     def _stage_synthesis(self, research_results, query, session_id):
         synthesis = self.synthesizer.synthesize(
-            research_results["sources"], query, session_id)
-
-            self.timeline.append({
-                "stage": "Synthesis",
-                "details": "Merged insights and created structured synthesis",
-                "timestamp": time.time()
-            })
-
-        
-
-        self.session_manager.update_session(session_id, {
-            "current_stage": "validation"
-        })
-
-        self.memory_bank.store_memory(
-            synthesis["synthesis"],
-            "synthesis",
-            0.9,
-            {"query": query}
+            research_results["sources"], query, session_id
         )
-
-        self.session_manager.set_agent_output(session_id, "Synthesizer", synthesis)
-        return synthesis
 
         self.timeline.append({
             "stage": "Synthesis",
-            "details": "Findings merged and summarized.",
-            "status": "completed"
+            "details": "Merged sources into structured synthesis.",
+            "timestamp": time.time()
         })
 
+        return synthesis
 
-    # ----------------------------------------------
+
     def _stage_validation(self, synthesis_results, sources, session_id):
         validation = self.validator.validate(
+            synthesis_results["synthesis"], sources, session_id
+        )
+
+        self.timeline.append({
+            "stage": "Validation",
+            "details": "Validated content accuracy and coherence.",
+            "timestamp": time.time()
+        })
+
+        return validation
+
+
+    def _stage_generation(self, synthesis_results, validation_results, sources, output_format, session_id):
+        final = self.content_generator.generate(
             synthesis_results["synthesis"],
+            validation_results,
+            sources,
+            output_format,
+            session_id
+        )
+
+        self.timeline.append({
+            "stage": "Content Generation",
+            "details": f"Generated final {output_format}.",
+            "timestamp": time.time()
+        })
+
+        return final
+
+
+    # ======================================================================
+    # BROCHURE MODE
+    # ======================================================================
+    def _stage_brochure(self, synthesis_results, validation_results, sources, session_id):
+
+        pdf_path, pdf_bytes = self.brochure_agent.generate_brochure(
+            synthesis_results["synthesis"],
+            validation_results,
             sources,
             session_id
         )
+
         self.timeline.append({
-            "stage": "Validation",
-            "details": "Cross-checked claims and validated accuracy",
+            "stage": "Brochure",
+            "details": "Generated brochure PDF.",
             "timestamp": time.time()
         })
 
-
-        self.session_manager.update_session(session_id, {
-            "current_stage": "content_generation",
-            "validation_results": validation
-        })
-
-        self.session_manager.set_agent_output(session_id, "Validator", validation)
-        return validation
-        
-        self.timeline.append({
-            "stage": "Validation",
-            "details": "Information validated; contradictions checked.",
-            "status": "completed"
-        })
-
-
-    # ----------------------------------------------
-    def _stage_generation(
-        self,
-        synthesis_results,
-        validation_results,
-        sources,
-        output_format,
-        session_id
-    ):
-        self.timeline.append({
-            "stage": "Content Generation",
-            "details": "Generated final formatted output",
-            "timestamp": time.time()
-        })
-
-        if output_format == "brochure":
-            brochure_text = self.brochure_agent.generate_brochure_text(
-                synthesis_results["synthesis"],
-               synthesis_results["synthesis"]
-            )
-
-          pdf_path = self.brochure_agent.generate_pdf(brochure_text)
-
-          return {
-              "content": brochure_text,
-              "pdf_path": pdf_path,
-              "format": "brochure"
-          }
-     else:
-         final_content = self.content_generator.generate(
-             synthesis_results["synthesis"],
-             validation_results,
-             sources,
-             output_format,
-             session_id
-         )
-
-         return final_content
-
-
-        self.session_manager.update_session(session_id, {
-            "current_stage": "completed",
-            "status": "completed"
-        })
-
-        self.memory_bank.store_memory(
-            final_content["content"][:1200],
-            "final_content",
-            1.0,
-            {"format": output_format}
-        )
-
-        self.session_manager.set_agent_output(session_id, "ContentGenerator", final_content)
-        return final_content
-        
-        self.timeline.append({
-            "stage": "Content Generation",
-            "details": "Final report generated.",
-            "status": "completed"
-       })
+        return {
+            "content": "Brochure PDF generated.",
+            "pdf_path": pdf_path,
+            "pdf_bytes": pdf_bytes,
+            "word_count": len(synthesis_results["synthesis"].split())
+        }
 
 
 
-# ===================================================================
-# SHORTCUT FUNCTIONS
-# ===================================================================
+# ======================================================================
+# SHORTCUTS
+# ======================================================================
+
 def quick_research(query: str, format: str = "report"):
-    orchestrator = ResearchOrchestrator()
-    return orchestrator.conduct_research(query, format)
+    return ResearchOrchestrator().conduct_research(query, format)
 
 def get_related_research(query: str, limit: int = 5):
-    memory_bank = MemoryBank()
-    return memory_bank.get_related_research(query, limit)
+    return MemoryBank().get_related_research(query, limit)
