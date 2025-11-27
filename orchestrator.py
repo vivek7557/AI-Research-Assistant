@@ -51,6 +51,8 @@ class ResearchOrchestrator:
         self.memory_bank = MemoryBank()
         self.context_compactor = ContextCompactor()
 
+        self.timeline = []
+
         logger.info("Research Orchestrator initialized.")
 
     # ===================================================================
@@ -186,6 +188,8 @@ class ResearchOrchestrator:
                 "metrics": observability.get_metrics_summary(),
                 "memory_stats": self.memory_bank.get_statistics(),
                 "depth_used": depth
+                
+                 "timeline": self.timeline
             }
 
         except Exception as e:
