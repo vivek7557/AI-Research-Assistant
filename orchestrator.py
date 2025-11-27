@@ -35,6 +35,8 @@ class ResearchOrchestrator:
     def __init__(self):
         # Tools
         self.search_tool = WebSearchTool()
+        self.brochure_agent = BrochureAgent()
+
 
         # Agents
         self.query_planner = QueryPlannerAgent()
