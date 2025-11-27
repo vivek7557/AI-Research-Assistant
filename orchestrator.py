@@ -202,6 +202,12 @@ class ResearchOrchestrator:
     # ===================================================================
     def _stage_planning(self, query, session_id):
         plan = self.query_planner.plan_research(query, session_id)
+        self.timeline.append({
+            "stage": "Planning",
+            "details": "Research plan created",
+            "timestamp": time.time()
+        })
+
 
         self.session_manager.update_session(session_id, {
             "current_stage": "research",
@@ -229,6 +235,12 @@ class ResearchOrchestrator:
     def _stage_research(self, plan, session_id, iterations):
         sub_questions = plan.get("sub_questions", [])
         logger.info(f"Executing research loop with {iterations} iterations")
+        self.timeline.append({
+            "stage": "Research",
+            "details": f"Completed {results['iterations_completed']} research iterations",
+            "timestamp": time.time()
+        })
+
 
         results = self.researcher.research(
             sub_questions,
@@ -265,8 +277,15 @@ class ResearchOrchestrator:
     # ----------------------------------------------
     def _stage_synthesis(self, research_results, query, session_id):
         synthesis = self.synthesizer.synthesize(
-            research_results["sources"], query, session_id
-        )
+            research_results["sources"], query, session_id)
+
+            self.timeline.append({
+                "stage": "Synthesis",
+                "details": "Merged insights and created structured synthesis",
+                "timestamp": time.time()
+            })
+
+        
 
         self.session_manager.update_session(session_id, {
             "current_stage": "validation"
@@ -296,6 +315,12 @@ class ResearchOrchestrator:
             sources,
             session_id
         )
+        self.timeline.append({
+            "stage": "Validation",
+            "details": "Cross-checked claims and validated accuracy",
+            "timestamp": time.time()
+        })
+
 
         self.session_manager.update_session(session_id, {
             "current_stage": "content_generation",
@@ -321,6 +346,12 @@ class ResearchOrchestrator:
         output_format,
         session_id
     ):
+        self.timeline.append({
+            "stage": "Content Generation",
+            "details": "Generated final formatted output",
+            "timestamp": time.time()
+        })
+
         final_content = self.content_generator.generate(
             synthesis_results["synthesis"],
             validation_results,
