@@ -96,3 +96,6 @@ def router():
 
 
 router()
+
+from components.chat_agent import chat_agent
+chat_agent()
