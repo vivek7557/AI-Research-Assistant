@@ -361,9 +361,9 @@ MIT License - see LICENSE file for details
 
 ## 👤 Author
 
-[Your Name]
+vivek giri
 - GitHub: [@yourusername](https://github.com/yourusername)
-- LinkedIn: [Your LinkedIn](https://linkedin.com/in/yourprofile)
+- LinkedIn: [[https://www.linkedin.com/in/vivekgiri7557)]
 
 ## 🙏 Acknowledgments
 
