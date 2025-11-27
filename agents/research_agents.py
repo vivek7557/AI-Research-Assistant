@@ -178,71 +178,131 @@ class ValidationAgent:
 # -------------------------------------------------
 # AGENT 5 — Final Content Generator
 # -------------------------------------------------
+"""
+Content Generator Agent
+Produces final formatted reports/articles/summaries/presentations.
+Now includes clean citation rendering.
+"""
+
+from typing import Dict, List
+from agents.llm_model import call_llm
+from tools.citations import CitationFormatter
+
+
 class ContentGeneratorAgent:
+
+    def __init__(self):
+        self.max_tokens = 5000  # Increased for richer outputs
+
+    # ---------------------------------------------------
+    # MAIN ENTRY
+    # ---------------------------------------------------
     def generate(
         self,
         synthesis: str,
-        validation: Dict[str, Any],
+        validation: Dict,
         sources: List[Dict],
         output_format: str,
         session_id: str
-    ):
-        system = """
-        You are a professional research writer.
-        Produce extremely detailed, properly formatted long-form research output.
+    ) -> Dict[str, any]:
 
-        VERY IMPORTANT — Citations Format Requirement:
-        ------------------------------------------------
-        ALWAYS output citations EXACTLY like this:
+        prompt = self._build_prompt(synthesis, validation, output_format)
 
-        Citations:
-        1. Title of source – URL
-        2. Title of source – URL
-        3. Title of source – URL
+        response = call_llm(prompt, max_tokens=self.max_tokens)
 
-        • Each citation MUST be on its own line.
-        • MUST be numbered.
-        • Do NOT merge citations into one long paragraph.
-        """
+        final_text = response["content"]
 
-        # Build clean citation list
-        clean_citations = []
-        for s in sources:
-            title = s.get("title", "Untitled Source")
-            url = s.get("url", "")
-            if url:
-                clean_citations.append(f"{title} – {url}")
+        # -------------------------------------------
+        # CITATIONS ADDED HERE
+        # -------------------------------------------
+        citations_md = CitationFormatter.markdown(sources)
 
-        citations_numbered = "\n".join(
-            [f"{i+1}. {c}" for i, c in enumerate(clean_citations)]
-        )
+        final_text += f"""
 
-        user = f"""
-        Write a detailed {output_format} based on the research below.
+---
 
-        === SYNTHESIS ===
-        {synthesis}
+### 📚 Citations
+{citations_md}
 
-        === VALIDATION ===
-        {validation}
-
-        === CITATION SOURCES ===
-        {citations_numbered}
-
-        Requirements:
-        • 2500–6000 words (very long)
-        • Deep analysis
-        • Use bullet points, tables, data, statistics
-        • Add sections, subsections, and insights
-        • Finish with:
-
-        Citations:
-        {citations_numbered}
-        """
-
-        content = run_llm(system, user)
+"""
 
         return {
-            "content": content,
-            "word_count": len(content.split())
+            "content": final_text,
+            "word_count": len(final_text.split()),
+            "format": output_format
         }
+
+    # ---------------------------------------------------
+    # PROMPT BUILDER
+    # ---------------------------------------------------
+    def _build_prompt(self, synthesis: str, validation: Dict, fmt: str) -> str:
+
+        val_score = validation.get("confidence", "Unknown")
+        gaps = validation.get("gaps", [])
+        contradictions = validation.get("contradictions", [])
+
+        validation_text = f"""
+Validation Summary:
+- Confidence Level: {val_score}
+- Gaps: {", ".join(gaps) if gaps else "None"}
+- Contradictions: {", ".join(contradictions) if contradictions else "None"}
+"""
+
+        # ---------------------------
+        # FORMAT SPECIFIC OUTPUTS
+        # ---------------------------
+
+        formats = {
+            "report": f"""
+Write a detailed research **REPORT** based on the synthesis below.
+
+Requirements:
+- Executive Summary
+- Key Findings (5–10 points)
+- Data-backed explanations
+- Detailed implications
+- Clear recommendations
+- Validation info included
+
+SYNTHESIS:
+{synthesis}
+
+{validation_text}
+""",
+
+            "article": f"""
+Write a full-length **MAGAZINE ARTICLE** based on the synthesis.
+
+Requirements:
+- Engaging introduction
+- Professional tone
+- 6–8 long paragraphs
+- Real world examples
+- Human-like storytelling
+
+SYNTHESIS:
+{synthesis}
+
+{validation_text}
+""",
+
+            "summary": f"""
+Write a **COMPREHENSIVE SUMMARY** based on the synthesis (5–8 short sections)
+
+SYNTHESIS:
+{synthesis}
+
+{validation_text}
+""",
+
+            "presentation": f"""
+Write a **SLIDE-DECK STYLE PRESENTATION** with bullet points and sections.
+
+SYNTHESIS:
+{synthesis}
+
+{validation_text}
+"""
+        }
+
+        return formats.get(fmt, formats["report"])
