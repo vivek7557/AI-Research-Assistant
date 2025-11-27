@@ -190,9 +190,9 @@ class ContentGeneratorAgent:
         system = """
         You are a professional research writer.
         Produce extremely detailed, properly formatted long-form research output.
-        
+
         VERY IMPORTANT — Citations Format Requirement:
-        ---------------------------------------------
+        ------------------------------------------------
         ALWAYS output citations EXACTLY like this:
 
         Citations:
@@ -201,24 +201,24 @@ class ContentGeneratorAgent:
         3. Title of source – URL
 
         • Each citation MUST be on its own line.
-        • MUST be numbered clearly.
-        • Do NOT merge multiple citations into one line.
-        • Do NOT include raw text after URLs.
+        • MUST be numbered.
+        • Do NOT merge citations into one long paragraph.
         """
 
-        # Build clean citation data
-        # if your sources include title + url, format them safely
-        citations = []
+        # Build clean citation list
+        clean_citations = []
         for s in sources:
             title = s.get("title", "Untitled Source")
             url = s.get("url", "")
             if url:
-                citations.append(f"- {title} – {url}")
+                clean_citations.append(f"{title} – {url}")
 
-        citations_block = "\n".join(citations)
+        citations_numbered = "\n".join(
+            [f"{i+1}. {c}" for i, c in enumerate(clean_citations)]
+        )
 
         user = f"""
-        Write a full {output_format} based on this research:
+        Write a detailed {output_format} based on the research below.
 
         === SYNTHESIS ===
         {synthesis}
@@ -226,22 +226,18 @@ class ContentGeneratorAgent:
         === VALIDATION ===
         {validation}
 
-        === RAW SOURCES (FORMAT THESE INTO CLEAN CITATIONS) ===
-        {citations_block}
+        === CITATION SOURCES ===
+        {citations_numbered}
 
         Requirements:
-        • Length: 2500–6000 words
-        • 14+ sections
-        • Deep analysis, statistics, models, future predictions
-        • Structured, academic style
-        
-        At the end, include:
+        • 2500–6000 words (very long)
+        • Deep analysis
+        • Use bullet points, tables, data, statistics
+        • Add sections, subsections, and insights
+        • Finish with:
 
         Citations:
-        1. Title – URL
-        2. Title – URL
-        3. Title – URL
-        (Use the provided source list above)
+        {citations_numbered}
         """
 
         content = run_llm(system, user)
