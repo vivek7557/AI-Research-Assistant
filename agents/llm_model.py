@@ -41,30 +41,33 @@ def call_llm(prompt: str, max_tokens: int = 8000) -> str:
 # ==========================================================
 # GROQ (FREE) — llama3-70b / mixtral-8x7b
 # ==========================================================
-def call_groq(prompt: str, max_tokens: int = 8000):
-    GROQ_API_KEY = os.getenv("GROQ_API_KEY") or ""
+import os
+from groq import Groq
 
-    if not GROQ_API_KEY:
-        return "[ERROR] GROQ_API_KEY missing"
+# Load API key
+GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+client = Groq(api_key=GROQ_API_KEY)
 
-    url = "https://api.groq.com/openai/v1/chat/completions"
+# Default stable model
+DEFAULT_MODEL = "llama3-8b-8192"   # change this anytime
 
-    payload = {
-        "model": "llama3-70b-8192",
-        "messages": [{"role": "user", "content": prompt}],
-        "max_tokens": max_tokens,
-        "temperature": 0.4,
-    }
-
-    headers = {"Authorization": f"Bearer {GROQ_API_KEY}"}
+def call_llm(prompt, model=DEFAULT_MODEL, max_tokens=4096, temperature=0.7):
+    """
+    Unified LLM caller for Groq models.
+    """
 
     try:
-        r = requests.post(url, json=payload, headers=headers)
-        out = r.json()
-        return out["choices"][0]["message"]["content"]
+        response = client.chat.completions.create(
+            model=model,
+            temperature=temperature,
+            max_tokens=max_tokens,
+            messages=[{"role": "user", "content": prompt}]
+        )
+
+        return response.choices[0].message.content.strip()
 
     except Exception as e:
-        return f"[Groq Error] {str(e)}"
+        return f"[LLM ERROR] {str(e)}"
 
 
 # ==========================================================
