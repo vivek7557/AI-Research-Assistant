@@ -86,9 +86,30 @@ class ResearchAgent:
         for i in range(iterations):
             for q in sub_questions:
 
-                # ✅ FIXED: use correct argument + extract results list
-                res = self.search_tool.search(q, max_results=self.sources_per_iter)
-                sources = res.get("results", [])  # always safe
+                # -------------------------------
+                # SAFE SEARCH CALL (NO CRASHING)
+                # -------------------------------
+                try:
+                    res = self.search_tool.search(
+                        q,
+                        max_results=self.sources_per_iter
+                    )
+                except Exception as e:
+                    # if Tavily or internet fails → skip safely
+                    logger.error(f"[Search Error] {e}")
+                    res = None
+
+                # -------------------------------
+                # ALWAYS SAFE → extract list
+                # -------------------------------
+                if res and isinstance(res, dict):
+                    sources = res.get("results", [])
+                    if not isinstance(sources, list):
+                        sources = []
+                else:
+                    sources = []
+
+                # always extend list
                 collected_sources.extend(sources)
 
             time.sleep(0.2)
