@@ -1,4 +1,3 @@
-
 """Web search tool with TavilyClient wrapper.
 
 This module provides:
@@ -18,6 +17,7 @@ try:
 except Exception:
     _HAS_TAVILY = False
 
+
 class WebSearchTool:
     def __init__(self, api_key: str = None):
         self.api_key = api_key or os.getenv("TAVILY_API_KEY")
@@ -28,18 +28,32 @@ class WebSearchTool:
             raise ImportError("tavily client library not found. Install the official 'tavily' package or switch to mock mode.")
         self.client = TavilyClient(api_key=self.api_key)
 
-    def search(self, query: str, max_results: int = 5, search_depth: str = "general") -> Dict[str, Any]:
-        """Perform a web search using Tavily and return a normalized dict."""
+    # 🔥 FIXED: added top_k alias for ResearchAgent compatibility
+    def search(self, query: str, max_results: int = 5, search_depth: str = "general", top_k: int = None) -> Dict[str, Any]:
+        """
+        Perform a web search using Tavily and return a normalized dict.
+
+        FIX:
+        - Accepts `top_k` because ResearchAgent may pass it.
+        - If `top_k` is provided, override max_results.
+        """
+        if top_k is not None:
+            max_results = top_k
+
         resp = self.client.search(query=query, max_results=max_results)
+
         # Normalize response into list of {'url','title','content','relevance_score'}
         results = []
-        for item in getattr(resp, 'results', resp.get('results', [])):
+        raw_items = getattr(resp, 'results', resp.get('results', []))
+
+        for item in raw_items:
             results.append({
                 'url': item.get('url') if isinstance(item, dict) else getattr(item, 'url', None),
                 'title': item.get('title') if isinstance(item, dict) else getattr(item, 'title', None),
                 'content': item.get('snippet') if isinstance(item, dict) else getattr(item, 'snippet', ''),
                 'relevance_score': item.get('score', 0.5) if isinstance(item, dict) else getattr(item, 'score', 0.5)
             })
+
         return {'query': query, 'results': results}
 
     def search_news(self, query: str, max_results: int = 5) -> Dict[str, Any]:
