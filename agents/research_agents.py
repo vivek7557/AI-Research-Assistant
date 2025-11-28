@@ -14,25 +14,66 @@ from loguru import logger
 # ===============================================================
 # 1️⃣ Query Planner Agent
 # ===============================================================
-class QueryPlannerAgent:
+def plan_research(self, query, session_id):
+    """
+    STEP 1 — Query Planning
+    LLM returns JSON. We validate, repair, and fallback if JSON invalid.
+    """
 
-    def plan_research(self, query: str, session_id: str):
-        system = (
-            "You are a research planning agent. Break the main query into 4–6 "
-            "clear, non-overlapping sub-questions. Return JSON ONLY:"
-            '{"sub_questions": [...]}'
-        )
-        user = f"Main research topic: {query}\nSession: {session_id}"
+    system = "You are a research planning agent. Output ONLY valid JSON."
+    user = f"""
+    Create a research plan for: {query}
 
+    Return JSON exactly like:
+    {{
+        "sub_questions": [
+            "Question 1",
+            "Question 2",
+            "Question 3"
+        ]
+    }}
+    """
+
+    raw = run_llm(system, user)
+
+    # -------------------------------
+    # VALIDATE + FIX BROKEN JSON
+    # -------------------------------
+    try:
+        # Try to parse clean JSON first
+        plan = json.loads(raw)
+
+    except Exception:
+        logger.error(f"[Planner Error] Invalid JSON: {raw}")
+
+        # Soft fix: extract JSON-like region
         try:
-            result = call_llm(f"{system}\n\n{user}")
-            data = json.loads(result)
+            start = raw.index("{")
+            end = raw.rindex("}") + 1
+            repaired = raw[start:end]
+            plan = json.loads(repaired)
+        except Exception:
+            # Hard fallback (never break pipeline)
+            plan = {
+                "sub_questions": [
+                    f"What are the key aspects of {query}?",
+                    f"What are recent developments in {query}?",
+                    f"What challenges exist in {query}?"
+                ]
+            }
 
-            return data if isinstance(data, dict) else {"sub_questions": []}
+    # Ensure valid output
+    if "sub_questions" not in plan or not isinstance(plan["sub_questions"], list):
+        plan = {
+            "sub_questions": [
+                f"Overview of {query}",
+                f"Current trends in {query}",
+                f"Challenges and opportunities in {query}"
+            ]
+        }
 
-        except Exception as e:
-            logger.error(f"[Planner Error] {e}")
-            return {"sub_questions": []}
+    return plan
+
 
 
 # ===============================================================
