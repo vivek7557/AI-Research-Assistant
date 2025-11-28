@@ -15,7 +15,7 @@ from loguru import logger
 # GROQ — Latest Supported Models (Dec 2025)
 # ======================================================================
 
-PRIMARY_MODEL = "llama-3.1-70b-versatile"   # best
+PRIMARY_MODEL = "llama-3.3-70b-versatile"   # best
 FALLBACK_MODEL = "llama-3.1-8b-instant"     # backup
 
 MAX_TOKENS = 6000
