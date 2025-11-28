@@ -4,50 +4,82 @@ from typing import List, Dict, Any
 from loguru import logger
 
 # ======================================================================
-# LLM CONFIG (GROQ — mixtral-8x7b-32768)
+# LLM CONFIG — GROK (xAI)
+# Full replacement for Groq-based run_llm()
 # ======================================================================
 
 import os
-from groq import Groq
+import requests
 from loguru import logger
 
 # ======================================================================
-# GROQ — Latest Supported Models (Dec 2025)
+# GROK MODELS (2025)
 # ======================================================================
 
-PRIMARY_MODEL = "llama-3.1-70b-versatile"   # best
-FALLBACK_MODEL = "llama-3.3-8b-instant"     # backup
+PRIMARY_MODEL = "grok-2"           # Best quality
+FALLBACK_MODEL = "grok-2-mini"     # Fast + cheap
 
 MAX_TOKENS = 6000
 TEMP = 0.4
 
-client = Groq(api_key=os.getenv("GROQ_API_KEY"))
+# Base URL for xAI Grok models
+XAI_API_URL = "https://api.x.ai/v1/chat/completions"
+
+# Expecting in Streamlit secrets or env
+XAI_API_KEY = os.getenv("XAI_API_KEY")
 
 
 def run_llm(system_prompt: str, user_prompt: str) -> str:
-    """Universal LLM runner with model fallback."""
+    """
+    Universal Grok LLM runner with model fallback.
+    Returns plain text (string).
+    """
 
+    if not XAI_API_KEY:
+        logger.error("Missing XAI_API_KEY in environment or secrets!")
+        return "Error: Missing XAI_API_KEY."
+
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {XAI_API_KEY}"
+    }
+
+    # Try both models: primary → fallback
     for model in [PRIMARY_MODEL, FALLBACK_MODEL]:
+
+        payload = {
+            "model": model,
+            "temperature": TEMP,
+            "max_tokens": MAX_TOKENS,
+            "messages": [
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_prompt}
+            ]
+        }
+
         try:
-            response = client.chat.completions.create(
-                model=model,
-                temperature=TEMP,
-                max_tokens=MAX_TOKENS,
-                messages=[
-                    {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": user_prompt}
-                ]
+            response = requests.post(
+                XAI_API_URL,
+                headers=headers,
+                json=payload,
+                timeout=40
             )
+
+            if response.status_code != 200:
+                logger.warning(f"[LLM ERROR] {model} → {response.text}")
+                continue
+
+            data = response.json()
+            content = data["choices"][0]["message"]["content"]
+
             logger.info(f"LLM used: {model}")
-            return response.choices[0].message["content"]
+            return content
 
         except Exception as e:
-            logger.warning(f"Model {model} failed: {e}")
+            logger.warning(f"Grok model {model} failed: {str(e)}")
             continue
 
-    # If everything fails
-    return "LLM model failed. Please check your GROQ_API_KEY."
-
+    return "All Grok models failed. Please verify your XAI_API_KEY."
 
 
 # ======================================================================
