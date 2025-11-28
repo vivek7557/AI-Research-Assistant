@@ -106,8 +106,13 @@ class ResearchAgent:
 class SynthesisAgent:
 
     def synthesize(self, sources, query, session_id):
+
+        # ---- SAFETY FIX ----
+        if not sources or not isinstance(sources, list):
+            sources = []
+
         extracted_info = "\n".join(
-            [s.get("content", "")[:500] for s in sources[:10]]
+            [(s.get("content") or "")[:500] for s in sources[:10]]
         )
 
         system = "You are a synthesis agent. Summarize research findings."
@@ -119,8 +124,11 @@ Sources:
 
 Write a well-structured synthesis.
 """
+
         synthesis_text = run_llm(system, user)
+
         return {"synthesis": synthesis_text}
+
 
 
 # ===================================================================
