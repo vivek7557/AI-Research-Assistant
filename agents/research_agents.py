@@ -7,25 +7,47 @@ from loguru import logger
 # LLM CONFIG (GROQ — mixtral-8x7b-32768)
 # ======================================================================
 
-client = Groq(api_key=os.getenv("GROQ_API_KEY"))
+import os
+from groq import Groq
+from loguru import logger
 
-LLM_MODEL = "mixtral-8x7b-32768"   # ✔ WORKING FREE MODEL
+# ======================================================================
+# GROQ — Latest Supported Models (Dec 2025)
+# ======================================================================
+
+PRIMARY_MODEL = "llama-3.1-70b-versatile"   # best
+FALLBACK_MODEL = "llama-3.1-8b-instant"     # backup
+
 MAX_TOKENS = 6000
 TEMP = 0.4
 
+client = Groq(api_key=os.getenv("GROQ_API_KEY"))
+
 
 def run_llm(system_prompt: str, user_prompt: str) -> str:
-    """Universal LLM runner for all agents."""
-    response = client.chat.completions.create(
-        model=LLM_MODEL,
-        temperature=TEMP,
-        max_tokens=MAX_TOKENS,
-        messages=[
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": user_prompt}
-        ]
-    )
-    return response.choices[0].message["content"]
+    """Universal LLM runner with model fallback."""
+
+    for model in [PRIMARY_MODEL, FALLBACK_MODEL]:
+        try:
+            response = client.chat.completions.create(
+                model=model,
+                temperature=TEMP,
+                max_tokens=MAX_TOKENS,
+                messages=[
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": user_prompt}
+                ]
+            )
+            logger.info(f"LLM used: {model}")
+            return response.choices[0].message["content"]
+
+        except Exception as e:
+            logger.warning(f"Model {model} failed: {e}")
+            continue
+
+    # If everything fails
+    return "LLM model failed. Please check your GROQ_API_KEY."
+
 
 
 # ======================================================================
