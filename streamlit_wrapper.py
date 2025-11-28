@@ -214,7 +214,11 @@ d3.download_button(
     file_name="research.txt"
 )
 
-# =============== BROCHURE DOWNLOAD ===============
+import requests
+import json
+import streamlit as st
+
+# =============================== BROCHURE DOWNLOAD ===============================
 if results.get("brochure"):
     st.markdown("### 📄 Brochure PDF")
     st.download_button(
@@ -224,34 +228,83 @@ if results.get("brochure"):
         mime="application/pdf"
     )
 
+st.markdown("----")
+st.markdown("### 💬 Chat With AI Assistant")
 
-st.markdown("### ")
+# =============================== CHAT CSS ===============================
+st.markdown("""
+<style>
+.chat-msg-user {
+    background: #3b82f6;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 10px;
+    margin: 6px 0;
+    width: fit-content;
+    max-width: 80%;
+    margin-left: auto;
+}
+.chat-msg-ai {
+    background: #1f2937;
+    color: #e5e7eb;
+    padding: 8px 12px;
+    border-radius: 10px;
+    margin: 6px 0;
+    width: fit-content;
+    max-width: 80%;
+    margin-right: auto;
+}
+</style>
+""", unsafe_allow_html=True)
 
-user_msg = st.text_input("Chat with AI:", key="chatbox")
-
+# =============================== CHAT STATE ===============================
 if "chat_history" not in st.session_state:
-    st.session_state.chat_history = []
+    st.session_state.chat_history = [
+        {"role": "assistant", "content": "Hi! You can ask me anything about your research 😊"}
+    ]
+
+# =============================== CHAT INPUT ===============================
+user_msg = st.text_input("Type your message…", key="chatbox")
 
 if user_msg:
-    st.session_state.chat_history.append({"role":"user","content":user_msg})
+    st.session_state.chat_history.append({"role": "user", "content": user_msg})
 
-    # Call GROQ Mixtral
-    r = requests.post(
-        "https://api.groq.com/openai/v1/chat/completions",
-        headers={"Authorization":f"Bearer {st.secrets['GROQ_API_KEY']}"},
-        json={
-            "model": "mixtral-8x7b-32768",
-            "messages": st.session_state.chat_history
-        }
+    try:
+        # GROQ LLM CALL
+        response = requests.post(
+            "https://api.groq.com/openai/v1/chat/completions",
+            headers={"Authorization": f"Bearer {st.secrets['GROQ_API_KEY']}"},
+            json={
+                "model": "mixtral-8x7b-32768",
+                "messages": st.session_state.chat_history,
+                "max_tokens": 800,
+                "temperature": 0.7
+            }
+        )
+
+        data = response.json()
+
+        if "choices" in data:
+            ai_reply = data["choices"][0]["message"]["content"]
+        else:
+            ai_reply = "⚠️ LLM error: Unable to fetch response."
+
+    except Exception as e:
+        ai_reply = f"❌ Error: {str(e)}"
+
+    st.session_state.chat_history.append(
+        {"role": "assistant", "content": ai_reply}
     )
 
-    ai_reply = r.json()["choices"][0]["message"]["content"]
-    st.session_state.chat_history.append({"role":"assistant","content":ai_reply})
-
-# Render chat
+# =============================== CHAT DISPLAY ===============================
 for msg in st.session_state.chat_history:
     if msg["role"] == "user":
-        st.markdown(f"<div class='chat-msg-user'>{msg['content']}</div>", unsafe_allow_html=True)
+        st.markdown(
+            f"<div class='chat-msg-user'>{msg['content']}</div>",
+            unsafe_allow_html=True
+        )
     else:
-        st.markdown(f"<div class='chat-msg-ai'>{msg['content']}</div>", unsafe_allow_html=True)
-
+        st.markdown(
+            f"<div class='chat-msg-ai'>{msg['content']}</div>",
+            unsafe_allow_html=True
+        )
