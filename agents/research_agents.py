@@ -1,84 +1,73 @@
-"""
-Research Agents — FIXED (NO LOGIC CHANGES)
-Uses the unified call_llm() from llm_model.py
-"""
-
 import json
 import time
-from typing import List, Dict
-
-from agents.llm_model import call_llm
 from loguru import logger
+from agents.llm_model import run_llm
 
 
-# ===============================================================
-# 1️⃣ Query Planner Agent
-# ===============================================================
-def plan_research(self, query, session_id):
-    """
-    STEP 1 — Query Planning
-    LLM returns JSON. We validate, repair, and fallback if JSON invalid.
-    """
+# ===================================================================
+# 1. QUERY PLANNER AGENT
+# ===================================================================
+class QueryPlannerAgent:
 
-    system = "You are a research planning agent. Output ONLY valid JSON."
-    user = f"""
-    Create a research plan for: {query}
+    def plan_research(self, query: str, session_id: str):
+        """
+        Generates sub-questions for the research workflow.
+        Ensures JSON output. Repairs invalid JSON automatically.
+        """
 
-    Return JSON exactly like:
-    {{
-        "sub_questions": [
-            "Question 1",
-            "Question 2",
-            "Question 3"
-        ]
-    }}
-    """
+        system_prompt = "You are a research planning agent. Output ONLY valid JSON."
 
-    raw = run_llm(system, user)
+        user_prompt = f"""
+Create a research plan for: {query}
 
-    # -------------------------------
-    # VALIDATE + FIX BROKEN JSON
-    # -------------------------------
-    try:
-        # Try to parse clean JSON first
-        plan = json.loads(raw)
+Return JSON EXACTLY like:
+{
+    "sub_questions": [
+        "Question 1",
+        "Question 2",
+        "Question 3"
+    ]
+}
+"""
 
-    except Exception:
-        logger.error(f"[Planner Error] Invalid JSON: {raw}")
+        llm_output = run_llm(system_prompt, user_prompt)
 
-        # Soft fix: extract JSON-like region
+        # Attempt JSON parsing
         try:
-            start = raw.index("{")
-            end = raw.rindex("}") + 1
-            repaired = raw[start:end]
-            plan = json.loads(repaired)
+            plan = json.loads(llm_output)
+
         except Exception:
-            # Hard fallback (never break pipeline)
-            plan = {
-                "sub_questions": [
-                    f"What are the key aspects of {query}?",
-                    f"What are recent developments in {query}?",
-                    f"What challenges exist in {query}?"
-                ]
-            }
+            logger.error(f"[Planner Error] Invalid JSON: {llm_output}")
 
-    # Ensure valid output
-    if "sub_questions" not in plan or not isinstance(plan["sub_questions"], list):
-        plan = {
-            "sub_questions": [
+            # Try soft repair
+            try:
+                start = llm_output.index("{")
+                end = llm_output.rindex("}") + 1
+                plan = json.loads(llm_output[start:end])
+            except Exception:
+                # Hard fallback
+                plan = {
+                    "sub_questions": [
+                        f"What is the overview of {query}?",
+                        f"What are current developments in {query}?",
+                        f"What challenges exist in {query}?"
+                    ]
+                }
+
+        # Final safety validation
+        if "sub_questions" not in plan:
+            plan["sub_questions"] = [
                 f"Overview of {query}",
-                f"Current trends in {query}",
-                f"Challenges and opportunities in {query}"
+                f"Recent trends in {query}",
+                f"Challenges in {query}"
             ]
-        }
 
-    return plan
-
+        return plan
 
 
-# ===============================================================
-# 2️⃣ Research Agent (Loop Agent)
-# ===============================================================
+# ===================================================================
+# 2. RESEARCH AGENT (SEARCH + LOOP)
+# ===================================================================
 class ResearchAgent:
 
     def __init__(self, search_tool):
@@ -86,139 +75,112 @@ class ResearchAgent:
         self.iterations = 3
         self.sources_per_iter = 5
 
-    def set_depth(self, iterations: int, sources: int):
+    def set_depth(self, iterations, sources):
         self.iterations = iterations
         self.sources_per_iter = sources
 
-    def research(self, sub_questions: List[str], session_id: str, memory_bank, loop_iterations=None):
-        results = []
-        all_sources = []
+    def research(self, sub_questions, session_id, memory_bank, loop_iterations=None):
 
-        iters = loop_iterations or self.iterations
+        if loop_iterations:
+            iterations = loop_iterations
+        else:
+            iterations = self.iterations
 
-        for i in range(iters):
-            for sq in sub_questions:
+        collected_sources = []
 
-                # run web search
-                search_results = self.search_tool.search(sq, self.sources_per_iter)
-                all_sources.extend(search_results)
+        for i in range(iterations):
+            for q in sub_questions:
+                res = self.search_tool.search(q, top_k=self.sources_per_iter)
+                collected_sources.extend(res)
 
-                # store research findings
-                text = "\n".join([s.get("content", "") for s in search_results])
-
-                memory_bank.store_memory(
-                    content=text[:800],
-                    category="research",
-                    importance=0.6,
-                    metadata={"session": session_id, "sq": sq}
-                )
-
-                results.append({"sub_question": sq, "raw_text": text})
+            time.sleep(0.2)
 
         return {
-            "sources": all_sources,
-            "iterations_completed": iters,
-            "raw_results": results,
-            "total_sources": len(all_sources),
+            "sources": collected_sources,
+            "total_sources": len(collected_sources),
+            "iterations_completed": iterations
         }
 
 
-# ===============================================================
-# 3️⃣ Synthesis Agent
-# ===============================================================
+# ===================================================================
+# 3. SYNTHESIS AGENT
+# ===================================================================
 class SynthesisAgent:
 
-    def synthesize(self, sources: List[Dict], query: str, session_id: str):
-        combined = "\n".join([s.get("content", "") for s in sources])
+    def synthesize(self, sources, query, session_id):
 
-        prompt = (
-            f"Topic: {query}\n\n"
-            "You are a synthesis expert. Combine all research into a single, "
-            "well-structured narrative (long, detailed). Include:\n"
-            "- Executive Summary\n"
-            "- Key Findings\n"
-            "- Deep Analysis\n"
-            "- Recommendations\n\n"
-            "Here is the research:\n"
-            f"{combined[:15000]}"
+        extracted_info = "\n".join(
+            [s.get("content", "")[:500] for s in sources[:10]]
         )
 
-        try:
-            out = call_llm(prompt, max_tokens=7000)
-            return {"synthesis": out}
-        except Exception as e:
-            logger.error(f"[Synthesis Error] {e}")
-            return {"synthesis": "Synthesis failed."}
+        system = "You are a synthesis agent. Summarize research findings."
+        user = f"""
+Combine and synthesize the following research results for: {query}
+
+Sources:
+{extracted_info}
+
+Write a well-structured synthesis.
+"""
+
+        synthesis_text = run_llm(system, user)
+
+        return {"synthesis": synthesis_text}
 
 
-# ===============================================================
-# 4️⃣ Validation Agent
-# ===============================================================
+# ===================================================================
+# 4. VALIDATION AGENT
+# ===================================================================
 class ValidationAgent:
 
-    def validate(self, synthesis_text: str, sources: List[Dict], session_id: str):
-        prompt = (
-            "Validate the synthesized research. Check for:\n"
-            "- gaps\n"
-            "- contradictions\n"
-            "- unsupported claims\n"
-            "Return JSON ONLY like:\n"
-            '{"gaps": [...], "contradictions": [...], "confidence": 0-100}'
-        )
+    def validate(self, synthesis_text, sources, session_id):
 
-        try:
-            out = call_llm(prompt + "\n\n" + synthesis_text[:5000])
-            data = json.loads(out)
-            return data
-        except:
-            return {"gaps": [], "contradictions": [], "confidence": 100}
+        system = "You are a validation agent. Detect gaps or contradictions."
+        user = f"""
+Validate the following synthesized research:
+
+{synthesis_text}
+
+Check for:
+- Missing information
+- Contradictions
+- Logical gaps
+
+Return a helpful validation report.
+"""
+
+        validation_text = run_llm(system, user)
+
+        return {"validation": validation_text}
 
 
-# ===============================================================
-# 5️⃣ Final Content Generator Agent
-# ===============================================================
+# ===================================================================
+# 5. CONTENT GENERATOR AGENT
+# ===================================================================
 class ContentGeneratorAgent:
 
-    def generate(self, synthesis_text: str, validation_results: dict, sources: List[Dict], output_format: str, session_id: str):
+    def generate(self, synthesis_text, validation_results, sources, output_format, session_id):
 
-        prompt = (
-            f"You are a senior technical writer.\n"
-            f"Format the research output as a **{output_format}**.\n"
-            "Must be LONG, DETAILED, PROFESSIONAL.\n"
-            "Sections REQUIRED:\n"
-            "- Title\n"
-            "- Executive Summary\n"
-            "- Key Findings\n"
-            "- Deep Analysis\n"
-            "- Recommendations\n"
-            "- Validation Summary\n"
-            "- Citations (one per line)\n\n"
-            "Here is the synthesis:\n"
-            f"{synthesis_text}\n\n"
-            "Validation:\n"
-            f"{json.dumps(validation_results, indent=2)}\n\n"
-            "Sources:\n"
-            f"{json.dumps(sources[:20], indent=2)}"
-        )
+        source_list = "\n".join([f"- {s.get('url', '')}" for s in sources[:10]])
 
-        try:
-            text = call_llm(prompt, max_tokens=7000)
+        system = "You are an expert content generator."
+        user = f"""
+Write a {output_format} based on this synthesis:
 
-            citations = []
-            for s in sources[:20]:
-                if s.get("url"):
-                    citations.append(f"- {s.get('title', 'Source')} — {s['url']}")
+{synthesis_text}
 
-            return {
-                "content": text,
-                "citations": citations,
-                "word_count": len(text.split())
-            }
+Validation notes:
+{validation_results}
 
-        except Exception as e:
-            logger.error(f"[ContentGenerator Error] {e}")
-            return {
-                "content": "Content generation failed.",
-                "citations": [],
-                "word_count": 0
-            }
+Include a short conclusion.
+
+Sources:
+{source_list}
+"""
+
+        final = run_llm(system, user)
+
+        return {
+            "content": final,
+            "word_count": len(final.split())
+        }
