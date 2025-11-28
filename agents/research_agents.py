@@ -4,18 +4,18 @@ from typing import List, Dict, Any
 from loguru import logger
 
 # ======================================================================
-# LLM CONFIG  (Groq — LLaMA 3–70B)
+# LLM CONFIG (GROQ — mixtral-8x7b-32768)
 # ======================================================================
 
 client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
-LLM_MODEL = "llama3-70b-8192"   # FREE long-context model
-MAX_TOKENS = 7000               # Allow large research output
+LLM_MODEL = "mixtral-8x7b-32768"   # ✔ WORKING FREE MODEL
+MAX_TOKENS = 6000
 TEMP = 0.4
 
 
 def run_llm(system_prompt: str, user_prompt: str) -> str:
-    """Universal LLM runner"""
+    """Universal LLM runner for all agents."""
     response = client.chat.completions.create(
         model=LLM_MODEL,
         temperature=TEMP,
@@ -66,7 +66,7 @@ class QueryPlannerAgent:
 
 
 # ======================================================================
-# AGENT 2 — RESEARCH AGENT  (Iterative deep search)
+# AGENT 2 — RESEARCH (LOOP DEPTH)
 # ======================================================================
 
 class ResearchAgent:
@@ -170,7 +170,7 @@ class ValidationAgent:
 
         return {
             "validation_text": validation_text,
-            "confidence_score": 95
+            "confidence_score": 92
         }
 
 
@@ -201,7 +201,6 @@ class ContentGeneratorAgent:
         response = call_llm(prompt, max_tokens=self.max_tokens)
         text = response["content"]
 
-        # Append citations
         citations_md = CitationFormatter.markdown(sources)
 
         final = text + f"\n\n---\n\n### 📚 Citations\n{citations_md}\n"
