@@ -7,61 +7,93 @@ from agents.llm_model import run_llm
 # ===================================================================
 # 1. QUERY PLANNER AGENT
 # ===================================================================
+import json
+from loguru import logger
+from agents.llm_model import run_llm
+
+
 class QueryPlannerAgent:
 
     def plan_research(self, query: str, session_id: str):
         """
         Generates sub-questions for the research workflow.
-        Ensures JSON output. Repairs invalid JSON automatically.
+        Forces valid JSON. Repairs bad JSON automatically.
         """
 
-        system_prompt = "You are a research planning agent. Output ONLY valid JSON."
+        system_prompt = (
+            "You are a research planning agent. "
+            "Return ONLY valid JSON with key 'sub_questions'."
+        )
 
         user_prompt = f"""
-Create a research plan for: {query}
+Create a research plan for: "{query}"
 
-Return JSON EXACTLY like:
-{
+Return JSON exactly like this:
+
+{{
     "sub_questions": [
         "Question 1",
         "Question 2",
         "Question 3"
     ]
-}
+}}
 """
 
+        # ==============================
+        # CALL LLM
+        # ==============================
         llm_output = run_llm(system_prompt, user_prompt)
 
-        # Attempt JSON parsing
+        # For debug only — without format specifiers
+        logger.info("Planner LLM raw output:")
+        logger.info(llm_output)
+
+        # ==============================
+        # TRY DIRECT JSON PARSE
+        # ==============================
         try:
             plan = json.loads(llm_output)
 
         except Exception:
-            logger.error(f"[Planner Error] Invalid JSON: {llm_output}")
+            logger.error(f"[Planner Error] Invalid JSON received.")
 
-            # Try soft repair
+            # ==============================
+            # SOFT REPAIR → Extract JSON part
+            # ==============================
             try:
                 start = llm_output.index("{")
                 end = llm_output.rindex("}") + 1
-                plan = json.loads(llm_output[start:end])
+                json_chunk = llm_output[start:end]
+                plan = json.loads(json_chunk)
+
             except Exception:
-                # Hard fallback
+                logger.warning("[Planner] JSON repair failed → using fallback")
+
+                # ==============================
+                # HARD SAFE FALLBACK
+                # ==============================
                 plan = {
                     "sub_questions": [
                         f"What is the overview of {query}?",
-                        f"What are current developments in {query}?",
+                        f"What are the latest developments in {query}?",
                         f"What challenges exist in {query}?"
                     ]
                 }
 
-        # Final safety validation
-        if "sub_questions" not in plan:
+        # ==============================
+        # FINAL SAFETY VALIDATION
+        # ==============================
+        if not isinstance(plan, dict):
+            plan = {}
+
+        if "sub_questions" not in plan or not isinstance(plan["sub_questions"], list):
             plan["sub_questions"] = [
                 f"Overview of {query}",
                 f"Recent trends in {query}",
                 f"Challenges in {query}"
             ]
 
+        # Final cleaned output
         return plan
 
 
