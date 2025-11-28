@@ -24,25 +24,31 @@ class BrochureAgent:
         # 1. LLM: Turn sections into brochure-style narrative
         # -------------------------------------------------------------
         prompt = f"""
-        Create a clean, simple brochure-style content for:
+        Create a clean, simple brochure-style content for the topic below.
 
         TITLE: {title}
 
         SECTIONS:
         {sections}
 
-        Make it readable, structured, and friendly.
+        Requirements:
+        - Make content friendly, structured, readable
+        - Write like a promotional brochure
+        - Use short paragraphs + bullet points
         """
 
         try:
             llm = self.client.chat.completions.create(
-                model="llama3-8b-8192",
+                model="llama3-8b-8192",   # FREE MODEL
                 messages=[{"role": "user", "content": prompt}],
-                max_tokens=1200
+                max_tokens=1000
             )
             brochure_text = llm.choices[0].message["content"]
-        except Exception:
-            brochure_text = "Brochure content unavailable. PDF contains section summaries only."
+        except Exception as e:
+            brochure_text = (
+                "Brochure content unavailable due to LLM error.\n"
+                f"Error: {str(e)}\n\nShowing basic section content instead."
+            )
 
         # -------------------------------------------------------------
         # 2. Generate PDF using FPDF
@@ -54,36 +60,39 @@ class BrochureAgent:
         # --- Title ---
         pdf.set_font("Arial", "B", 20)
         pdf.cell(0, 12, title, ln=True, align="C")
-        pdf.ln(6)
+        pdf.ln(8)
 
-        # --- LLM Generated Text ---
+        # --- LLM Brochure Text ---
         pdf.set_font("Arial", size=12)
         pdf.multi_cell(0, 6, brochure_text)
-        pdf.ln(6)
+        pdf.ln(8)
 
-        # --- Section Details ---
-        pdf.set_font("Arial", "B", 14)
-        pdf.cell(0, 10, "Sections", ln=True)
+        # --- Sections ---
+        pdf.set_font("Arial", "B", 16)
+        pdf.cell(0, 10, "Sections Overview", ln=True)
+        pdf.ln(4)
+
         pdf.set_font("Arial", size=12)
 
         for section_title, content in sections.items():
             pdf.set_font("Arial", "B", 13)
             pdf.cell(0, 8, section_title, ln=True)
+
             pdf.set_font("Arial", size=11)
-            pdf.multi_cell(0, 6, content)
+            pdf.multi_cell(0, 5, content)
             pdf.ln(3)
 
         # --- Sources ---
         if sources:
             pdf.set_font("Arial", "B", 14)
             pdf.cell(0, 10, "Sources", ln=True)
-
             pdf.set_font("Arial", size=10)
+
             for src in sources:
-                line = f"- {src.get('title', 'Unknown')} ({src.get('url', '')})"
+                line = f"- {src.get('title', 'Unknown Source')} ({src.get('url', '')})"
                 pdf.multi_cell(0, 5, line)
 
-        # --- PDF output ---
+        # --- Return PDF as bytes ---
         pdf_bytes = pdf.output(dest="S").encode("latin1")
 
         return {
