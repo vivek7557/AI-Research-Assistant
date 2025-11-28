@@ -3,23 +3,12 @@ import time
 from loguru import logger
 from agents.llm_model import run_llm
 
-
 # ===================================================================
 # 1. QUERY PLANNER AGENT
 # ===================================================================
-import json
-from loguru import logger
-from agents.llm_model import run_llm
-
-
 class QueryPlannerAgent:
 
     def plan_research(self, query: str, session_id: str):
-        """
-        Generates sub-questions for the research workflow.
-        Forces valid JSON. Repairs bad JSON automatically.
-        """
-
         system_prompt = (
             "You are a research planning agent. "
             "Return ONLY valid JSON with key 'sub_questions'."
@@ -39,39 +28,21 @@ Return JSON exactly like this:
 }}
 """
 
-        # ==============================
-        # CALL LLM
-        # ==============================
         llm_output = run_llm(system_prompt, user_prompt)
-
-        # For debug only — without format specifiers
         logger.info("Planner LLM raw output:")
         logger.info(llm_output)
 
-        # ==============================
-        # TRY DIRECT JSON PARSE
-        # ==============================
         try:
             plan = json.loads(llm_output)
-
         except Exception:
-            logger.error(f"[Planner Error] Invalid JSON received.")
-
-            # ==============================
-            # SOFT REPAIR → Extract JSON part
-            # ==============================
+            logger.error("[Planner Error] Invalid JSON received.")
             try:
                 start = llm_output.index("{")
                 end = llm_output.rindex("}") + 1
                 json_chunk = llm_output[start:end]
                 plan = json.loads(json_chunk)
-
             except Exception:
                 logger.warning("[Planner] JSON repair failed → using fallback")
-
-                # ==============================
-                # HARD SAFE FALLBACK
-                # ==============================
                 plan = {
                     "sub_questions": [
                         f"What is the overview of {query}?",
@@ -80,9 +51,6 @@ Return JSON exactly like this:
                     ]
                 }
 
-        # ==============================
-        # FINAL SAFETY VALIDATION
-        # ==============================
         if not isinstance(plan, dict):
             plan = {}
 
@@ -93,12 +61,11 @@ Return JSON exactly like this:
                 f"Challenges in {query}"
             ]
 
-        # Final cleaned output
         return plan
 
 
 # ===================================================================
-# 2. RESEARCH AGENT (SEARCH + LOOP)
+# 2. RESEARCH AGENT
 # ===================================================================
 class ResearchAgent:
 
@@ -113,17 +80,16 @@ class ResearchAgent:
 
     def research(self, sub_questions, session_id, memory_bank, loop_iterations=None):
 
-        if loop_iterations:
-            iterations = loop_iterations
-        else:
-            iterations = self.iterations
-
+        iterations = loop_iterations or self.iterations
         collected_sources = []
 
         for i in range(iterations):
             for q in sub_questions:
-                res = self.search_tool.search(q, top_k=self.sources_per_iter)
-                collected_sources.extend(res)
+
+                # ✅ FIXED: use correct argument + extract results list
+                res = self.search_tool.search(q, max_results=self.sources_per_iter)
+                sources = res.get("results", [])  # always safe
+                collected_sources.extend(sources)
 
             time.sleep(0.2)
 
@@ -140,7 +106,6 @@ class ResearchAgent:
 class SynthesisAgent:
 
     def synthesize(self, sources, query, session_id):
-
         extracted_info = "\n".join(
             [s.get("content", "")[:500] for s in sources[:10]]
         )
@@ -154,9 +119,7 @@ Sources:
 
 Write a well-structured synthesis.
 """
-
         synthesis_text = run_llm(system, user)
-
         return {"synthesis": synthesis_text}
 
 
@@ -182,7 +145,6 @@ Return a helpful validation report.
 """
 
         validation_text = run_llm(system, user)
-
         return {"validation": validation_text}
 
 
@@ -211,7 +173,6 @@ Sources:
 """
 
         final = run_llm(system, user)
-
         return {
             "content": final,
             "word_count": len(final.split())
