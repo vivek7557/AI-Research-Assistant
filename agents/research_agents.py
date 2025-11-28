@@ -221,7 +221,7 @@ class ContentGeneratorAgent:
         prompt = self._build_prompt(synthesis, validation, output_format)
 
         response = call_llm(prompt, max_tokens=self.max_tokens)
-        text = response["content"]
+        text = response
 
         citations_md = CitationFormatter.markdown(sources)
 
