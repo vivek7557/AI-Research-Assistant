@@ -1,152 +1,134 @@
 """
 Universal LLM Wrapper
 Supports:
-- Groq (FREE)
+- Groq (FREE, stable models)
 - Gemini (FREE)
-- HuggingFace (FREE)
+- HuggingFace Inference API (FREE)
 
-Main Function:
+Function exposed:
     call_llm(prompt, max_tokens=8000)
 """
 
 import os
 import requests
-from loguru import logger
-
-# ==========================================================
-# SELECT DEFAULT FREE MODEL HERE: groq / gemini / hf
-# ==========================================================
-DEFAULT_BACKEND = "groq"
-
-
-# ==========================================================
-# PUBLIC ENTRYPOINT
-# ==========================================================
-def call_llm(prompt: str, max_tokens: int = 8000) -> str:
-    """
-    Main LLM caller – decides which backend to use.
-    """
-
-    backend = DEFAULT_BACKEND.lower()
-
-    if backend == "groq":
-        return call_groq(prompt, max_tokens)
-
-    if backend == "gemini":
-        return call_gemini(prompt, max_tokens)
-
-    if backend == "hf":
-        return call_huggingface(prompt, max_tokens)
-
-    return "❌ ERROR: Invalid DEFAULT_BACKEND value."
-
-
-# ==========================================================
-# GROQ — Latest models (Dec 2025)
-# ==========================================================
 from groq import Groq
 
+
+# ==========================================================
+# DEFAULT MODEL SELECTION
+# ==========================================================
+DEFAULT_PROVIDER = "groq"     # groq / gemini / hf
+
+
+# ==========================================================
+# GROQ (FREE) — STABLE MODELS AS OF 2025
+# ==========================================================
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+groq_client = Groq(api_key=GROQ_API_KEY)
 
-if GROQ_API_KEY:
-    groq_client = Groq(api_key=GROQ_API_KEY)
-else:
-    groq_client = None
+# SAFE MODELS (Not deprecated)
+GROQ_PRIMARY = "llama-3.1-70b-versatile"
+GROQ_FALLBACK = "llama-3.1-8b-instant"
 
-# Modern Groq models
-GROQ_PRIMARY = "llama-3.3-70b-versatile"     # Best
-GROQ_FALLBACK = "llama-3.3-8b-instant"       # Fast + stable
-
-
-def call_groq(prompt, max_tokens=4096, temperature=0.6):
+def call_groq(prompt: str, max_tokens: int = 8000):
     """
-    Groq LLM wrapper with fallback models.
+    Groq LLM runner with fallback.
     """
-
-    if not groq_client:
-        return "❌ [Groq Error] GROQ_API_KEY missing"
 
     for model in [GROQ_PRIMARY, GROQ_FALLBACK]:
         try:
-            response = groq_client.chat.completions.create(
+            res = groq_client.chat.completions.create(
                 model=model,
-                temperature=temperature,
-                max_tokens=max_tokens,
                 messages=[{"role": "user", "content": prompt}],
+                max_tokens=max_tokens,
+                temperature=0.4
             )
-
-            logger.info(f"[Groq] Model used: {model}")
-            return response.choices[0].message.content.strip()
+            return res.choices[0].message["content"]
 
         except Exception as e:
-            logger.warning(f"[Groq] Model {model} failed: {e}")
+            # Continue trying fallback models
+            continue
 
-    return "❌ Groq: All models failed."
+    return "[Groq Error] All Groq models failed."
 
 
 # ==========================================================
-# GEMINI FREE API
+# GEMINI (FREE)
 # ==========================================================
 def call_gemini(prompt: str, max_tokens: int = 8000):
-    GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+    GEMINI_API_KEY = os.getenv("GEMINI_API_KEY") or ""
 
     if not GEMINI_API_KEY:
-        return "❌ GEMINI_API_KEY missing"
+        return "[Gemini Error] API key missing"
 
     url = (
-        f"https://generativelanguage.googleapis.com/v1beta/models/"
-        f"gemini-pro:generateContent?key={GEMINI_API_KEY}"
+        "https://generativelanguage.googleapis.com/v1beta/models/"
+        "gemini-pro:generateContent?key=" + GEMINI_API_KEY
     )
 
-    payload = {
+    data = {
         "contents": [{"parts": [{"text": prompt}]}],
-        "generationConfig": {"maxOutputTokens": max_tokens},
+        "generationConfig": {"maxOutputTokens": max_tokens}
     }
 
     try:
-        res = requests.post(url, json=payload)
-        out = res.json()
-
-        return (
-            out["candidates"][0]["content"]["parts"][0]["text"]
-            if "candidates" in out
-            else str(out)
-        )
+        r = requests.post(url, json=data)
+        out = r.json()
+        return out["candidates"][0]["content"]["parts"][0]["text"]
 
     except Exception as e:
-        return f"❌ [Gemini Error] {e}"
+        return f"[Gemini Error] {str(e)}"
 
 
 # ==========================================================
-# HUGGINGFACE FREE API (Mistral / Mixtral / Llama)
+# HUGGINGFACE (FREE)
 # ==========================================================
-def call_huggingface(prompt: str, max_tokens: int = 4000, model="mistralai/Mixtral-8x7B-Instruct-v0.1"):
-    HF_API_KEY = os.getenv("HF_API_KEY")
+def call_huggingface(prompt: str, model="mistralai/Mixtral-8x7B-Instruct-v0.1"):
+    HF_API_KEY = os.getenv("HF_API_KEY") or ""
 
     if not HF_API_KEY:
-        return "❌ HF_API_KEY missing"
+        return "[HF Error] API key missing"
 
     url = f"https://api-inference.huggingface.co/models/{model}"
-
     headers = {"Authorization": f"Bearer {HF_API_KEY}"}
 
     payload = {
         "inputs": prompt,
-        "parameters": {"max_new_tokens": max_tokens, "temperature": 0.5},
+        "parameters": {
+            "max_new_tokens": 2000,
+            "temperature": 0.4,
+        }
     }
 
     try:
         r = requests.post(url, json=payload, headers=headers)
-        out = r.json()
+        result = r.json()
 
-        # HF outputs can vary → normalize
-        if isinstance(out, list) and "generated_text" in out[0]:
-            return out[0]["generated_text"]
+        if isinstance(result, list) and "generated_text" in result[0]:
+            return result[0]["generated_text"]
 
-        if "error" in out:
-            return f"❌ HF Error: {out['error']}"
-
-        return str(out)
+        return str(result)
 
     except Exception as e:
-        return f"❌ [HF Error] {e}"
+        return f"[HF Error] {str(e)}"
+
+
+# ==========================================================
+# MASTER WRAPPER FUNCTION
+# ==========================================================
+def call_llm(prompt: str, max_tokens: int = 8000) -> str:
+    """
+    Main unified LLM function.
+    Chooses provider based on DEFAULT_PROVIDER.
+    """
+
+    if DEFAULT_PROVIDER == "groq":
+        return call_groq(prompt, max_tokens)
+
+    if DEFAULT_PROVIDER == "gemini":
+        return call_gemini(prompt, max_tokens)
+
+    if DEFAULT_PROVIDER == "hf":
+        return call_huggingface(prompt)
+
+    return "[LLM Error] Unknown model provider."
