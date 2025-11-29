@@ -1,353 +1,782 @@
 """
-AI Research Assistant – Ultimate Streamlit Beauty
-Logic untouched, visuals maximised
+Streamlit Web Interface for AI Research Assistant
+Ultra-Modern UI with React-inspired design
 """
 import streamlit as st
-import os, sys, json, time
+import os
+import sys
 from pathlib import Path
 from dotenv import load_dotenv
+import json
 
 load_dotenv()
 sys.path.insert(0, os.path.dirname(__file__))
 
-# --------------  ORIGINAL IMPORTS  --------------
 from orchestrator import ResearchOrchestrator
 from evaluation.evaluator import ResearchEvaluator
 from memory.memory_bank import MemoryBank
 
-# --------------  PAGE CONFIG  --------------
+# Page configuration
 st.set_page_config(
     page_title="AI Research Assistant",
     page_icon="🔍",
     layout="wide",
-    initial_sidebar_state="expanded",
+    initial_sidebar_state="expanded"
 )
 
-# --------------  GLOBAL BEAUTIFY CSS  --------------
-st.markdown(
-    """
+# Modern CSS with React-style components
+st.markdown("""
 <style>
-/* ---------- ROOT TOKENS ---------- */
-:root{
-    --bg0:#0c0c0f;
-    --bg1:#111115;
-    --bg2:#1a1a20;
-    --glass:rgba(26,26,32,0.55);
-    --accent:#00f5ff;
-    --accent2:#ff00c1;
-    --text1:#f0f0f5;
-    --text2:#a0a0b3;
-    --green:#00ff9d;
-    --yellow:#ffd60a;
-    --red:#ff3d3d;
-    --radius:18px;
-    --blur:16px;
-    --glow:0 0 12px var(--accent);
-    --font:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-}
-/* ---------- AURORA BACKDROP ---------- */
-body{
-    font-family:var(--font);
-    background:var(--bg0);
-    color:var(--text1);
-    overflow-x:hidden;
-}
-body::before{
-    content:"";
-    position:fixed;
-    top:0;left:0;width:100%;height:100%;
-    background:
-        radial-gradient(circle at 15% 30%, var(--accent) 0%, transparent 30%),
-        radial-gradient(circle at 85% 70%, var(--accent2) 0%, transparent 30%);
-    opacity:.13;
-    animation:aurora 20s infinite alternate;
-    z-index:-1;
-}
-@keyframes aurora{
-    0%{transform:rotate(0deg) scale(1.2);}
-    100%{transform:rotate(360deg) scale(1.4);}
-}
-/* ---------- GLASS CARD ---------- */
-.glass{
-    background:var(--glass);
-    backdrop-filter:blur(var(--blur));
-    -webkit-backdrop-filter:blur(var(--blur));
-    border:1px solid rgba(255,255,255,.08);
-    border-radius:var(--radius);
-    padding:2rem;
-    box-shadow:0 12px 40px rgba(0,0,0,.35);
-    transition:all .3s ease;
-}
-.glass:hover{
-    border-color:var(--accent);
-    box-shadow:var(--glow),0 12px 40px rgba(0,0,0,.45);
-    transform:translateY(-4px);
-}
-/* ---------- FLOATING HERO ---------- */
-.hero{
-    text-align:center;
-    padding:5rem 0 4rem 0;
-}
-.hero h1{
-    font-size:3.5rem;
-    font-weight:900;
-    letter-spacing:-1px;
-    background:linear-gradient(90deg,var(--accent),var(--accent2));
-    -webkit-background-clip:text;
-    -webkit-text-fill-color:transparent;
-    animation:float 4s ease-in-out infinite;
-}
-@keyframes float{
-    0%,100%{transform:translateY(0);}
-    50%{transform:translateY(-8px);}
-}
-.hero p{
-    font-size:1.2rem;
-    color:var(--text2);
-    margin-top:.5rem;
-}
-/* ---------- BUTTON ---------- */
-.stButton > button{
-    background:linear-gradient(90deg,var(--accent),var(--accent2));
-    color:#fff;
-    border:none;
-    border-radius:var(--radius);
-    padding:.8rem 2rem;
-    font-weight:700;
-    font-size:1rem;
-    box-shadow:var(--glow);
-    transition:all .25s ease;
-}
-.stButton > button:hover{
-    transform:scale(1.05);
-    box-shadow:0 0 20px var(--accent);
-}
-/* ---------- METRIC ---------- */
-.metric-card{
-    text-align:center;
-    padding:1.5rem 1rem;
-    border-radius:var(--radius);
-    background:var(--glass);
-    border:1px solid rgba(255,255,255,.06);
-    transition:all .3s ease;
-}
-.metric-card:hover{
-    border-color:var(--accent);
-    transform:translateY(-4px);
-}
-.metric-value{
-    font-size:2.5rem;
-    font-weight:800;
-    background:linear-gradient(90deg,var(--accent),var(--accent2));
-    -webkit-background-clip:text;
-    -webkit-text-fill-color:transparent;
-}
-.metric-label{
-    font-size:.875rem;
-    color:var(--text2);
-    margin-top:.25rem;
-}
-</style>""",
-    unsafe_allow_html=True,
-)
+    /* ===== RESET & BASE ===== */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+    
+    /* Dark theme variables */
+    :root {
+        --primary: #6366f1;
+        --primary-dark: #4f46e5;
+        --primary-light: #818cf8;
+        --bg-dark: #0f0f23;
+        --bg-card: #1a1a2e;
+        --bg-card-hover: #1f1f38;
+        --border: #2d2d44;
+        --border-hover: #6366f1;
+        --text-primary: #e5e7eb;
+        --text-secondary: #9ca3af;
+        --success: #10b981;
+        --warning: #f59e0b;
+        --danger: #ef4444;
+    }
+    
+    /* ===== ANIMATIONS ===== */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    @keyframes slideInRight {
+        from {
+            opacity: 0;
+            transform: translateX(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+    
+    @keyframes pulse {
+        0%, 100% {
+            opacity: 1;
+        }
+        50% {
+            opacity: 0.8;
+        }
+    }
+    
+    @keyframes shimmer {
+        0% {
+            background-position: -1000px 0;
+        }
+        100% {
+            background-position: 1000px 0;
+        }
+    }
+    
+    /* ===== GLOBAL OVERRIDES ===== */
+    .main {
+        background: var(--bg-dark);
+        padding: 0 !important;
+    }
+    
+    .block-container {
+        padding: 2rem 3rem !important;
+        max-width: 1400px !important;
+    }
+    
+    /* ===== SIDEBAR ===== */
+    [data-testid="stSidebar"] {
+        background: linear-gradient(180deg, #0f0f23 0%, #1a1a2e 100%);
+        border-right: 1px solid var(--border);
+    }
+    
+    [data-testid="stSidebar"] > div {
+        padding: 1.5rem 1rem;
+    }
+    
+    /* Sidebar cards */
+    .sidebar-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 1rem;
+        margin-bottom: 0.75rem;
+        transition: all 0.3s ease;
+        animation: fadeInUp 0.5s ease;
+    }
+    
+    .sidebar-card:hover {
+        transform: translateY(-2px);
+        border-color: var(--primary);
+        box-shadow: 0 8px 20px rgba(99, 102, 241, 0.15);
+    }
+    
+    .sidebar-title {
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.5rem;
+    }
+    
+    .sidebar-value {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+    
+    .sidebar-section-title {
+        font-size: 0.9rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin: 1.5rem 0 0.75rem 0;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid var(--border);
+    }
+    
+    .sidebar-activity-item {
+        font-size: 0.8rem;
+        color: var(--text-secondary);
+        padding: 0.5rem 0;
+        border-left: 2px solid transparent;
+        padding-left: 0.5rem;
+        margin-bottom: 0.25rem;
+        transition: all 0.2s ease;
+    }
+    
+    .sidebar-activity-item:hover {
+        color: var(--text-primary);
+        border-left-color: var(--primary);
+        padding-left: 0.75rem;
+    }
+    
+    /* ===== HEADER ===== */
+    .hero-header {
+        background: linear-gradient(135deg, var(--bg-card) 0%, #1a1a35 100%);
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        padding: 3rem 2rem;
+        margin-bottom: 2rem;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+        animation: fadeInUp 0.6s ease;
+    }
+    
+    .hero-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 200%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.1), transparent);
+        animation: shimmer 3s infinite;
+    }
+    
+    .hero-title {
+        font-size: 3rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 0.5rem;
+        position: relative;
+    }
+    
+    .hero-subtitle {
+        font-size: 1.1rem;
+        color: var(--text-secondary);
+        font-weight: 500;
+        position: relative;
+    }
+    
+    /* ===== TABS ===== */
+    .stTabs [data-baseweb="tab-list"] {
+        gap: 1rem;
+        justify-content: center;
+        background: transparent;
+        padding: 0.5rem;
+    }
+    
+    .stTabs [data-baseweb="tab"] {
+        background: var(--bg-card) !important;
+        border: 1px solid var(--border) !important;
+        border-radius: 12px !important;
+        padding: 0.75rem 1.5rem !important;
+        font-weight: 600 !important;
+        color: var(--text-secondary) !important;
+        transition: all 0.3s ease !important;
+    }
+    
+    .stTabs [data-baseweb="tab"]:hover {
+        border-color: var(--primary) !important;
+        transform: translateY(-2px);
+    }
+    
+    .stTabs [data-baseweb="tab"][aria-selected="true"] {
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%) !important;
+        border-color: var(--primary) !important;
+        color: white !important;
+        box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
+    }
+    
+    /* ===== INPUT CONTAINER ===== */
+    .input-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 2rem;
+        margin: 2rem auto;
+        max-width: 900px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        animation: fadeInUp 0.7s ease;
+        transition: all 0.3s ease;
+    }
+    
+    .input-card:hover {
+        border-color: var(--primary);
+        box-shadow: 0 10px 40px rgba(99, 102, 241, 0.2);
+    }
+    
+    /* ===== INPUTS ===== */
+    .stTextInput input {
+        background: var(--bg-dark) !important;
+        border: 1px solid var(--border) !important;
+        border-radius: 12px !important;
+        color: var(--text-primary) !important;
+        padding: 0.75rem 1rem !important;
+        font-size: 1rem !important;
+        transition: all 0.3s ease !important;
+    }
+    
+    .stTextInput input:focus {
+        border-color: var(--primary) !important;
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1) !important;
+    }
+    
+    .stSelectbox select {
+        background: var(--bg-dark) !important;
+        border: 1px solid var(--border) !important;
+        border-radius: 12px !important;
+        color: var(--text-primary) !important;
+        padding: 0.75rem 1rem !important;
+    }
+    
+    /* ===== BUTTONS ===== */
+    .stButton > button {
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%) !important;
+        color: white !important;
+        border: none !important;
+        border-radius: 12px !important;
+        padding: 0.875rem 2rem !important;
+        font-weight: 600 !important;
+        font-size: 1rem !important;
+        transition: all 0.3s ease !important;
+        box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3) !important;
+    }
+    
+    .stButton > button:hover {
+        transform: translateY(-2px) !important;
+        box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4) !important;
+    }
+    
+    .stDownloadButton > button {
+        background: var(--bg-card) !important;
+        border: 1px solid var(--border) !important;
+        color: var(--text-primary) !important;
+        border-radius: 12px !important;
+        transition: all 0.3s ease !important;
+    }
+    
+    .stDownloadButton > button:hover {
+        border-color: var(--primary) !important;
+        background: var(--bg-card-hover) !important;
+    }
+    
+    /* ===== METRICS ===== */
+    [data-testid="stMetric"] {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 1.25rem;
+        transition: all 0.3s ease;
+        animation: fadeInUp 0.5s ease;
+    }
+    
+    [data-testid="stMetric"]:hover {
+        transform: translateY(-3px);
+        border-color: var(--primary);
+        box-shadow: 0 8px 20px rgba(99, 102, 241, 0.15);
+    }
+    
+    [data-testid="stMetricLabel"] {
+        color: var(--text-secondary) !important;
+        font-size: 0.875rem !important;
+        font-weight: 600 !important;
+    }
+    
+    [data-testid="stMetricValue"] {
+        color: var(--text-primary) !important;
+        font-size: 2rem !important;
+        font-weight: 700 !important;
+    }
+    
+    /* ===== PROGRESS ===== */
+    .stProgress > div > div {
+        background: linear-gradient(90deg, var(--primary) 0%, #8b5cf6 100%) !important;
+        border-radius: 10px !important;
+        animation: pulse 2s ease-in-out infinite;
+    }
+    
+    /* ===== CONTENT SECTIONS ===== */
+    .content-section {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 2rem;
+        margin: 1.5rem 0;
+        animation: fadeInUp 0.6s ease;
+    }
+    
+    .section-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 1rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 2px solid var(--border);
+    }
+    
+    /* ===== EVALUATION CARDS ===== */
+    .eval-metric {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        transition: all 0.3s ease;
+        animation: slideInRight 0.5s ease;
+    }
+    
+    .eval-metric:hover {
+        border-color: var(--primary);
+        transform: translateX(5px);
+    }
+    
+    .eval-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.75rem;
+    }
+    
+    .eval-name {
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--text-primary);
+    }
+    
+    .eval-score {
+        font-size: 1.5rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, var(--primary) 0%, #8b5cf6 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+    
+    .eval-description {
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+        line-height: 1.5;
+        margin-top: 0.5rem;
+    }
+    
+    /* ===== EXPANDER ===== */
+    .streamlit-expanderHeader {
+        background: var(--bg-card) !important;
+        border: 1px solid var(--border) !important;
+        border-radius: 12px !important;
+        color: var(--text-primary) !important;
+    }
+    
+    /* ===== ALERTS ===== */
+    .stAlert {
+        border-radius: 12px !important;
+        border: 1px solid var(--border) !important;
+    }
+    
+    /* ===== MARKDOWN ===== */
+    .markdown-text-container {
+        color: var(--text-primary);
+        line-height: 1.8;
+    }
+    
+    /* ===== DIVIDER ===== */
+    hr {
+        border: none;
+        border-top: 1px solid var(--border);
+        margin: 2rem 0;
+    }
+    
+    /* ===== FOOTER ===== */
+    .footer {
+        text-align: center;
+        padding: 2rem;
+        color: var(--text-secondary);
+        font-size: 0.875rem;
+        border-top: 1px solid var(--border);
+        margin-top: 3rem;
+    }
+    
+    /* ===== CHECKBOX ===== */
+    .stCheckbox {
+        color: var(--text-primary) !important;
+    }
+    
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 768px) {
+        .hero-title {
+            font-size: 2rem;
+        }
+        
+        .block-container {
+            padding: 1rem !important;
+        }
+        
+        .input-card {
+            padding: 1.5rem;
+        }
+    }
+</style>
+""", unsafe_allow_html=True)
 
-# --------------  SIDEBAR GLASS STATS  --------------
+# Sidebar
 with st.sidebar:
-    st.markdown("### 📊 Research Analytics")
+    st.markdown('<div class="sidebar-section-title">📊 Research Analytics</div>', unsafe_allow_html=True)
+
     try:
-        stats = MemoryBank().get_statistics()
-        c1, c2 = st.columns(2)
-        with c1:
-            st.markdown(
-                f'<div class="metric-card"><div class="metric-value">{stats.get("total_memories",0)}</div><div class="metric-label">Total Research</div></div>',
-                unsafe_allow_html=True,
-            )
-            st.markdown(
-                f'<div class="metric-card"><div class="metric-value">{stats.get("completed_sessions",0)}</div><div class="metric-label">Completed</div></div>',
-                unsafe_allow_html=True,
-            )
-        with c2:
-            st.markdown(
-                f'<div class="metric-card"><div class="metric-value">{stats.get("total_sources",0)}</div><div class="metric-label">Sources</div></div>',
-                unsafe_allow_html=True,
-            )
-            st.markdown(
-                f'<div class="metric-card"><div class="metric-value">{stats.get("avg_importance",0):.1f}</div><div class="metric-label">Avg Quality</div></div>',
-                unsafe_allow_html=True,
-            )
-    except Exception:
-        st.info("Stats will appear after first research.")
+        memory_bank = MemoryBank()
+        stats = memory_bank.get_statistics()
 
-    st.markdown("### 📈 Recent Activity")
-    out_dir = Path("outputs")
-    if out_dir.exists():
-        files = sorted(out_dir.glob("*.json"), key=os.path.getmtime, reverse=True)[:6]
-        for f in files:
-            try:
-                q = json.loads(f.read_text()).get("query", "Untitled")
-                st.markdown(f"• {q[:32]}…")
-            except Exception:
-                pass
+        st.markdown(f"""
+        <div class="sidebar-card">
+            <div class="sidebar-title">📚 Total Research</div>
+            <div class="sidebar-value">{stats.get('total_memories', 0)}</div>
+        </div>
+        
+        <div class="sidebar-card">
+            <div class="sidebar-title">✅ Completed</div>
+            <div class="sidebar-value">{stats.get('completed_sessions', 0)}</div>
+        </div>
+        
+        <div class="sidebar-card">
+            <div class="sidebar-title">🔗 Total Sources</div>
+            <div class="sidebar-value">{stats.get('total_sources', 0)}</div>
+        </div>
+        
+        <div class="sidebar-card">
+            <div class="sidebar-title">⭐ Avg Quality</div>
+            <div class="sidebar-value">{stats.get('avg_importance', 0):.1f}<span style="font-size:1rem;color:var(--text-secondary);">/10</span></div>
+        </div>
+        """, unsafe_allow_html=True)
+    except:
+        st.info("📊 Statistics will appear after first research")
+
+    st.markdown('<div class="sidebar-section-title">📈 Recent Activity</div>', unsafe_allow_html=True)
+
+    output_dir = Path("outputs")
+    if output_dir.exists():
+        json_files = list(output_dir.glob("*.json"))
+        if json_files:
+            recent_files = sorted(json_files, key=os.path.getmtime, reverse=True)[:6]
+            for file in recent_files:
+                try:
+                    with open(file, 'r') as f:
+                        data = json.load(f)
+                    query = data.get("query", "Untitled")
+                    st.markdown(f'<div class="sidebar-activity-item">• {query[:32]}...</div>', unsafe_allow_html=True)
+                except:
+                    pass
+        else:
+            st.markdown('<div class="sidebar-activity-item">No recent activity</div>', unsafe_allow_html=True)
     else:
-        st.markdown("No activity yet")
+        st.markdown('<div class="sidebar-activity-item">No activity yet</div>', unsafe_allow_html=True)
 
-# --------------  API KEYS  --------------
+# API Keys
 anthropic_key = os.getenv("ANTHROPIC_API_KEY") or st.secrets.get("ANTHROPIC_API_KEY", "")
 tavily_key = os.getenv("TAVILY_API_KEY") or st.secrets.get("TAVILY_API_KEY", "")
+
 if anthropic_key:
     os.environ["ANTHROPIC_API_KEY"] = anthropic_key
 if tavily_key:
     os.environ["TAVILY_API_KEY"] = tavily_key
+
 keys_set = bool(anthropic_key and tavily_key)
 
-# --------------  FLOATING HERO  --------------
-st.markdown(
-    '<div class="hero"><h1>🔍 AI Research Assistant</h1><p>Deep, multi-agent research at your fingertips</p></div>',
-    unsafe_allow_html=True,
-)
+# Header
+st.markdown("""
+<div class="hero-header">
+    <div class="hero-title">🔍 AI Research Assistant</div>
+    <div class="hero-subtitle">Deep research powered by multi-agent AI system</div>
+</div>
+""", unsafe_allow_html=True)
 
-# --------------  TABS  --------------
+# Tabs
 tab1, tab2, tab3 = st.tabs(["🔬 New Research", "🔍 Find Related", "📂 Past Sessions"])
 
-# ---------- TAB 1 : NEW RESEARCH ----------
+# Tab 1 - New Research
 with tab1:
     if not keys_set:
-        st.error("⚠️  Add ANTHROPIC_API_KEY and TAVILY_API_KEY to your `.env` file.")
+        st.error("⚠️ API Keys missing. Please configure ANTHROPIC_API_KEY and TAVILY_API_KEY in .env file")
         st.stop()
 
-    with st.form("research_form"):
-        query = st.text_input(
-            "Research Query",
-            placeholder="e.g., Impact of artificial intelligence on healthcare systems",
+    st.markdown('<div class="input-card">', unsafe_allow_html=True)
+
+    query = st.text_input(
+        "🔎 Research Query",
+        placeholder="e.g., Impact of artificial intelligence on healthcare systems",
+        label_visibility="collapsed"
+    )
+
+    col_format, col_eval = st.columns([3, 2])
+    with col_format:
+        output_format = st.selectbox(
+            "📄 Output Format",
+            ["report", "article", "summary", "presentation"]
         )
-        col_format, col_eval = st.columns([3, 2])
-        with col_format:
-            output_format = st.selectbox("Output Format", ["report", "article", "summary", "presentation"])
-        with col_eval:
-            run_evaluation = st.checkbox("Run Evaluation", value=True)
-        with st.expander("Advanced Options"):
+    with col_eval:
+        run_evaluation = st.checkbox("🎯 Run Evaluation", value=True)
+
+    with st.expander("⚙️ Advanced Options"):
+        colA, colB = st.columns(2)
+        with colA:
             session_id_input = st.text_input("Resume Session ID", placeholder="research_xxxxx")
+        with colB:
             depth_level = st.slider("Research Depth", 1, 5, 3)
-        submitted = st.form_submit_button("🚀 Start Research", use_container_width=True)
 
-    if submitted and query:
-        progress = st.progress(0)
-        status = st.empty()
+    st.markdown('</div>', unsafe_allow_html=True)
+
+    if st.button("🚀 Start Research", use_container_width=True):
+        if not query:
+            st.warning("⚠️ Please enter a research query")
+            st.stop()
+
+        progress_bar = st.progress(0)
+        status_text = st.empty()
+
         try:
-            status.info("🎯 Initializing agents…")
-            progress.progress(20)
-            orch = ResearchOrchestrator()
+            status_text.info("🎯 Initializing research agents...")
+            progress_bar.progress(20)
+            orchestrator = ResearchOrchestrator()
 
-            status.info("📋 Planning strategy…")
-            progress.progress(40)
+            status_text.info("📋 Planning research strategy...")
+            progress_bar.progress(40)
 
-            status.info("🔍 Conducting research…")
-            progress.progress(60)
-            results = orch.conduct_research(
+            status_text.info("🔍 Conducting research...")
+            progress_bar.progress(60)
+            results = orchestrator.conduct_research(
                 query=query,
                 output_format=output_format,
-                session_id=session_id_input or None,
+                session_id=session_id_input or None
             )
 
-            status.info("✅ Finalising report…")
-            progress.progress(100)
-            time.sleep(0.3)
-            progress.empty()
-            status.empty()
-            st.success("✅ Research completed!")
+            status_text.info("✅ Finalizing report...")
+            progress_bar.progress(100)
 
-            # metrics
+            progress_bar.empty()
+            status_text.empty()
+
+            st.success("✅ Research completed successfully!")
+
+            # Metrics
+            st.markdown("---")
+            st.markdown('<div class="section-title">📊 Research Metrics</div>', unsafe_allow_html=True)
+
+            final_content = results.get("final_content", {})
             summary = results.get("research_summary", {})
             validation = results.get("validation", {})
-            c1, c2 = st.columns(2)
-            with c1:
-                st.markdown(
-                    f'<div class="metric-card"><div class="metric-value">{summary.get("total_sources",0)}</div><div class="metric-label">Sources</div></div>',
-                    unsafe_allow_html=True,
-                )
-                st.markdown(
-                    f'<div class="metric-card"><div class="metric-value">{summary.get("iterations",0)}</div><div class="metric-label">Iterations</div></div>',
-                    unsafe_allow_html=True,
-                )
-            with c2:
-                st.markdown(
-                    f'<div class="metric-card"><div class="metric-value">{validation.get("confidence_score",0)}%</div><div class="metric-label">Confidence</div></div>',
-                    unsafe_allow_html=True,
-                )
-                st.markdown(
-                    f'<div class="metric-card"><div class="metric-value">{output_format.title()}</div><div class="metric-label">Format</div></div>',
-                    unsafe_allow_html=True,
-                )
 
-            # content
-            content = results.get("final_content", {}).get("content", "")
+            col1, col2, col3, col4 = st.columns(4)
+            col1.metric("📚 Sources", summary.get("total_sources", 0))
+            col2.metric("🔄 Iterations", summary.get("iterations", 0))
+            col3.metric("🎯 Confidence", f"{validation.get('confidence_score', 0)}%")
+            col4.metric("📝 Format", output_format.title())
+
+            # Content
+            st.markdown("---")
+            st.markdown('<div class="section-title">📄 Generated Research</div>', unsafe_allow_html=True)
+
+            content = final_content.get("content", "")
             st.markdown(content)
 
-            # downloads
+            # Downloads
+            st.markdown("---")
             d1, d2, d3 = st.columns(3)
-            d1.download_button("📥 Markdown", data=content, file_name="research.md", use_container_width=True)
-            d2.download_button("📥 JSON", data=json.dumps(results, indent=2), file_name="research.json", use_container_width=True)
-            d3.download_button("📥 TXT", data=content, file_name="research.txt", use_container_width=True)
+            d1.download_button("📥 Download Markdown", data=content, file_name="research.md", use_container_width=True)
+            d2.download_button("📥 Download JSON", data=json.dumps(results, indent=2), file_name="research.json", use_container_width=True)
+            d3.download_button("📥 Download TXT", data=content, file_name="research.txt", use_container_width=True)
 
-            # evaluation
+            # Evaluation
             if run_evaluation:
-                evaluator = ResearchEvaluator()
-                metrics = evaluator.evaluate_research(query, results)
-                overall = metrics.overall_score
                 st.markdown("---")
-                st.subheader(f"📊 Quality Score – {overall:.1f}/100")
-                for k, v in metrics.to_dict().items():
-                    st.write(f"**{k.replace('_',' ').title()}** – {v:.0f}/100")
-                    st.progress(v / 100)
+                st.markdown('<div class="section-title">📊 Quality Evaluation</div>', unsafe_allow_html=True)
+
+                try:
+                    evaluator = ResearchEvaluator()
+                    metrics = evaluator.evaluate_research(query, results)
+                    metrics_dict = metrics.to_dict()
+
+                    explanations = {
+                        "completeness": "Measures how fully the research covers all important aspects of the topic.",
+                        "accuracy": "Checks factual correctness based on cross-verified sources.",
+                        "relevance": "Evaluates how closely content matches the research query.",
+                        "quality": "Judges structure, clarity, and flow of writing.",
+                        "efficiency": "Measures how well sources were used to produce concise content.",
+                        "citations": "Evaluates whether sources are properly referenced.",
+                    }
+
+                    for metric, score in metrics_dict.items():
+                        m_name = metric.replace("_", " ").title()
+                        
+                        st.markdown(f"""
+                        <div class="eval-metric">
+                            <div class="eval-header">
+                                <div class="eval-name">{m_name}</div>
+                                <div class="eval-score">{score:.0f}</div>
+                            </div>
+                        """, unsafe_allow_html=True)
+                        
+                        st.progress(score / 100)
+                        
+                        st.markdown(f"""
+                            <div class="eval-description">{explanations.get(metric, '')}</div>
+                        </div>
+                        """, unsafe_allow_html=True)
+
+                    st.markdown("---")
+                    overall = metrics.overall_score
+                    emoji = "🟢" if overall >= 80 else "🟡" if overall >= 60 else "🔴"
+                    st.markdown(f"""
+                    <div class="content-section">
+                        <h2>{emoji} Overall Quality Score: {overall:.1f}/100</h2>
+                        <p style='color:var(--text-secondary); margin-top:0.5rem;'>
+                        Weighted average of all quality metrics - your total research score.
+                        </p>
+                    </div>
+                    """, unsafe_allow_html=True)
+
+                except Exception as e:
+                    st.warning(f"Evaluation unavailable: {str(e)}")
 
         except Exception as e:
-            st.error(f"❌ Research failed: {e}")
-            with st.expander("Show traceback"):
+            st.error(f"❌ Research failed: {str(e)}")
+            with st.expander("Show error details"):
                 st.exception(e)
 
-# ---------- TAB 2 : FIND RELATED ----------
+# Tab 2 - Find Related
 with tab2:
-    st.markdown("### 🔍 Find Related Research")
-    related_query = st.text_input("Search Query", placeholder="Enter keywords…")
-    if st.button("🔎 Search", use_container_width=True) and related_query:
-        try:
-            related = MemoryBank().get_related_research(related_query, limit=10)
-            if related:
-                st.success(f"Found {len(related)} related sessions")
-                for r in related:
-                    with st.expander(r.get("query", "Untitled")):
-                        st.write("ID:", r.get("id", "N/A")[:12] + "…")
-                        st.write("Sources:", r.get("sources_count", 0))
-            else:
-                st.info("No matches – try different keywords.", icon="ℹ️")
-        except Exception as e:
-            st.error(f"Search failed: {e}")
-
-# ---------- TAB 3 : PAST SESSIONS ----------
-with tab3:
-    st.markdown("### 📂 Past Research Sessions")
-    out_dir = Path("outputs")
-    if out_dir.exists():
-        files = sorted(out_dir.glob("*.json"), key=os.path.getmtime, reverse=True)[:20]
-        if files:
-            for f in files:
-                try:
-                    data = json.loads(f.read_text())
-                    with st.expander(data.get("query", "Untitled")):
-                        c1, c2 = st.columns(2)
-                        c1.write("**ID:** " + data.get("session_id", "N/A")[:12] + "…")
-                        summary = data.get("research_summary", {})
-                        c2.write("**Sources:** " + str(summary.get("total_sources", 0)))
-                        st.download_button("📥 Download", json.dumps(data, indent=2), f.name, use_container_width=True)
-                except Exception:
-                    pass
+    st.markdown('<div class="input-card">', unsafe_allow_html=True)
+    st.markdown('<div class="section-title">🔍 Find Related Research</div>', unsafe_allow_html=True)
+    
+    related_query = st.text_input(
+        "Search Query",
+        placeholder="Enter keywords or topic to find related research",
+        label_visibility="collapsed"
+    )
+    
+    if st.button("🔎 Search Related", use_container_width=True):
+        if related_query:
+            try:
+                memory_bank = MemoryBank()
+                related = memory_bank.get_related_research(related_query, limit=10)
+                
+                if related:
+                    st.success(f"✅ Found {len(related)} related research sessions")
+                    for i, session in enumerate(related, 1):
+                        with st.expander(f"📄 {session.get('query', 'Untitled')}"):
+                            col1, col2 = st.columns(2)
+                            col1.write("**Session:**", session.get('id', 'N/A')[:12] + "...")
+                            col2.write("**Sources:**", session.get('sources_count', 0))
+                else:
+                    st.info("No related research found. Try different keywords.")
+            except Exception as e:
+                st.error(f"Search failed: {str(e)}")
         else:
-            st.info("No past sessions – start your first research!", icon="ℹ️")
-    else:
-        st.info("No history yet", icon="ℹ️")
+            st.warning("Please enter a search query")
+    
+    st.markdown('</div>', unsafe_allow_html=True)
 
-# --------------  FOOTER  --------------
-st.markdown(
-    '<footer><strong>AI Research Assistant v2.0</strong><br>Multi-Agent System • Powered by Claude & Tavily</footer>',
-    unsafe_allow_html=True,
-)
+# Tab 3 - Past Sessions
+with tab3:
+    st.markdown('<div class="section-title">📂 Past Research Sessions</div>', unsafe_allow_html=True)
+    
+    output_dir = Path("outputs")
+    if output_dir.exists():
+        json_files = list(output_dir.glob("*.json"))
+        
+        if json_files:
+            st.info(f"📊 {len(json_files)} research sessions found")
+            
+            sorted_files = sorted(json_files, key=os.path.getmtime, reverse=True)
+            
+            for json_file in sorted_files[:20]:
+                try:
+                    with open(json_file, 'r') as f:
+                        data = json.load(f)
+                    
+                    query_text = data.get('query', 'Untitled')
+                    with st.expander(f"📄 {query_text}"):
+                        col1, col2 = st.columns(2)
+                        with col1:
+                            st.write("**ID:**", data.get('session_id', 'N/A')[:12] + "...")
+                            st.write("**Format:**", data.get('output_format', 'N/A'))
+                        with col2:
+                            summary = data.get('research_summary', {})
+                            st.write("**Sources:**", summary.get('total_sources', 0))
+                            st.write("**Iterations:**", summary.get('iterations', 0))
+                        
+                        st.download_button(
+                            "📥 Download",
+                            json.dumps(data, indent=2),
+                            json_file.name,
+                            use_container_width=True
+                        )
+                except Exception as e:
+                    st.error(f"Error loading {json_file.name}")
+        else:
+            st.info("📭 No past sessions found. Start your first research!")
+    else:
+        st.info("📭 No research history yet.")
+
+# Footer
+st.markdown("""
+<div class="footer">
+    <strong>AI Research Assistant v2.0</strong><br>
+    Multi-Agent System • Powered by Claude & Tavily<br>
+    Built with ❤️ using Streamlit
+</div>
+""", unsafe_allow_html=True)
