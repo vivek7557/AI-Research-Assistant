@@ -1,9 +1,9 @@
 """
-AI Research Assistant – Creative Edition
-Ultra-modern glass-morphism UI (logic untouched)
+AI Research Assistant – Ultimate Streamlit Beauty
+Logic untouched, visuals maximised
 """
 import streamlit as st
-import os, sys, json, time, datetime
+import os, sys, json, time
 from pathlib import Path
 from dotenv import load_dotenv
 
@@ -23,7 +23,7 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# --------------  GLOBAL GLASS-MORPHISM CSS  --------------
+# --------------  GLOBAL BEAUTIFY CSS  --------------
 st.markdown(
     """
 <style>
@@ -32,7 +32,6 @@ st.markdown(
     --bg0:#0c0c0f;
     --bg1:#111115;
     --bg2:#1a1a20;
-    --bg3:#22222b;
     --glass:rgba(26,26,32,0.55);
     --accent:#00f5ff;
     --accent2:#ff00c1;
@@ -46,8 +45,7 @@ st.markdown(
     --glow:0 0 12px var(--accent);
     --font:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
 }
-
-/* ---------- BACKDROP (AURORA) ---------- */
+/* ---------- AURORA BACKDROP ---------- */
 body{
     font-family:var(--font);
     background:var(--bg0);
@@ -69,7 +67,6 @@ body::before{
     0%{transform:rotate(0deg) scale(1.2);}
     100%{transform:rotate(360deg) scale(1.4);}
 }
-
 /* ---------- GLASS CARD ---------- */
 .glass{
     background:var(--glass);
@@ -86,10 +83,8 @@ body::before{
     box-shadow:var(--glow),0 12px 40px rgba(0,0,0,.45);
     transform:translateY(-4px);
 }
-
 /* ---------- FLOATING HERO ---------- */
 .hero{
-    position:relative;
     text-align:center;
     padding:5rem 0 4rem 0;
 }
@@ -111,56 +106,6 @@ body::before{
     color:var(--text2);
     margin-top:.5rem;
 }
-
-/* ---------- SIDEBAR ---------- */
-section[data-testid="stSidebar"]{
-    background:var(--bg1);
-    border-right:1px solid rgba(255,255,255,.06);
-}
-section[data-testid="stSidebar"] > div{
-    padding:2.5rem 1.75rem;
-}
-
-/* ---------- TABS ---------- */
-.stTabs [data-baseweb="tab-list"]{
-    gap:1rem;
-    background:transparent;
-    border-bottom:1px solid rgba(255,255,255,.06);
-}
-.stTabs [data-baseweb="tab"]{
-    background:var(--glass);
-    border:1px solid rgba(255,255,255,.06);
-    border-radius:var(--radius);
-    padding:.6rem 1.4rem;
-    font-weight:600;
-    color:var(--text2);
-    transition:all .2s ease;
-}
-.stTabs [data-baseweb="tab"]:hover{
-    border-color:var(--accent);
-}
-.stTabs [aria-selected="true"]{
-    background:linear-gradient(90deg,var(--accent),var(--accent2));
-    color:#fff;
-    border-color:transparent;
-    box-shadow:var(--glow);
-}
-
-/* ---------- INPUT ---------- */
-.stTextInput input, .stSelectbox select{
-    background:var(--bg1);
-    border:1px solid rgba(255,255,255,.08);
-    border-radius:var(--radius);
-    color:var(--text1);
-    padding:.75rem 1rem;
-    font-size:1rem;
-    transition:all .2s ease;
-}
-.stTextInput input:focus, .stSelectbox select:focus{
-    border-color:var(--accent);
-    box-shadow:var(--glow);
-}
-
 /* ---------- BUTTON ---------- */
 .stButton > button{
     background:linear-gradient(90deg,var(--accent),var(--accent2));
@@ -177,7 +122,6 @@ section[data-testid="stSidebar"] > div{
     transform:scale(1.05);
     box-shadow:0 0 20px var(--accent);
 }
-
 /* ---------- METRIC ---------- */
 .metric-card{
     text-align:center;
@@ -203,21 +147,11 @@ section[data-testid="stSidebar"] > div{
     color:var(--text2);
     margin-top:.25rem;
 }
-
-/* ---------- FOOTER ---------- */
-footer{
-    text-align:center;
-    padding:3rem 0 2rem 0;
-    font-size:.875rem;
-    color:var(--text2);
-    border-top:1px solid rgba(255,255,255,.06);
-    margin-top:5rem;
-}
 </style>""",
     unsafe_allow_html=True,
 )
 
-# --------------  SIDEBAR GLASS STATS --------------
+# --------------  SIDEBAR GLASS STATS  --------------
 with st.sidebar:
     st.markdown("### 📊 Research Analytics")
     try:
@@ -385,13 +319,14 @@ with tab2:
                         st.write("ID:", r.get("id", "N/A")[:12] + "…")
                         st.write("Sources:", r.get("sources_count", 0))
             else:
-                st.info("No matches – try different keywords.")
+                st.info("No matches – try different keywords.", icon="ℹ️")
         except Exception as e:
             st.error(f"Search failed: {e}")
 
 # ---------- TAB 3 : PAST SESSIONS ----------
 with tab3:
     st.markdown("### 📂 Past Research Sessions")
+    out_dir = Path("outputs")
     if out_dir.exists():
         files = sorted(out_dir.glob("*.json"), key=os.path.getmtime, reverse=True)[:20]
         if files:
@@ -407,9 +342,9 @@ with tab3:
                 except Exception:
                     pass
         else:
-            st.info("No past sessions – start your first research!")
+            st.info("No past sessions – start your first research!", icon="ℹ️")
     else:
-        st.info("No history yet.")
+        st.info("No history yet", icon="ℹ️")
 
 # --------------  FOOTER  --------------
 st.markdown(
