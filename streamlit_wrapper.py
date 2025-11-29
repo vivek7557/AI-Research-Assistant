@@ -1,16 +1,16 @@
 """
-Streamlit Web Interface for AI Research Assistant
-Ultra-polished SaaS-style UI – 100 % logic-compatible
+AI Research Assistant – Creative Edition
+Ultra-modern glass-morphism UI (logic untouched)
 """
 import streamlit as st
-import os, sys, json, time
+import os, sys, json, time, datetime
 from pathlib import Path
 from dotenv import load_dotenv
 
 load_dotenv()
 sys.path.insert(0, os.path.dirname(__file__))
 
-# --------------  BUSINESS LOGIC IMPORTS (UNCHANGED) --------------
+# --------------  ORIGINAL IMPORTS  --------------
 from orchestrator import ResearchOrchestrator
 from evaluation.evaluator import ResearchEvaluator
 from memory.memory_bank import MemoryBank
@@ -23,101 +23,115 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# --------------  GLOBAL CSS (SELF-CONTAINED) --------------
+# --------------  GLOBAL GLASS-MORPHISM CSS  --------------
 st.markdown(
     """
 <style>
 /* ---------- ROOT TOKENS ---------- */
 :root{
-    --bg0:#0e0e17;
-    --bg1:#15151f;
-    --bg2:#1c1c27;
-    --bg3:#232330;
-    --accent:#6366f1;
-    --accent-dark:#4f46e5;
-    --text1:#f2f2f7;
-    --text2:#a0a0b4;
-    --green:#10b981;
-    --yellow:#f59e0b;
-    --red:#ef4444;
-    --border:#2a2a38;
-    --radius:14px;
-    --shadow:0 8px 32px rgba(0,0,0,.32);
+    --bg0:#0c0c0f;
+    --bg1:#111115;
+    --bg2:#1a1a20;
+    --bg3:#22222b;
+    --glass:rgba(26,26,32,0.55);
+    --accent:#00f5ff;
+    --accent2:#ff00c1;
+    --text1:#f0f0f5;
+    --text2:#a0a0b3;
+    --green:#00ff9d;
+    --yellow:#ffd60a;
+    --red:#ff3d3d;
+    --radius:18px;
+    --blur:16px;
+    --glow:0 0 12px var(--accent);
     --font:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
 }
 
-/* ---------- RESET ---------- */
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-}
+/* ---------- BACKDROP (AURORA) ---------- */
 body{
     font-family:var(--font);
     background:var(--bg0);
     color:var(--text1);
+    overflow-x:hidden;
+}
+body::before{
+    content:"";
+    position:fixed;
+    top:0;left:0;width:100%;height:100%;
+    background:
+        radial-gradient(circle at 15% 30%, var(--accent) 0%, transparent 30%),
+        radial-gradient(circle at 85% 70%, var(--accent2) 0%, transparent 30%);
+    opacity:.13;
+    animation:aurora 20s infinite alternate;
+    z-index:-1;
+}
+@keyframes aurora{
+    0%{transform:rotate(0deg) scale(1.2);}
+    100%{transform:rotate(360deg) scale(1.4);}
 }
 
-/* ---------- MAIN LAYOUT ---------- */
-.main .block-container{
-    padding:2rem 3rem 4rem 3rem !important;
-    max-width:1440px !important;
+/* ---------- GLASS CARD ---------- */
+.glass{
+    background:var(--glass);
+    backdrop-filter:blur(var(--blur));
+    -webkit-backdrop-filter:blur(var(--blur));
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:var(--radius);
+    padding:2rem;
+    box-shadow:0 12px 40px rgba(0,0,0,.35);
+    transition:all .3s ease;
+}
+.glass:hover{
+    border-color:var(--accent);
+    box-shadow:var(--glow),0 12px 40px rgba(0,0,0,.45);
+    transform:translateY(-4px);
+}
+
+/* ---------- FLOATING HERO ---------- */
+.hero{
+    position:relative;
+    text-align:center;
+    padding:5rem 0 4rem 0;
+}
+.hero h1{
+    font-size:3.5rem;
+    font-weight:900;
+    letter-spacing:-1px;
+    background:linear-gradient(90deg,var(--accent),var(--accent2));
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    animation:float 4s ease-in-out infinite;
+}
+@keyframes float{
+    0%,100%{transform:translateY(0);}
+    50%{transform:translateY(-8px);}
+}
+.hero p{
+    font-size:1.2rem;
+    color:var(--text2);
+    margin-top:.5rem;
 }
 
 /* ---------- SIDEBAR ---------- */
 section[data-testid="stSidebar"]{
     background:var(--bg1);
-    border-right:1px solid var(--border);
+    border-right:1px solid rgba(255,255,255,.06);
 }
 section[data-testid="stSidebar"] > div{
-    padding:2rem 1.5rem;
-}
-
-/* ---------- CARDS ---------- */
-.card{
-    background:var(--bg2);
-    border:1px solid var(--border);
-    border-radius:var(--radius);
-    padding:1.5rem;
-    margin-bottom:1rem;
-    transition:all .25s ease;
-}
-.card:hover{
-    border-color:var(--accent);
-    transform:translateY(-2px);
-    box-shadow:var(--shadow);
-}
-
-/* ---------- HERO ---------- */
-.hero{
-    text-align:center;
-    padding:4rem 0 3rem 0;
-}
-.hero h1{
-    font-size:3rem;
-    font-weight:800;
-    background:linear-gradient(90deg,var(--accent) 0%,#8b5cf6 100%);
-    -webkit-background-clip:text;
-    -webkit-text-fill-color:transparent;
-    margin-bottom:.25rem;
-}
-.hero p{
-    font-size:1.1rem;
-    color:var(--text2);
+    padding:2.5rem 1.75rem;
 }
 
 /* ---------- TABS ---------- */
 .stTabs [data-baseweb="tab-list"]{
-    gap:.75rem;
+    gap:1rem;
     background:transparent;
-    border-bottom:1px solid var(--border);
-    padding-bottom:.5rem;
+    border-bottom:1px solid rgba(255,255,255,.06);
 }
 .stTabs [data-baseweb="tab"]{
-    background:var(--bg2);
-    border:1px solid var(--border);
+    background:var(--glass);
+    border:1px solid rgba(255,255,255,.06);
     border-radius:var(--radius);
-    padding:.5rem 1.25rem;
+    padding:.6rem 1.4rem;
     font-weight:600;
     color:var(--text2);
     transition:all .2s ease;
@@ -126,69 +140,84 @@ section[data-testid="stSidebar"] > div{
     border-color:var(--accent);
 }
 .stTabs [aria-selected="true"]{
-    background:var(--accent) !important;
-    color:#fff !important;
-    border-color:var(--accent) !important;
+    background:linear-gradient(90deg,var(--accent),var(--accent2));
+    color:#fff;
+    border-color:transparent;
+    box-shadow:var(--glow);
 }
 
-/* ---------- INPUTS ---------- */
+/* ---------- INPUT ---------- */
 .stTextInput input, .stSelectbox select{
-    background:var(--bg0);
-    border:1px solid var(--border);
+    background:var(--bg1);
+    border:1px solid rgba(255,255,255,.08);
     border-radius:var(--radius);
     color:var(--text1);
     padding:.75rem 1rem;
     font-size:1rem;
+    transition:all .2s ease;
 }
 .stTextInput input:focus, .stSelectbox select:focus{
     border-color:var(--accent);
-    box-shadow:0 0 0 2px rgba(99,102,241,.35);
+    box-shadow:var(--glow);
 }
 
-/* ---------- BUTTONS ---------- */
+/* ---------- BUTTON ---------- */
 .stButton > button{
-    background:var(--accent);
+    background:linear-gradient(90deg,var(--accent),var(--accent2));
     color:#fff;
     border:none;
     border-radius:var(--radius);
-    padding:.75rem 1.5rem;
-    font-weight:600;
-    transition:all .2s ease;
+    padding:.8rem 2rem;
+    font-weight:700;
+    font-size:1rem;
+    box-shadow:var(--glow);
+    transition:all .25s ease;
 }
 .stButton > button:hover{
-    background:var(--accent-dark);
-    transform:translateY(-2px);
+    transform:scale(1.05);
+    box-shadow:0 0 20px var(--accent);
 }
 
 /* ---------- METRIC ---------- */
-.metric{
+.metric-card{
     text-align:center;
+    padding:1.5rem 1rem;
+    border-radius:var(--radius);
+    background:var(--glass);
+    border:1px solid rgba(255,255,255,.06);
+    transition:all .3s ease;
 }
-.metric .label{
+.metric-card:hover{
+    border-color:var(--accent);
+    transform:translateY(-4px);
+}
+.metric-value{
+    font-size:2.5rem;
+    font-weight:800;
+    background:linear-gradient(90deg,var(--accent),var(--accent2));
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+}
+.metric-label{
     font-size:.875rem;
     color:var(--text2);
-    margin-bottom:.25rem;
-}
-.metric .value{
-    font-size:2.25rem;
-    font-weight:700;
-    color:var(--text1);
+    margin-top:.25rem;
 }
 
 /* ---------- FOOTER ---------- */
 footer{
     text-align:center;
-    padding:2.5rem 0 2rem 0;
+    padding:3rem 0 2rem 0;
     font-size:.875rem;
     color:var(--text2);
-    border-top:1px solid var(--border);
-    margin-top:4rem;
+    border-top:1px solid rgba(255,255,255,.06);
+    margin-top:5rem;
 }
 </style>""",
     unsafe_allow_html=True,
 )
 
-# --------------  SIDEBAR  --------------
+# --------------  SIDEBAR GLASS STATS --------------
 with st.sidebar:
     st.markdown("### 📊 Research Analytics")
     try:
@@ -196,20 +225,20 @@ with st.sidebar:
         c1, c2 = st.columns(2)
         with c1:
             st.markdown(
-                f'<div class="card metric"><div class="label">Total Research</div><div class="value">{stats.get("total_memories",0)}</div></div>',
+                f'<div class="metric-card"><div class="metric-value">{stats.get("total_memories",0)}</div><div class="metric-label">Total Research</div></div>',
                 unsafe_allow_html=True,
             )
             st.markdown(
-                f'<div class="card metric"><div class="label">Completed</div><div class="value">{stats.get("completed_sessions",0)}</div></div>',
+                f'<div class="metric-card"><div class="metric-value">{stats.get("completed_sessions",0)}</div><div class="metric-label">Completed</div></div>',
                 unsafe_allow_html=True,
             )
         with c2:
             st.markdown(
-                f'<div class="card metric"><div class="label">Sources</div><div class="value">{stats.get("total_sources",0)}</div></div>',
+                f'<div class="metric-card"><div class="metric-value">{stats.get("total_sources",0)}</div><div class="metric-label">Sources</div></div>',
                 unsafe_allow_html=True,
             )
             st.markdown(
-                f'<div class="card metric"><div class="label">Avg Quality</div><div class="value">{stats.get("avg_importance",0):.1f}/10</div></div>',
+                f'<div class="metric-card"><div class="metric-value">{stats.get("avg_importance",0):.1f}</div><div class="metric-label">Avg Quality</div></div>',
                 unsafe_allow_html=True,
             )
     except Exception:
@@ -237,7 +266,7 @@ if tavily_key:
     os.environ["TAVILY_API_KEY"] = tavily_key
 keys_set = bool(anthropic_key and tavily_key)
 
-# --------------  HERO  --------------
+# --------------  FLOATING HERO  --------------
 st.markdown(
     '<div class="hero"><h1>🔍 AI Research Assistant</h1><p>Deep, multi-agent research at your fingertips</p></div>',
     unsafe_allow_html=True,
@@ -296,11 +325,25 @@ with tab1:
             # metrics
             summary = results.get("research_summary", {})
             validation = results.get("validation", {})
-            c1, c2, c3, c4 = st.columns(4)
-            c1.metric("Sources", summary.get("total_sources", 0))
-            c2.metric("Iterations", summary.get("iterations", 0))
-            c3.metric("Confidence", f"{validation.get('confidence_score',0)}%")
-            c4.metric("Format", output_format.title())
+            c1, c2 = st.columns(2)
+            with c1:
+                st.markdown(
+                    f'<div class="metric-card"><div class="metric-value">{summary.get("total_sources",0)}</div><div class="metric-label">Sources</div></div>',
+                    unsafe_allow_html=True,
+                )
+                st.markdown(
+                    f'<div class="metric-card"><div class="metric-value">{summary.get("iterations",0)}</div><div class="metric-label">Iterations</div></div>',
+                    unsafe_allow_html=True,
+                )
+            with c2:
+                st.markdown(
+                    f'<div class="metric-card"><div class="metric-value">{validation.get("confidence_score",0)}%</div><div class="metric-label">Confidence</div></div>',
+                    unsafe_allow_html=True,
+                )
+                st.markdown(
+                    f'<div class="metric-card"><div class="metric-value">{output_format.title()}</div><div class="metric-label">Format</div></div>',
+                    unsafe_allow_html=True,
+                )
 
             # content
             content = results.get("final_content", {}).get("content", "")
@@ -370,6 +413,4 @@ with tab3:
 
 # --------------  FOOTER  --------------
 st.markdown(
-    '<footer><strong>AI Research Assistant v2.0</strong><br>Multi-Agent System • Powered by Claude & Tavily</footer>',
-    unsafe_allow_html=True,
-)
+    '<footer><strong>AI Research Assistant
