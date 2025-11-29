@@ -413,4 +413,6 @@ with tab3:
 
 # --------------  FOOTER  --------------
 st.markdown(
-    '<footer><strong>AI Research Assistant
+    '<footer><strong>AI Research Assistant v2.0</strong><br>Multi-Agent System • Powered by Claude & Tavily</footer>',
+    unsafe_allow_html=True,
+)
