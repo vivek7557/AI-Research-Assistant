@@ -368,8 +368,7 @@ st.markdown("""
     }
 </style>
 """, unsafe_allow_html=True)
-
-
+    
     /* Header Navigation */
     .header-nav {
         background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
