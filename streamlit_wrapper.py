@@ -21,22 +21,11 @@ from evaluation.evaluator import ResearchEvaluator
 from memory.memory_bank import MemoryBank
 
 # --------------------------------------------------
-# Page config
-# --------------------------------------------------
-st.set_page_config(
-    page_title="ResearchAI",
-    page_icon="🔬",
-    layout="wide",
-    initial_sidebar_state="expanded"
-)
-
-# --------------------------------------------------
-# React-style gradient modern CSS
+# React-style gradient modern CSS  (drop-in)
 # --------------------------------------------------
 st.markdown(
     """
 <style>
-/* ---- ROOT TOKENS ---- */
 :root {
     --bg: #0f0f15;
     --surface: #1a1a24;
@@ -126,46 +115,80 @@ html, body, .block-container {
 )
 
 # --------------------------------------------------
-# Sidebar
+# React-style header / form / metrics  (drop-in)
 # --------------------------------------------------
-with st.sidebar:
-    st.markdown("### 📊 Research Analytics")
-    try:
-        stats = MemoryBank().get_statistics()
-        c1, c2 = st.columns(2)
-        with c1:
-            st.markdown(
-                f'<div class="metric-card"><div class="metric-value">{stats.get("total_memories",0)}</div><div class="metric-label">Total Research</div></div>',
-                unsafe_allow_html=True,
-            )
-            st.markdown(
-                f'<div class="metric-card"><div class="metric-value">{stats.get("completed_sessions",0)}</div><div class="metric-label">Completed</div></div>',
-                unsafe_allow_html=True,
-            )
-        with c2:
-            st.markdown(
-                f'<div class="metric-card"><div class="metric-value">{stats.get("total_sources",0)}</div><div class="metric-label">Sources</div></div>',
-                unsafe_allow_html=True,
-            )
-            st.markdown(
-                f'<div class="metric-card"><div class="metric-value">{stats.get("avg_importance",0):.1f}</div><div class="metric-label">Avg Quality</div></div>',
-                unsafe_allow_html=True,
-            )
-    except Exception:
-        st.info("Stats will appear after first research.")
+st.markdown("## 🔬 ResearchAI")
+st.markdown("Deep, multi-agent research at your fingertips.")
 
-    st.markdown("### Recent Activity")
-    out = Path("outputs")
-    if out.exists():
-        files = sorted(out.glob("*.json"), key=os.path.getmtime, reverse=True)[:6]
-        for f in files:
-            try:
-                q = json.loads(f.read_text()).get("query", "Untitled")
-                st.markdown(f"• {q[:40]}…")
-            except Exception:
-                pass
-    else:
-        st.markdown("No activity yet")
+with st.form("research_form"):
+    query = st.text_input("Research Query", placeholder="E.g. Impact of AI on healthcare")
+    col_format, col_eval = st.columns([3, 2])
+    with col_format:
+        output_format = st.selectbox("Output Format", ["report", "article", "summary", "presentation"])
+    with col_eval:
+        run_evaluation = st.checkbox("Run Evaluation", value=True)
+    with st.expander("Advanced"):
+        session_id_input = st.text_input("Resume Session ID", placeholder="research_xxxxx")
+        depth_level = st.slider("Research Depth", 1, 5, 3)
+    submitted = st.form_submit_button("Start Research", use_container_width=True)
+
+if submitted and query:
+    progress = st.progress(0)
+    status = st.empty()
+    try:
+        status.info("Initializing agents…")
+        progress.progress(20)
+        orch = ResearchOrchestrator()
+
+        status.info("Planning strategy…")
+        progress.progress(40)
+
+        status.info("Conducting research…")
+        progress.progress(60)
+        results = orch.conduct_research(
+            query=query,
+            output_format=output_format,
+            session_id=session_id_input or None,
+        )
+
+        status.info("Finalising report…")
+        progress.progress(100)
+        time.sleep(0.3)
+        progress.empty()
+        status.empty()
+        st.success("Research completed!")
+
+        summary = results.get("research_summary", {})
+        validation = results.get("validation", {})
+        c1, c2, c3, c4 = st.columns(4)
+        c1.metric("Sources", summary.get("total_sources", 0))
+        c2.metric("Iterations", summary.get("iterations", 0))
+        c3.metric("Confidence", f"{validation.get('confidence_score', 0)}%")
+        c4.metric("Format", output_format.title())
+
+        content = results.get("final_content", {}).get("content", "")
+        st.markdown(content)
+
+        d1, d2, d3 = st.columns(3)
+        d1.download_button("Markdown", data=content, file_name="research.md", use_container_width=True)
+        d2.download_button("JSON", data=json.dumps(results, indent=2), file_name="research.json", use_container_width=True)
+        d3.download_button("TXT", data=content, file_name="research.txt", use_container_width=True)
+
+        if run_evaluation:
+            evaluator = ResearchEvaluator()
+            metrics = evaluator.evaluate_research(query, results)
+            overall = metrics.overall_score
+            st.markdown("---")
+            st.markdown(f"**Quality Score:** {overall:.1f}/100")
+            for k, v in metrics.to_dict().items():
+                st.write(f"{k.replace('_', ' ').title()} – {v:.0f}/100")
+                st.progress(v / 100)
+
+    except Exception as e:
+        st.error(f"Research failed: {e}")
+        with st.expander("Traceback"):
+            st.exception(e)
+
 
 # --------------------------------------------------
 # API keys
