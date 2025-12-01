@@ -1,5 +1,5 @@
 """
-streamlit_wrapper.py — GLASS-MORPHISM STYLE
+streamlit_wrapper.py — MODERN GLASS-MORPHISM UI
 Logic 100 % unchanged.
 """
 import streamlit as st
@@ -30,12 +30,11 @@ st.set_page_config(
 )
 
 # --------------------------------------------------
-# Glass-morphism + neon CSS
+# Minimal glass-morphism CSS
 # --------------------------------------------------
 st.markdown(
     """
 <style>
-/* ---- ROOT ---- */
 :root {
     --bg0: #0c0c0f;
     --bg1: #111115;
@@ -48,7 +47,6 @@ st.markdown(
     --border: rgba(255, 255, 255, 0.08);
     --radius: 12px;
     --blur: 16px;
-    --glow: 0 0 12px var(--accent);
     --font: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
@@ -58,7 +56,7 @@ html, body, .block-container {
     color: var(--text);
 }
 
-/* ---- Glass card ---- */
+/* Glass card */
 .glass {
     background: var(--glass);
     backdrop-filter: blur(var(--blur));
@@ -67,62 +65,45 @@ html, body, .block-container {
     border-radius: var(--radius);
     padding: 1.5rem;
     margin-bottom: 1rem;
-    transition: all 0.3s ease;
-}
-.glass:hover {
-    border-color: var(--accent);
-    box-shadow: var(--glow), 0 12px 40px rgba(0, 0, 0, 0.45);
-    transform: translateY(-4px);
 }
 
-/* ---- Inputs ---- */
+/* Inputs */
 .stTextInput input, .stSelectbox select {
     background: var(--bg1);
     border: 1px solid var(--border);
     border-radius: var(--radius);
     color: var(--text);
-    padding: 0.75rem 1rem;
-    font-size: 0.95rem;
-    transition: all 0.2s ease;
+    padding: 0.5rem 0.75rem;
 }
 .stTextInput input:focus, .stSelectbox select:focus {
     border-color: var(--accent);
-    box-shadow: var(--glow);
+    box-shadow: 0 0 0 1px var(--accent);
 }
 
-/* ---- Button ---- */
+/* Button */
 .stButton > button {
     background: linear-gradient(90deg, var(--accent), var(--accent2));
     color: #fff;
     border: none;
     border-radius: var(--radius);
-    padding: 0.75rem 1.5rem;
+    padding: 0.5rem 1.25rem;
     font-weight: 600;
-    font-size: 1rem;
-    box-shadow: var(--glow);
-    transition: all 0.25s ease;
 }
 .stButton > button:hover {
-    transform: scale(1.05);
-    box-shadow: 0 0 20px var(--accent);
+    transform: scale(1.03);
 }
 
-/* ---- Metric ---- */
+/* Metric */
 .metric-card {
     text-align: center;
     padding: 1rem;
     background: var(--glass);
     border: 1px solid var(--border);
     border-radius: var(--radius);
-    transition: all 0.3s ease;
-}
-.metric-card:hover {
-    border-color: var(--accent);
-    transform: translateY(-4px);
 }
 .metric-value {
-    font-size: 2.25rem;
-    font-weight: 700;
+    font-size: 2rem;
+    font-weight: 600;
     background: linear-gradient(90deg, var(--accent), var(--accent2));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
