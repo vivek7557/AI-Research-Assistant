@@ -1,6 +1,6 @@
 """
 Streamlit Web Interface for AI Research Assistant
-Ultra-Modern UI with React-inspired design
+Beautiful Modern UI with Format Fix
 """
 import streamlit as st
 import os
@@ -24,96 +24,41 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Modern CSS with React-style components
+# Beautiful Modern CSS
 st.markdown("""
 <style>
-    /* ===== RESET & BASE ===== */
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-    }
-    
-    /* Dark theme variables */
     :root {
-        --primary: #6366f1;
-        --primary-dark: #4f46e5;
-        --primary-light: #818cf8;
-        --bg-dark: #0f0f23;
-        --bg-card: #1a1a2e;
-        --bg-card-hover: #1f1f38;
-        --border: #2d2d44;
-        --border-hover: #6366f1;
-        --text-primary: #e5e7eb;
-        --text-secondary: #9ca3af;
+        --primary: #3b82f6;
+        --primary-dark: #2563eb;
+        --secondary: #8b5cf6;
+        --accent: #06b6d4;
         --success: #10b981;
         --warning: #f59e0b;
         --danger: #ef4444;
+        --bg: #0f172a;
+        --bg-card: #1e293b;
+        --border: #334155;
+        --text: #f1f5f9;
+        --text-secondary: #cbd5e1;
     }
     
-    /* ===== ANIMATIONS ===== */
-    @keyframes fadeInUp {
-        from {
-            opacity: 0;
-            transform: translateY(20px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes slideInRight { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
+    @keyframes shimmer { 0% { background-position: -1000px 0; } 100% { background-position: 1000px 0; } }
     
-    @keyframes slideInRight {
-        from {
-            opacity: 0;
-            transform: translateX(-20px);
-        }
-        to {
-            opacity: 1;
-            transform: translateX(0);
-        }
-    }
+    .main { background: var(--bg); }
     
-    @keyframes pulse {
-        0%, 100% {
-            opacity: 1;
-        }
-        50% {
-            opacity: 0.8;
-        }
-    }
-    
-    @keyframes shimmer {
-        0% {
-            background-position: -1000px 0;
-        }
-        100% {
-            background-position: 1000px 0;
-        }
-    }
-    
-    /* ===== GLOBAL OVERRIDES ===== */
-    .main {
-        background: var(--bg-dark);
-        padding: 0 !important;
-    }
-    
-    .block-container {
-        padding: 2rem 3rem !important;
+    .block-container { 
+        padding: 2rem 3rem !important; 
         max-width: 1400px !important;
     }
     
-    /* ===== SIDEBAR ===== */
     [data-testid="stSidebar"] {
-        background: linear-gradient(180deg, #0f0f23 0%, #1a1a2e 100%);
+        background: linear-gradient(180deg, var(--bg) 0%, var(--bg-card) 100%);
         border-right: 1px solid var(--border);
     }
     
-    [data-testid="stSidebar"] > div {
-        padding: 1.5rem 1rem;
-    }
-    
-    /* Sidebar cards */
     .sidebar-card {
         background: var(--bg-card);
         border: 1px solid var(--border);
@@ -127,7 +72,7 @@ st.markdown("""
     .sidebar-card:hover {
         transform: translateY(-2px);
         border-color: var(--primary);
-        box-shadow: 0 8px 20px rgba(99, 102, 241, 0.15);
+        box-shadow: 0 8px 20px rgba(59, 130, 246, 0.15);
     }
     
     .sidebar-title {
@@ -142,8 +87,7 @@ st.markdown("""
     .sidebar-value {
         font-size: 1.75rem;
         font-weight: 700;
-        color: var(--text-primary);
-        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+        background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
     }
@@ -151,7 +95,7 @@ st.markdown("""
     .sidebar-section-title {
         font-size: 0.9rem;
         font-weight: 700;
-        color: var(--text-primary);
+        color: var(--text);
         margin: 1.5rem 0 0.75rem 0;
         padding-bottom: 0.5rem;
         border-bottom: 1px solid var(--border);
@@ -168,14 +112,13 @@ st.markdown("""
     }
     
     .sidebar-activity-item:hover {
-        color: var(--text-primary);
+        color: var(--text);
         border-left-color: var(--primary);
         padding-left: 0.75rem;
     }
     
-    /* ===== HEADER ===== */
     .hero-header {
-        background: linear-gradient(135deg, var(--bg-card) 0%, #1a1a35 100%);
+        background: linear-gradient(135deg, var(--bg-card) 0%, #1a2847 100%);
         border: 1px solid var(--border);
         border-radius: 20px;
         padding: 3rem 2rem;
@@ -193,14 +136,14 @@ st.markdown("""
         left: -100%;
         width: 200%;
         height: 100%;
-        background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.1), transparent);
+        background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.1), transparent);
         animation: shimmer 3s infinite;
     }
     
     .hero-title {
         font-size: 3rem;
         font-weight: 800;
-        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%);
+        background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 50%, var(--accent) 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         margin-bottom: 0.5rem;
@@ -214,7 +157,6 @@ st.markdown("""
         position: relative;
     }
     
-    /* ===== TABS ===== */
     .stTabs [data-baseweb="tab-list"] {
         gap: 1rem;
         justify-content: center;
@@ -241,10 +183,9 @@ st.markdown("""
         background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%) !important;
         border-color: var(--primary) !important;
         color: white !important;
-        box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
+        box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3);
     }
     
-    /* ===== INPUT CONTAINER ===== */
     .input-card {
         background: var(--bg-card);
         border: 1px solid var(--border);
@@ -259,15 +200,14 @@ st.markdown("""
     
     .input-card:hover {
         border-color: var(--primary);
-        box-shadow: 0 10px 40px rgba(99, 102, 241, 0.2);
+        box-shadow: 0 10px 40px rgba(59, 130, 246, 0.2);
     }
     
-    /* ===== INPUTS ===== */
     .stTextInput input {
-        background: var(--bg-dark) !important;
+        background: var(--bg) !important;
         border: 1px solid var(--border) !important;
         border-radius: 12px !important;
-        color: var(--text-primary) !important;
+        color: var(--text) !important;
         padding: 0.75rem 1rem !important;
         font-size: 1rem !important;
         transition: all 0.3s ease !important;
@@ -275,18 +215,17 @@ st.markdown("""
     
     .stTextInput input:focus {
         border-color: var(--primary) !important;
-        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1) !important;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
     }
     
     .stSelectbox select {
-        background: var(--bg-dark) !important;
+        background: var(--bg) !important;
         border: 1px solid var(--border) !important;
         border-radius: 12px !important;
-        color: var(--text-primary) !important;
+        color: var(--text) !important;
         padding: 0.75rem 1rem !important;
     }
     
-    /* ===== BUTTONS ===== */
     .stButton > button {
         background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%) !important;
         color: white !important;
@@ -296,28 +235,27 @@ st.markdown("""
         font-weight: 600 !important;
         font-size: 1rem !important;
         transition: all 0.3s ease !important;
-        box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3) !important;
+        box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3) !important;
     }
     
     .stButton > button:hover {
         transform: translateY(-2px) !important;
-        box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4) !important;
+        box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4) !important;
     }
     
     .stDownloadButton > button {
         background: var(--bg-card) !important;
         border: 1px solid var(--border) !important;
-        color: var(--text-primary) !important;
+        color: var(--text) !important;
         border-radius: 12px !important;
         transition: all 0.3s ease !important;
     }
     
     .stDownloadButton > button:hover {
         border-color: var(--primary) !important;
-        background: var(--bg-card-hover) !important;
+        background: var(--bg-card) !important;
     }
     
-    /* ===== METRICS ===== */
     [data-testid="stMetric"] {
         background: var(--bg-card);
         border: 1px solid var(--border);
@@ -330,29 +268,14 @@ st.markdown("""
     [data-testid="stMetric"]:hover {
         transform: translateY(-3px);
         border-color: var(--primary);
-        box-shadow: 0 8px 20px rgba(99, 102, 241, 0.15);
+        box-shadow: 0 8px 20px rgba(59, 130, 246, 0.15);
     }
     
-    [data-testid="stMetricLabel"] {
-        color: var(--text-secondary) !important;
-        font-size: 0.875rem !important;
-        font-weight: 600 !important;
-    }
-    
-    [data-testid="stMetricValue"] {
-        color: var(--text-primary) !important;
-        font-size: 2rem !important;
-        font-weight: 700 !important;
-    }
-    
-    /* ===== PROGRESS ===== */
     .stProgress > div > div {
-        background: linear-gradient(90deg, var(--primary) 0%, #8b5cf6 100%) !important;
+        background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%) !important;
         border-radius: 10px !important;
-        animation: pulse 2s ease-in-out infinite;
     }
     
-    /* ===== CONTENT SECTIONS ===== */
     .content-section {
         background: var(--bg-card);
         border: 1px solid var(--border);
@@ -365,13 +288,12 @@ st.markdown("""
     .section-title {
         font-size: 1.5rem;
         font-weight: 700;
-        color: var(--text-primary);
+        color: var(--text);
         margin-bottom: 1rem;
         padding-bottom: 0.75rem;
         border-bottom: 2px solid var(--border);
     }
     
-    /* ===== EVALUATION CARDS ===== */
     .eval-metric {
         background: var(--bg-card);
         border: 1px solid var(--border);
@@ -387,62 +309,31 @@ st.markdown("""
         transform: translateX(5px);
     }
     
-    .eval-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 0.75rem;
-    }
-    
     .eval-name {
         font-size: 1rem;
         font-weight: 600;
-        color: var(--text-primary);
+        color: var(--text);
     }
     
     .eval-score {
         font-size: 1.5rem;
         font-weight: 700;
-        background: linear-gradient(135deg, var(--primary) 0%, #8b5cf6 100%);
+        background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
     }
     
-    .eval-description {
-        font-size: 0.875rem;
-        color: var(--text-secondary);
-        line-height: 1.5;
-        margin-top: 0.5rem;
-    }
-    
-    /* ===== EXPANDER ===== */
     .streamlit-expanderHeader {
         background: var(--bg-card) !important;
         border: 1px solid var(--border) !important;
         border-radius: 12px !important;
-        color: var(--text-primary) !important;
+        color: var(--text) !important;
     }
     
-    /* ===== ALERTS ===== */
-    .stAlert {
-        border-radius: 12px !important;
-        border: 1px solid var(--border) !important;
-    }
+    .stAlert { border-radius: 12px !important; }
     
-    /* ===== MARKDOWN ===== */
-    .markdown-text-container {
-        color: var(--text-primary);
-        line-height: 1.8;
-    }
+    hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
     
-    /* ===== DIVIDER ===== */
-    hr {
-        border: none;
-        border-top: 1px solid var(--border);
-        margin: 2rem 0;
-    }
-    
-    /* ===== FOOTER ===== */
     .footer {
         text-align: center;
         padding: 2rem;
@@ -452,24 +343,10 @@ st.markdown("""
         margin-top: 3rem;
     }
     
-    /* ===== CHECKBOX ===== */
-    .stCheckbox {
-        color: var(--text-primary) !important;
-    }
-    
-    /* ===== RESPONSIVE ===== */
     @media (max-width: 768px) {
-        .hero-title {
-            font-size: 2rem;
-        }
-        
-        .block-container {
-            padding: 1rem !important;
-        }
-        
-        .input-card {
-            padding: 1.5rem;
-        }
+        .hero-title { font-size: 2rem; }
+        .block-container { padding: 1rem !important; }
+        .input-card { padding: 1.5rem; }
     }
 </style>
 """, unsafe_allow_html=True)
@@ -598,6 +475,8 @@ with tab1:
 
             status_text.info("🔍 Conducting research...")
             progress_bar.progress(60)
+            
+            # ✅ FIX: Pass output_format to orchestrator
             results = orchestrator.conduct_research(
                 query=query,
                 output_format=output_format,
@@ -631,7 +510,11 @@ with tab1:
             st.markdown('<div class="section-title">📄 Generated Research</div>', unsafe_allow_html=True)
 
             content = final_content.get("content", "")
-            st.markdown(content)
+            if not content:
+                st.warning(f"⚠️ No {output_format} content generated. This may be an orchestrator issue.")
+                st.info("💡 Make sure your orchestrator.conduct_research() returns content for all formats.")
+            else:
+                st.markdown(content)
 
             # Downloads
             st.markdown("---")
@@ -664,16 +547,13 @@ with tab1:
                         
                         st.markdown(f"""
                         <div class="eval-metric">
-                            <div class="eval-header">
-                                <div class="eval-name">{m_name}</div>
-                                <div class="eval-score">{score:.0f}</div>
-                            </div>
+                            <div class="eval-name">{m_name}: <span class="eval-score">{score:.0f}</span></div>
                         """, unsafe_allow_html=True)
                         
                         st.progress(score / 100)
                         
                         st.markdown(f"""
-                            <div class="eval-description">{explanations.get(metric, '')}</div>
+                            <p style="font-size:0.875rem; color:var(--text-secondary); margin-top:0.5rem;">{explanations.get(metric, '')}</p>
                         </div>
                         """, unsafe_allow_html=True)
 
