@@ -1,6 +1,6 @@
 """
 Streamlit Web Interface for AI Research Assistant
-Fresh Modern UI - Clean & Minimalist Design
+Beautiful Modern UI with Format Fix
 """
 import streamlit as st
 import os
@@ -16,396 +16,394 @@ from orchestrator import ResearchOrchestrator
 from evaluation.evaluator import ResearchEvaluator
 from memory.memory_bank import MemoryBank
 
+# Page configuration
 st.set_page_config(
-    page_title="ResearchAI",
+    page_title="AI Research Assistant",
     page_icon="🔍",
     layout="wide",
-    initial_sidebar_state="collapsed"
+    initial_sidebar_state="expanded"
 )
 
-# Fresh Modern CSS - Minimalist Design
+# Beautiful Modern CSS
 st.markdown("""
 <style>
-    /* Variables */
     :root {
-        --primary: #2563eb;
-        --secondary: #7c3aed;
+        --primary: #3b82f6;
+        --primary-dark: #2563eb;
+        --secondary: #8b5cf6;
         --accent: #06b6d4;
-        --success: #059669;
-        --bg: #ffffff;
-        --bg-light: #f8fafc;
-        --border: #e2e8f0;
-        --text: #0f172a;
-        --text-light: #475569;
+        --success: #10b981;
+        --warning: #f59e0b;
+        --danger: #ef4444;
+        --bg: #0f172a;
+        --bg-card: #1e293b;
+        --border: #334155;
+        --text: #f1f5f9;
+        --text-secondary: #cbd5e1;
     }
     
-    /* Animations */
-    @keyframes fadeIn { 
-        from { opacity: 0; } 
-        to { opacity: 1; } 
-    }
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes slideInRight { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
+    @keyframes shimmer { 0% { background-position: -1000px 0; } 100% { background-position: 1000px 0; } }
     
-    @keyframes slideUp { 
-        from { opacity: 0; transform: translateY(20px); } 
-        to { opacity: 1; transform: translateY(0); } 
-    }
+    .main { background: var(--bg); }
     
-    @keyframes pulse { 
-        0%, 100% { opacity: 1; } 
-        50% { opacity: 0.8; } 
-    }
-    
-    /* Global */
-    html, body, [data-testid="stAppViewContainer"] {
-        background: #ffffff !important;
-    }
-    
-    .main {
-        background: #ffffff;
+    .block-container { 
+        padding: 2rem 3rem !important; 
+        max-width: 1400px !important;
     }
     
     [data-testid="stSidebar"] {
-        display: none !important;
+        background: linear-gradient(180deg, var(--bg) 0%, var(--bg-card) 100%);
+        border-right: 1px solid var(--border);
     }
     
-    .block-container {
-        padding: 0 !important;
-        max-width: 100% !important;
-    }
-    
-    /* Header Navigation */
-    .header-nav {
-        background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-        border-bottom: 1px solid var(--border);
-        padding: 1.5rem 2rem;
-        position: sticky;
-        top: 0;
-        z-index: 100;
-    }
-    
-    .nav-container {
-        max-width: 1200px;
-        margin: 0 auto;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-    }
-    
-    .nav-logo {
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        font-size: 1.5rem;
-        font-weight: 800;
-        color: var(--text);
-    }
-    
-    .nav-logo-icon {
-        width: 40px;
-        height: 40px;
-        background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+    .sidebar-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
         border-radius: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.5rem;
+        padding: 1rem;
+        margin-bottom: 0.75rem;
+        transition: all 0.3s ease;
+        animation: fadeInUp 0.5s ease;
     }
     
-    .nav-stats {
-        display: flex;
-        gap: 2rem;
+    .sidebar-card:hover {
+        transform: translateY(-2px);
+        border-color: var(--primary);
+        box-shadow: 0 8px 20px rgba(59, 130, 246, 0.15);
     }
     
-    .nav-stat {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 0.25rem;
+    .sidebar-title {
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.5rem;
     }
     
-    .nav-stat-value {
-        font-size: 1.25rem;
+    .sidebar-value {
+        font-size: 1.75rem;
         font-weight: 700;
         background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
     }
     
-    .nav-stat-label {
-        font-size: 0.75rem;
-        color: var(--text-light);
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
+    .sidebar-section-title {
+        font-size: 0.9rem;
+        font-weight: 700;
+        color: var(--text);
+        margin: 1.5rem 0 0.75rem 0;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid var(--border);
     }
     
-    /* Main Content */
-    .main-content {
-        max-width: 1200px;
-        margin: 0 auto;
+    .sidebar-activity-item {
+        font-size: 0.8rem;
+        color: var(--text-secondary);
+        padding: 0.5rem 0;
+        border-left: 2px solid transparent;
+        padding-left: 0.5rem;
+        margin-bottom: 0.25rem;
+        transition: all 0.2s ease;
+    }
+    
+    .sidebar-activity-item:hover {
+        color: var(--text);
+        border-left-color: var(--primary);
+        padding-left: 0.75rem;
+    }
+    
+    .hero-header {
+        background: linear-gradient(135deg, var(--bg-card) 0%, #1a2847 100%);
+        border: 1px solid var(--border);
+        border-radius: 20px;
         padding: 3rem 2rem;
+        margin-bottom: 2rem;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+        animation: fadeInUp 0.6s ease;
     }
     
-    /* Hero Section */
-    .hero {
-        text-align: center;
-        margin-bottom: 3rem;
-        animation: slideUp 0.6s ease;
+    .hero-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 200%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.1), transparent);
+        animation: shimmer 3s infinite;
     }
     
     .hero-title {
-        font-size: 3.5rem;
-        font-weight: 900;
-        color: var(--text);
-        margin-bottom: 0.75rem;
-        letter-spacing: -1px;
+        font-size: 3rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 50%, var(--accent) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 0.5rem;
+        position: relative;
     }
     
     .hero-subtitle {
-        font-size: 1.25rem;
-        color: var(--text-light);
-        margin-bottom: 1rem;
+        font-size: 1.1rem;
+        color: var(--text-secondary);
         font-weight: 500;
+        position: relative;
     }
     
-    .hero-description {
-        font-size: 1rem;
-        color: var(--text-light);
-        max-width: 600px;
-        margin: 0 auto 2rem;
-        line-height: 1.6;
+    .stTabs [data-baseweb="tab-list"] {
+        gap: 1rem;
+        justify-content: center;
+        background: transparent;
+        padding: 0.5rem;
     }
     
-    /* Search Card */
-    .search-card {
-        background: var(--bg-light);
+    .stTabs [data-baseweb="tab"] {
+        background: var(--bg-card) !important;
+        border: 1px solid var(--border) !important;
+        border-radius: 12px !important;
+        padding: 0.75rem 1.5rem !important;
+        font-weight: 600 !important;
+        color: var(--text-secondary) !important;
+        transition: all 0.3s ease !important;
+    }
+    
+    .stTabs [data-baseweb="tab"]:hover {
+        border-color: var(--primary) !important;
+        transform: translateY(-2px);
+    }
+    
+    .stTabs [data-baseweb="tab"][aria-selected="true"] {
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%) !important;
+        border-color: var(--primary) !important;
+        color: white !important;
+        box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3);
+    }
+    
+    .input-card {
+        background: var(--bg-card);
         border: 1px solid var(--border);
         border-radius: 16px;
-        padding: 2.5rem;
-        margin-bottom: 3rem;
-        animation: slideUp 0.7s ease;
+        padding: 2rem;
+        margin: 2rem auto;
+        max-width: 900px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        animation: fadeInUp 0.7s ease;
+        transition: all 0.3s ease;
     }
     
-    /* Inputs */
-    .stTextInput > label,
-    .stSelectbox > label,
-    .stSlider > label {
-        font-size: 0.95rem !important;
-        font-weight: 600 !important;
-        color: var(--text) !important;
-        margin-bottom: 0.75rem !important;
+    .input-card:hover {
+        border-color: var(--primary);
+        box-shadow: 0 10px 40px rgba(59, 130, 246, 0.2);
     }
     
     .stTextInput input {
-        background: #ffffff !important;
-        border: 2px solid var(--border) !important;
-        border-radius: 10px !important;
+        background: var(--bg) !important;
+        border: 1px solid var(--border) !important;
+        border-radius: 12px !important;
         color: var(--text) !important;
-        padding: 0.875rem 1rem !important;
+        padding: 0.75rem 1rem !important;
         font-size: 1rem !important;
         transition: all 0.3s ease !important;
     }
     
     .stTextInput input:focus {
         border-color: var(--primary) !important;
-        outline: none !important;
-        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1) !important;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
     }
     
     .stSelectbox select {
-        background: #ffffff !important;
-        border: 2px solid var(--border) !important;
-        border-radius: 10px !important;
+        background: var(--bg) !important;
+        border: 1px solid var(--border) !important;
+        border-radius: 12px !important;
         color: var(--text) !important;
-        padding: 0.875rem 1rem !important;
+        padding: 0.75rem 1rem !important;
     }
     
-    .stSlider > div > div {
-        background: var(--border) !important;
-    }
-    
-    /* Columns */
-    .stColumns > div {
-        gap: 1.5rem !important;
-    }
-    
-    /* Checkboxes */
-    .stCheckbox {
-        color: var(--text) !important;
-    }
-    
-    .stCheckbox > label {
-        font-weight: 500 !important;
-        color: var(--text) !important;
-    }
-    
-    /* Buttons */
     .stButton > button {
-        background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%) !important;
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%) !important;
         color: white !important;
         border: none !important;
-        border-radius: 10px !important;
-        padding: 1rem 2rem !important;
-        font-weight: 700 !important;
+        border-radius: 12px !important;
+        padding: 0.875rem 2rem !important;
+        font-weight: 600 !important;
         font-size: 1rem !important;
         transition: all 0.3s ease !important;
-        box-shadow: 0 4px 15px rgba(37, 99, 235, 0.2) !important;
-        height: auto !important;
+        box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3) !important;
     }
     
     .stButton > button:hover {
         transform: translateY(-2px) !important;
-        box-shadow: 0 8px 25px rgba(37, 99, 235, 0.3) !important;
-    }
-    
-    .stButton > button:active {
-        transform: translateY(0) !important;
+        box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4) !important;
     }
     
     .stDownloadButton > button {
-        background: var(--bg-light) !important;
-        border: 2px solid var(--border) !important;
+        background: var(--bg-card) !important;
+        border: 1px solid var(--border) !important;
         color: var(--text) !important;
-        border-radius: 10px !important;
-        font-weight: 600 !important;
-        padding: 0.875rem 1.75rem !important;
+        border-radius: 12px !important;
         transition: all 0.3s ease !important;
-        height: auto !important;
     }
     
     .stDownloadButton > button:hover {
         border-color: var(--primary) !important;
-        background: #ffffff !important;
+        background: var(--bg-card) !important;
     }
     
-    /* Expander */
-    .streamlit-expanderHeader {
-        background: var(--bg-light) !important;
-        border: 2px solid var(--border) !important;
-        border-radius: 10px !important;
-        color: var(--text) !important;
-        font-weight: 600 !important;
-    }
-    
-    /* Tabs */
-    .stTabs [data-baseweb="tab-list"] {
-        gap: 0.5rem !important;
-        justify-content: center !important;
-        border-bottom: 2px solid var(--border) !important;
-        padding: 0 !important;
-    }
-    
-    .stTabs [data-baseweb="tab"] {
-        background: transparent !important;
-        border: none !important;
-        border-bottom: 3px solid transparent !important;
-        color: var(--text-light) !important;
-        font-weight: 600 !important;
-        padding: 1rem 1.5rem !important;
-        transition: all 0.3s ease !important;
-    }
-    
-    .stTabs [data-baseweb="tab"]:hover {
-        color: var(--text) !important;
-    }
-    
-    .stTabs [data-baseweb="tab"][aria-selected="true"] {
-        color: var(--primary) !important;
-        border-bottom-color: var(--primary) !important;
-        background: transparent !important;
-    }
-    
-    /* Metrics */
     [data-testid="stMetric"] {
-        background: var(--bg-light);
+        background: var(--bg-card);
         border: 1px solid var(--border);
         border-radius: 12px;
-        padding: 1.5rem;
+        padding: 1.25rem;
         transition: all 0.3s ease;
+        animation: fadeInUp 0.5s ease;
     }
     
     [data-testid="stMetric"]:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+        transform: translateY(-3px);
+        border-color: var(--primary);
+        box-shadow: 0 8px 20px rgba(59, 130, 246, 0.15);
     }
     
-    [data-testid="stMetricLabel"] {
-        color: var(--text-light) !important;
-        font-size: 0.85rem !important;
-        font-weight: 600 !important;
-    }
-    
-    [data-testid="stMetricValue"] {
-        color: var(--text) !important;
-        font-size: 2.2rem !important;
-        font-weight: 800 !important;
-    }
-    
-    /* Progress */
     .stProgress > div > div {
         background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%) !important;
         border-radius: 10px !important;
     }
     
-    /* Section */
-    .section {
-        background: var(--bg-light);
+    .content-section {
+        background: var(--bg-card);
         border: 1px solid var(--border);
         border-radius: 16px;
         padding: 2rem;
-        margin: 2rem 0;
-        animation: slideUp 0.6s ease;
+        margin: 1.5rem 0;
+        animation: fadeInUp 0.6s ease;
     }
     
     .section-title {
         font-size: 1.5rem;
-        font-weight: 800;
+        font-weight: 700;
         color: var(--text);
-        margin-bottom: 1.5rem;
-        padding-bottom: 1rem;
+        margin-bottom: 1rem;
+        padding-bottom: 0.75rem;
         border-bottom: 2px solid var(--border);
     }
     
-    /* Alert */
-    .stAlert {
-        border-radius: 12px !important;
-        border: 1px solid var(--border) !important;
+    .eval-metric {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        transition: all 0.3s ease;
+        animation: slideInRight 0.5s ease;
     }
     
-    /* Divider */
-    hr {
-        border: none !important;
-        border-top: 1px solid var(--border) !important;
-        margin: 2rem 0 !important;
+    .eval-metric:hover {
+        border-color: var(--primary);
+        transform: translateX(5px);
     }
     
-    /* Markdown */
-    .markdown-text-container {
+    .eval-name {
+        font-size: 1rem;
+        font-weight: 600;
         color: var(--text);
-        line-height: 1.8;
     }
     
-    /* Footer */
+    .eval-score {
+        font-size: 1.5rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+    
+    .streamlit-expanderHeader {
+        background: var(--bg-card) !important;
+        border: 1px solid var(--border) !important;
+        border-radius: 12px !important;
+        color: var(--text) !important;
+    }
+    
+    .stAlert { border-radius: 12px !important; }
+    
+    hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+    
     .footer {
-        background: var(--bg-light);
-        border-top: 1px solid var(--border);
-        padding: 2rem;
         text-align: center;
-        color: var(--text-light);
-        font-size: 0.9rem;
+        padding: 2rem;
+        color: var(--text-secondary);
+        font-size: 0.875rem;
+        border-top: 1px solid var(--border);
         margin-top: 3rem;
     }
     
-    /* Responsive */
     @media (max-width: 768px) {
         .hero-title { font-size: 2rem; }
-        .main-content { padding: 1.5rem 1rem; }
-        .search-card { padding: 1.5rem; }
-        .nav-stats { gap: 1rem; }
+        .block-container { padding: 1rem !important; }
+        .input-card { padding: 1.5rem; }
     }
 </style>
 """, unsafe_allow_html=True)
 
-# Header Navigation
+# Sidebar
+with st.sidebar:
+    st.markdown('<div class="sidebar-section-title">📊 Research Analytics</div>', unsafe_allow_html=True)
+
+    try:
+        memory_bank = MemoryBank()
+        stats = memory_bank.get_statistics()
+
+        st.markdown(f"""
+        <div class="sidebar-card">
+            <div class="sidebar-title">📚 Total Research</div>
+            <div class="sidebar-value">{stats.get('total_memories', 0)}</div>
+        </div>
+        
+        <div class="sidebar-card">
+            <div class="sidebar-title">✅ Completed</div>
+            <div class="sidebar-value">{stats.get('completed_sessions', 0)}</div>
+        </div>
+        
+        <div class="sidebar-card">
+            <div class="sidebar-title">🔗 Total Sources</div>
+            <div class="sidebar-value">{stats.get('total_sources', 0)}</div>
+        </div>
+        
+        <div class="sidebar-card">
+            <div class="sidebar-title">⭐ Avg Quality</div>
+            <div class="sidebar-value">{stats.get('avg_importance', 0):.1f}<span style="font-size:1rem;color:var(--text-secondary);">/10</span></div>
+        </div>
+        """, unsafe_allow_html=True)
+    except:
+        st.info("📊 Statistics will appear after first research")
+
+    st.markdown('<div class="sidebar-section-title">📈 Recent Activity</div>', unsafe_allow_html=True)
+
+    output_dir = Path("outputs")
+    if output_dir.exists():
+        json_files = list(output_dir.glob("*.json"))
+        if json_files:
+            recent_files = sorted(json_files, key=os.path.getmtime, reverse=True)[:6]
+            for file in recent_files:
+                try:
+                    with open(file, 'r') as f:
+                        data = json.load(f)
+                    query = data.get("query", "Untitled")
+                    st.markdown(f'<div class="sidebar-activity-item">• {query[:32]}...</div>', unsafe_allow_html=True)
+                except:
+                    pass
+        else:
+            st.markdown('<div class="sidebar-activity-item">No recent activity</div>', unsafe_allow_html=True)
+    else:
+        st.markdown('<div class="sidebar-activity-item">No activity yet</div>', unsafe_allow_html=True)
+
+# API Keys
 anthropic_key = os.getenv("ANTHROPIC_API_KEY") or st.secrets.get("ANTHROPIC_API_KEY", "")
 tavily_key = os.getenv("TAVILY_API_KEY") or st.secrets.get("TAVILY_API_KEY", "")
 
@@ -416,251 +414,230 @@ if tavily_key:
 
 keys_set = bool(anthropic_key and tavily_key)
 
-try:
-    memory_bank = MemoryBank()
-    stats = memory_bank.get_statistics()
-except:
-    stats = {"total_memories": 0, "completed_sessions": 0, "total_sources": 0}
-
-st.markdown(f"""
-<div class="header-nav">
-    <div class="nav-container">
-        <div class="nav-logo">
-            <div class="nav-logo-icon">🔍</div>
-            <span>ResearchAI</span>
-        </div>
-        <div class="nav-stats">
-            <div class="nav-stat">
-                <div class="nav-stat-value">{stats.get('total_memories', 0)}</div>
-                <div class="nav-stat-label">Research</div>
-            </div>
-            <div class="nav-stat">
-                <div class="nav-stat-value">{stats.get('completed_sessions', 0)}</div>
-                <div class="nav-stat-label">Completed</div>
-            </div>
-            <div class="nav-stat">
-                <div class="nav-stat-value">{stats.get('total_sources', 0)}</div>
-                <div class="nav-stat-label">Sources</div>
-            </div>
-        </div>
-    </div>
-</div>
-""", unsafe_allow_html=True)
-
-# Main Content
-st.markdown('<div class="main-content">', unsafe_allow_html=True)
-
-# Hero Section
+# Header
 st.markdown("""
-<div class="hero">
-    <h1 class="hero-title">Deep Research</h1>
-    <p class="hero-subtitle">Powered by AI Agents</p>
-    <p class="hero-description">
-        Conduct comprehensive research on any topic with multi-agent AI collaboration, 
-        quality evaluation, and multiple output formats.
-    </p>
+<div class="hero-header">
+    <div class="hero-title">🔍 AI Research Assistant</div>
+    <div class="hero-subtitle">Deep research powered by multi-agent AI system</div>
 </div>
 """, unsafe_allow_html=True)
 
 # Tabs
-tab1, tab2, tab3 = st.tabs(["🔬 Research", "🔍 Related", "📂 History"])
+tab1, tab2, tab3 = st.tabs(["🔬 New Research", "🔍 Find Related", "📂 Past Sessions"])
 
-# Tab 1
+# Tab 1 - New Research
 with tab1:
     if not keys_set:
-        st.error("⚠️ Missing API Keys - Configure ANTHROPIC_API_KEY and TAVILY_API_KEY")
+        st.error("⚠️ API Keys missing. Please configure ANTHROPIC_API_KEY and TAVILY_API_KEY in .env file")
         st.stop()
-    
-    st.markdown('<div class="search-card">', unsafe_allow_html=True)
-    
-    st.markdown("<h3 style='margin-top:0;color:#0f172a;'>Start Your Research</h3>", unsafe_allow_html=True)
-    
+
+    st.markdown('<div class="input-card">', unsafe_allow_html=True)
+
     query = st.text_input(
-        "What do you want to research?",
-        placeholder="e.g., Impact of AI on healthcare",
-        label_visibility="visible"
+        "🔎 Research Query",
+        placeholder="e.g., Impact of artificial intelligence on healthcare systems",
+        label_visibility="collapsed"
     )
-    
-    col1, col2 = st.columns([1.5, 1])
-    
-    with col1:
+
+    col_format, col_eval = st.columns([3, 2])
+    with col_format:
         output_format = st.selectbox(
-            "Output Format",
-            ["report", "article", "summary", "presentation"],
-            label_visibility="visible"
+            "📄 Output Format",
+            ["report", "article", "summary", "presentation"]
         )
-    
-    with col2:
-        run_evaluation = st.checkbox("Run Evaluation", value=True)
-    
-    with st.expander("⚙️ Advanced Settings"):
-        col_adv1, col_adv2 = st.columns(2)
-        with col_adv1:
-            session_id_input = st.text_input("Session ID", placeholder="Optional")
-        with col_adv2:
+    with col_eval:
+        run_evaluation = st.checkbox("🎯 Run Evaluation", value=True)
+
+    with st.expander("⚙️ Advanced Options"):
+        colA, colB = st.columns(2)
+        with colA:
+            session_id_input = st.text_input("Resume Session ID", placeholder="research_xxxxx")
+        with colB:
             depth_level = st.slider("Research Depth", 1, 5, 3)
-    
+
     st.markdown('</div>', unsafe_allow_html=True)
-    
+
     if st.button("🚀 Start Research", use_container_width=True):
         if not query:
-            st.warning("Please enter a research query")
+            st.warning("⚠️ Please enter a research query")
             st.stop()
-        
+
         progress_bar = st.progress(0)
         status_text = st.empty()
-        
+
         try:
             status_text.info("🎯 Initializing research agents...")
             progress_bar.progress(20)
             orchestrator = ResearchOrchestrator()
-            
+
             status_text.info("📋 Planning research strategy...")
             progress_bar.progress(40)
-            
-            status_text.info("🔍 Conducting deep research...")
+
+            status_text.info("🔍 Conducting research...")
             progress_bar.progress(60)
             
+            # ✅ FIX: Pass output_format to orchestrator
             results = orchestrator.conduct_research(
                 query=query,
                 output_format=output_format,
                 session_id=session_id_input or None
             )
-            
+
             status_text.info("✅ Finalizing report...")
             progress_bar.progress(100)
-            
+
             progress_bar.empty()
             status_text.empty()
-            
-            st.success("✅ Research completed!")
-            
+
+            st.success("✅ Research completed successfully!")
+
             # Metrics
             st.markdown("---")
-            st.markdown('<div class="section">', unsafe_allow_html=True)
-            st.markdown('<h2 class="section-title">Research Metrics</h2>', unsafe_allow_html=True)
-            
+            st.markdown('<div class="section-title">📊 Research Metrics</div>', unsafe_allow_html=True)
+
             final_content = results.get("final_content", {})
             summary = results.get("research_summary", {})
             validation = results.get("validation", {})
-            
-            m1, m2, m3, m4 = st.columns(4)
-            m1.metric("📚 Sources", summary.get("total_sources", 0))
-            m2.metric("🔄 Iterations", summary.get("iterations", 0))
-            m3.metric("🎯 Confidence", f"{validation.get('confidence_score', 0)}%")
-            m4.metric("📝 Format", output_format.title())
-            
-            st.markdown('</div>', unsafe_after_html=True)
-            
+
+            col1, col2, col3, col4 = st.columns(4)
+            col1.metric("📚 Sources", summary.get("total_sources", 0))
+            col2.metric("🔄 Iterations", summary.get("iterations", 0))
+            col3.metric("🎯 Confidence", f"{validation.get('confidence_score', 0)}%")
+            col4.metric("📝 Format", output_format.title())
+
             # Content
             st.markdown("---")
-            st.markdown('<div class="section">', unsafe_allow_html=True)
-            st.markdown('<h2 class="section-title">Generated Research</h2>', unsafe_allow_html=True)
-            
+            st.markdown('<div class="section-title">📄 Generated Research</div>', unsafe_allow_html=True)
+
             content = final_content.get("content", "")
             if not content:
-                st.warning(f"⚠️ No {output_format} content generated")
+                st.warning(f"⚠️ No {output_format} content generated. This may be an orchestrator issue.")
+                st.info("💡 Make sure your orchestrator.conduct_research() returns content for all formats.")
             else:
                 st.markdown(content)
-            
-            st.markdown('</div>', unsafe_allow_html=True)
-            
+
             # Downloads
             st.markdown("---")
-            st.markdown('<div class="section">', unsafe_allow_html=True)
             d1, d2, d3 = st.columns(3)
-            d1.download_button("📥 Markdown", content, "research.md", use_container_width=True)
-            d2.download_button("📥 JSON", json.dumps(results, indent=2), "research.json", use_container_width=True)
-            d3.download_button("📥 TXT", content, "research.txt", use_container_width=True)
-            st.markdown('</div>', unsafe_allow_html=True)
-            
+            d1.download_button("📥 Download Markdown", data=content, file_name="research.md", use_container_width=True)
+            d2.download_button("📥 Download JSON", data=json.dumps(results, indent=2), file_name="research.json", use_container_width=True)
+            d3.download_button("📥 Download TXT", data=content, file_name="research.txt", use_container_width=True)
+
             # Evaluation
             if run_evaluation:
                 st.markdown("---")
-                st.markdown('<div class="section">', unsafe_allow_html=True)
-                st.markdown('<h2 class="section-title">Quality Evaluation</h2>', unsafe_allow_html=True)
-                
+                st.markdown('<div class="section-title">📊 Quality Evaluation</div>', unsafe_allow_html=True)
+
                 try:
                     evaluator = ResearchEvaluator()
                     metrics = evaluator.evaluate_research(query, results)
                     metrics_dict = metrics.to_dict()
-                    
-                    for metric, score in list(metrics_dict.items())[:6]:
+
+                    explanations = {
+                        "completeness": "Measures how fully the research covers all important aspects of the topic.",
+                        "accuracy": "Checks factual correctness based on cross-verified sources.",
+                        "relevance": "Evaluates how closely content matches the research query.",
+                        "quality": "Judges structure, clarity, and flow of writing.",
+                        "efficiency": "Measures how well sources were used to produce concise content.",
+                        "citations": "Evaluates whether sources are properly referenced.",
+                    }
+
+                    for metric, score in metrics_dict.items():
                         m_name = metric.replace("_", " ").title()
-                        col_eval1, col_eval2 = st.columns([3, 1])
-                        with col_eval1:
-                            st.write(f"**{m_name}**")
-                            st.progress(score / 100)
-                        with col_eval2:
-                            st.metric("", f"{score:.0f}", delta=None)
-                    
+                        
+                        st.markdown(f"""
+                        <div class="eval-metric">
+                            <div class="eval-name">{m_name}: <span class="eval-score">{score:.0f}</span></div>
+                        """, unsafe_allow_html=True)
+                        
+                        st.progress(score / 100)
+                        
+                        st.markdown(f"""
+                            <p style="font-size:0.875rem; color:var(--text-secondary); margin-top:0.5rem;">{explanations.get(metric, '')}</p>
+                        </div>
+                        """, unsafe_allow_html=True)
+
                     st.markdown("---")
                     overall = metrics.overall_score
                     emoji = "🟢" if overall >= 80 else "🟡" if overall >= 60 else "🔴"
-                    st.markdown(f"## {emoji} Quality Score: {overall:.1f}/100")
-                
+                    st.markdown(f"""
+                    <div class="content-section">
+                        <h2>{emoji} Overall Quality Score: {overall:.1f}/100</h2>
+                        <p style='color:var(--text-secondary); margin-top:0.5rem;'>
+                        Weighted average of all quality metrics - your total research score.
+                        </p>
+                    </div>
+                    """, unsafe_allow_html=True)
+
                 except Exception as e:
                     st.warning(f"Evaluation unavailable: {str(e)}")
-                
-                st.markdown('</div>', unsafe_allow_html=True)
-        
-        except Exception as e:
-            st.error(f"❌ Error: {str(e)}")
 
-# Tab 2
+        except Exception as e:
+            st.error(f"❌ Research failed: {str(e)}")
+            with st.expander("Show error details"):
+                st.exception(e)
+
+# Tab 2 - Find Related
 with tab2:
-    st.markdown('<div class="search-card">', unsafe_allow_html=True)
-    st.markdown("<h3 style='margin-top:0;'>Find Related Research</h3>", unsafe_allow_html=True)
+    st.markdown('<div class="input-card">', unsafe_allow_html=True)
+    st.markdown('<div class="section-title">🔍 Find Related Research</div>', unsafe_allow_html=True)
     
     related_query = st.text_input(
-        "Search keywords",
-        placeholder="Enter topic to find related research",
-        label_visibility="visible"
+        "Search Query",
+        placeholder="Enter keywords or topic to find related research",
+        label_visibility="collapsed"
     )
     
-    if st.button("🔎 Search", use_container_width=True):
+    if st.button("🔎 Search Related", use_container_width=True):
         if related_query:
             try:
                 memory_bank = MemoryBank()
                 related = memory_bank.get_related_research(related_query, limit=10)
                 
                 if related:
-                    st.success(f"✅ Found {len(related)} related sessions")
-                    for session in related:
+                    st.success(f"✅ Found {len(related)} related research sessions")
+                    for i, session in enumerate(related, 1):
                         with st.expander(f"📄 {session.get('query', 'Untitled')}"):
-                            st.write(f"**Sources:** {session.get('sources_count', 0)}")
+                            col1, col2 = st.columns(2)
+                            col1.write("**Session:**", session.get('id', 'N/A')[:12] + "...")
+                            col2.write("**Sources:**", session.get('sources_count', 0))
                 else:
-                    st.info("No related research found")
+                    st.info("No related research found. Try different keywords.")
             except Exception as e:
                 st.error(f"Search failed: {str(e)}")
+        else:
+            st.warning("Please enter a search query")
     
     st.markdown('</div>', unsafe_allow_html=True)
 
-# Tab 3
+# Tab 3 - Past Sessions
 with tab3:
-    st.markdown('<div class="section">', unsafe_allow_html=True)
-    st.markdown('<h2 class="section-title">Past Research Sessions</h2>', unsafe_allow_html=True)
+    st.markdown('<div class="section-title">📂 Past Research Sessions</div>', unsafe_allow_html=True)
     
     output_dir = Path("outputs")
     if output_dir.exists():
         json_files = list(output_dir.glob("*.json"))
         
         if json_files:
-            st.info(f"📊 {len(json_files)} sessions found")
+            st.info(f"📊 {len(json_files)} research sessions found")
             
-            for json_file in sorted(json_files, key=os.path.getmtime, reverse=True)[:20]:
+            sorted_files = sorted(json_files, key=os.path.getmtime, reverse=True)
+            
+            for json_file in sorted_files[:20]:
                 try:
                     with open(json_file, 'r') as f:
                         data = json.load(f)
                     
-                    with st.expander(f"📄 {data.get('query', 'Untitled')}"):
-                        c1, c2 = st.columns(2)
-                        c1.write(f"**ID:** {data.get('session_id', 'N/A')[:12]}...")
-                        c2.write(f"**Format:** {data.get('output_format', 'N/A')}")
-                        
-                        summary = data.get('research_summary', {})
-                        c1.write(f"**Sources:** {summary.get('total_sources', 0)}")
-                        c2.write(f"**Iterations:** {summary.get('iterations', 0)}")
+                    query_text = data.get('query', 'Untitled')
+                    with st.expander(f"📄 {query_text}"):
+                        col1, col2 = st.columns(2)
+                        with col1:
+                            st.write("**ID:**", data.get('session_id', 'N/A')[:12] + "...")
+                            st.write("**Format:**", data.get('output_format', 'N/A'))
+                        with col2:
+                            summary = data.get('research_summary', {})
+                            st.write("**Sources:**", summary.get('total_sources', 0))
+                            st.write("**Iterations:**", summary.get('iterations', 0))
                         
                         st.download_button(
                             "📥 Download",
@@ -668,20 +645,18 @@ with tab3:
                             json_file.name,
                             use_container_width=True
                         )
-                except:
-                    pass
+                except Exception as e:
+                    st.error(f"Error loading {json_file.name}")
         else:
-            st.info("📭 No sessions yet")
+            st.info("📭 No past sessions found. Start your first research!")
     else:
-        st.info("📭 No history")
-    
-    st.markdown('</div>', unsafe_allow_html=True)
-
-st.markdown('</div>', unsafe_allow_html=True)
+        st.info("📭 No research history yet.")
 
 # Footer
 st.markdown("""
 <div class="footer">
-    <strong>ResearchAI v2.0</strong> • Multi-Agent System • Built with Streamlit
+    <strong>AI Research Assistant v2.0</strong><br>
+    Multi-Agent System • Powered by Claude & Tavily<br>
+    Built with ❤️ using Streamlit
 </div>
 """, unsafe_allow_html=True)
