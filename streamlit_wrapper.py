@@ -1,5 +1,5 @@
 """
-streamlit_wrapper.py — CLEAN MINIMAL UI
+streamlit_wrapper.py — GLASS-MORPHISM STYLE
 Logic 100 % unchanged.
 """
 import streamlit as st
@@ -30,76 +30,102 @@ st.set_page_config(
 )
 
 # --------------------------------------------------
-# Clean React-like CSS
+# Glass-morphism + neon CSS
 # --------------------------------------------------
 st.markdown(
     """
 <style>
 /* ---- ROOT ---- */
 :root {
-    --bg: #ffffff;
-    --surface: #f7f9fc;
-    --border: #e5e7eb;
-    --text: #111827;
-    --text2: #6b7280;
-    --primary: #2563eb;
-    --radius: 8px;
+    --bg0: #0c0c0f;
+    --bg1: #111115;
+    --bg2: #1a1a20;
+    --glass: rgba(26, 26, 32, 0.55);
+    --accent: #00f5ff;
+    --accent2: #ff00c1;
+    --text: #f0f0f5;
+    --text2: #a0a0b3;
+    --border: rgba(255, 255, 255, 0.08);
+    --radius: 12px;
+    --blur: 16px;
+    --glow: 0 0 12px var(--accent);
     --font: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
 html, body, .block-container {
-    background: var(--bg);
+    background: var(--bg0);
     font-family: var(--font);
     color: var(--text);
 }
 
-/* ---- Card ---- */
-.card {
-    background: var(--surface);
+/* ---- Glass card ---- */
+.glass {
+    background: var(--glass);
+    backdrop-filter: blur(var(--blur));
+    -webkit-backdrop-filter: blur(var(--blur));
     border: 1px solid var(--border);
     border-radius: var(--radius);
     padding: 1.5rem;
     margin-bottom: 1rem;
+    transition: all 0.3s ease;
+}
+.glass:hover {
+    border-color: var(--accent);
+    box-shadow: var(--glow), 0 12px 40px rgba(0, 0, 0, 0.45);
+    transform: translateY(-4px);
 }
 
 /* ---- Inputs ---- */
 .stTextInput input, .stSelectbox select {
+    background: var(--bg1);
     border: 1px solid var(--border);
     border-radius: var(--radius);
-    padding: 0.5rem 0.75rem;
-    font-size: 0.9rem;
+    color: var(--text);
+    padding: 0.75rem 1rem;
+    font-size: 0.95rem;
+    transition: all 0.2s ease;
 }
 .stTextInput input:focus, .stSelectbox select:focus {
-    border-color: var(--primary);
-    box-shadow: 0 0 0 1px var(--primary);
+    border-color: var(--accent);
+    box-shadow: var(--glow);
 }
 
 /* ---- Button ---- */
 .stButton > button {
-    background: var(--primary);
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
     color: #fff;
     border: none;
     border-radius: var(--radius);
-    padding: 0.5rem 1.25rem;
-    font-weight: 500;
-    transition: background 0.2s;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    font-size: 1rem;
+    box-shadow: var(--glow);
+    transition: all 0.25s ease;
 }
 .stButton > button:hover {
-    background: #1e40af;
+    transform: scale(1.05);
+    box-shadow: 0 0 20px var(--accent);
 }
 
 /* ---- Metric ---- */
 .metric-card {
     text-align: center;
     padding: 1rem;
-    background: var(--surface);
+    background: var(--glass);
     border: 1px solid var(--border);
     border-radius: var(--radius);
+    transition: all 0.3s ease;
+}
+.metric-card:hover {
+    border-color: var(--accent);
+    transform: translateY(-4px);
 }
 .metric-value {
-    font-size: 2rem;
-    font-weight: 600;
-    color: var(--primary);
+    font-size: 2.25rem;
+    font-weight: 700;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 .metric-label {
     font-size: 0.8rem;
