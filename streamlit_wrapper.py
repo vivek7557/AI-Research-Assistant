@@ -6,6 +6,8 @@ import streamlit as st
 import os
 import sys
 import json
+import time          # <-- add this line
+
 from pathlib import Path
 from dotenv import load_dotenv
 
