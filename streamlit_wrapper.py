@@ -1,13 +1,12 @@
 """
-streamlit_wrapper.py — MODERN GLASS-MORPHISM UI
+ResearchAI – React-Style Gradient Modern UI
 Logic 100 % unchanged.
 """
 import streamlit as st
 import os
 import sys
 import json
-import time          # <-- add this line
-
+import time
 from pathlib import Path
 from dotenv import load_dotenv
 
@@ -32,20 +31,20 @@ st.set_page_config(
 )
 
 # --------------------------------------------------
-# Minimal glass-morphism CSS
+# React-style gradient modern CSS
 # --------------------------------------------------
 st.markdown(
     """
 <style>
+/* ---- ROOT TOKENS ---- */
 :root {
-    --bg0: #0c0c0f;
-    --bg1: #111115;
-    --bg2: #1a1a20;
-    --glass: rgba(26, 26, 32, 0.55);
-    --accent: #00f5ff;
-    --accent2: #ff00c1;
-    --text: #f0f0f5;
-    --text2: #a0a0b3;
+    --bg: #0f0f15;
+    --surface: #1a1a24;
+    --glass: rgba(26, 26, 36, 0.6);
+    --gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --accent: #667eea;
+    --text: #f5f5f5;
+    --text2: #a0a0b0;
     --border: rgba(255, 255, 255, 0.08);
     --radius: 12px;
     --blur: 16px;
@@ -53,13 +52,13 @@ st.markdown(
 }
 
 html, body, .block-container {
-    background: var(--bg0);
+    background: var(--bg);
     font-family: var(--font);
     color: var(--text);
 }
 
 /* Glass card */
-.glass {
+.card {
     background: var(--glass);
     backdrop-filter: blur(var(--blur));
     -webkit-backdrop-filter: blur(var(--blur));
@@ -67,29 +66,36 @@ html, body, .block-container {
     border-radius: var(--radius);
     padding: 1.5rem;
     margin-bottom: 1rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.37);
+    transition: all 0.3s ease;
+}
+.card:hover {
+    box-shadow: 0 8px 40px rgba(102, 126, 234, 0.25);
+    transform: translateY(-2px);
 }
 
 /* Inputs */
 .stTextInput input, .stSelectbox select {
-    background: var(--bg1);
+    background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--radius);
     color: var(--text);
     padding: 0.5rem 0.75rem;
+    transition: border-color 0.2s;
 }
 .stTextInput input:focus, .stSelectbox select:focus {
     border-color: var(--accent);
-    box-shadow: 0 0 0 1px var(--accent);
 }
 
 /* Button */
 .stButton > button {
-    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    background: var(--gradient);
     color: #fff;
     border: none;
     border-radius: var(--radius);
     padding: 0.5rem 1.25rem;
     font-weight: 600;
+    transition: transform 0.2s;
 }
 .stButton > button:hover {
     transform: scale(1.03);
@@ -105,8 +111,8 @@ html, body, .block-container {
 }
 .metric-value {
     font-size: 2rem;
-    font-weight: 600;
-    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    font-weight: 700;
+    background: var(--gradient);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
@@ -301,7 +307,7 @@ with tab3:
 # --------------------------------------------------
 st.markdown("---")
 st.markdown(
-    '<div style="text-align:center;font-size:0.8rem;color:var(--text2);">'
+    '<div style="text-align:center;font-size:0.8rem;color:#a0a0b0;">'
     "Built with ❤️ using Streamlit • Multi-Agent Research AI</div>",
     unsafe_allow_html=True,
 )
