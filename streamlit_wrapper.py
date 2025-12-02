@@ -1,13 +1,12 @@
 """
-CYBER•NEXUS v10 — FINAL 100% WORKING VERSION
-Ready for GitHub / Streamlit Cloud / Hugging Face
+CYBER•NEXUS v10 – MINIMALIST VERSION
+Clean UI with simplified buttons
 """
 
 import streamlit as st
 from streamlit_lottie import st_lottie
 from streamlit_extras.colored_header import colored_header
 from streamlit_extras.add_vertical_space import add_vertical_space
-from streamlit_card import card
 import requests
 import os
 import sys
@@ -28,7 +27,7 @@ from memory.memory_bank import MemoryBank
 # ======================================================
 st.set_page_config(
     page_title="Cyber Nexus",
-    page_icon="Gem",
+    page_icon="💎",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
@@ -53,7 +52,7 @@ def load_lottie():
 lottie = load_lottie()
 
 # ======================================================
-# BEAUTIFUL CSS
+# MINIMALIST CSS
 # ======================================================
 st.markdown("""
 <style>
@@ -74,6 +73,17 @@ st.markdown("""
         padding: 40px; margin: 20px 0;
         box-shadow: 0 20px 50px rgba(0,0,0,0.3);
     }
+    /* Minimalist Button Styles */
+    .stButton button {
+        border-radius: 12px;
+        font-weight: 500;
+        letter-spacing: 0.5px;
+        transition: all 0.3s ease;
+    }
+    .stButton button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -93,7 +103,7 @@ add_vertical_space(3)
 # ======================================================
 with st.container():
     st.markdown("<div class='glass'>", unsafe_allow_html=True)
-    colored_header("Begin Your Research", "Ask anything — get deep, verified answers", "violet-70")
+    colored_header("Begin Your Research", "Ask anything – get deep, verified answers", "violet-70")
 
     query = st.text_input(
         "What do you want to know?",
@@ -101,14 +111,21 @@ with st.container():
         label_visibility="collapsed"
     )
 
-    col1, col2 = st.columns([3,1])
+    col1, col2, col3 = st.columns([2,1,1])
     with col1:
         depth_level = st.slider("Research Depth", 1, 5, 3)
     with col2:
         st.write(""); st.write("")
-        start_research = st.button("START RESEARCH", type="primary", use_container_width=True)
+        start_research = st.button("Start Research", type="primary", use_container_width=True)
+    with col3:
+        st.write(""); st.write("")
+        clear_btn = st.button("Clear", use_container_width=True)
 
     st.markdown("</div>", unsafe_allow_html=True)
+
+# Clear functionality
+if clear_btn:
+    st.rerun()
 
 # API key check
 if not (st.secrets.get("ANTHROPIC_API_KEY") or os.getenv("ANTHROPIC_API_KEY")) or \
@@ -117,7 +134,7 @@ if not (st.secrets.get("ANTHROPIC_API_KEY") or os.getenv("ANTHROPIC_API_KEY")) o
     st.stop()
 
 # ======================================================
-# TABS — FIXED SYNTAX
+# TABS
 # ======================================================
 tab1, tab2, tab3 = st.tabs(["RESEARCH", "MEMORY", "ARCHIVE"])
 
@@ -130,8 +147,6 @@ with tab1:
         col1, col2 = st.columns([3,2])
         with col1:
             output_format = st.selectbox("Output Format", ["report", "article", "summary", "presentation", "paper"])
-        with col2:
-            run_eval = st.checkbox("Run Evaluation", value=True)
 
         with st.expander("Advanced Options"):
             session_id = st.text_input("Resume Session ID (optional)")
@@ -139,7 +154,7 @@ with tab1:
         st.markdown("</div>", unsafe_allow_html=True)
 
     # Trigger research
-    if start_research or st.button("INITIATE RESEARCH", type="primary", use_container_width=True):
+    if start_research:
         if not query.strip():
             st.warning("Please enter a query")
             st.stop()
@@ -153,7 +168,6 @@ with tab1:
                 progress_bar.progress(i + 1)
                 status_text.caption(f"Researching... {i+1}%")
 
-            # Your original logic — 100% unchanged
             results = ResearchOrchestrator().conduct_research(
                 query=query,
                 output_format=output_format,
@@ -164,43 +178,20 @@ with tab1:
         st.balloons()
 
         content = results.get("final_content", {}).get("content", "")
-        validation = results.get("validation", {})
-
-        # Beautiful validation cards
-        if validation and run_eval:
-            colored_header("Validation Metrics", "", "violet-70")
-            cols = st.columns(5)
-            metrics = [
-                ("Quality", validation.get('quality_score', 100)),
-                ("Relevance", validation.get('relevance_score', 0)),
-                ("Accuracy", validation.get('confidence_score', 0)),
-                ("Citations", validation.get('citation_quality', 0)),
-                ("Overall", validation.get('overall_score', 76.5)),
-            ]
-            for col, (label, score) in zip(cols, metrics):  # FIXED
-                with col:
-                    card(
-                        title=str(score),
-                        text=label,
-                        styles={
-                            "card": {"background":"rgba(139,92,246,0.15)","padding":"24px","border-radius":"24px","text-align":"center"},
-                            "text": {"font-size":"17px","color":"#e0e7ff"},
-                            "title": {"font-size":"42px","font-weight":"800","color":"white"}
-                        }
-                    )
 
         # Result
         colored_header(f"Result: {query}", "", "blue-70")
         st.markdown(f"<div class='glass'>{content}</div>", unsafe_allow_html=True)
 
-        # Downloads
-        d1, d2, d3 = st.columns(3)
-        with d1:
-            st.download_button("Download JSON", json.dumps(results, indent=2), "result.json")
-        with d2:
-            st.download_button("Download Text", content, "report.txt")
-        with d3:
-            st.download_button("Download PDF (HTML)", f"<h1>{query}</h1>{content}", "report.html", "text/html")
+        # Minimalist Downloads
+        st.write("")
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            st.download_button("📄 JSON", json.dumps(results, indent=2), "result.json", use_container_width=True)
+        with col2:
+            st.download_button("📝 Text", content, "report.txt", use_container_width=True)
+        with col3:
+            st.download_button("🌐 HTML", f"<h1>{query}</h1>{content}", "report.html", "text/html", use_container_width=True)
 
 # ======================================================
 # MEMORY & ARCHIVE TABS
@@ -208,8 +199,15 @@ with tab1:
 with tab2:
     st.markdown("<div class='glass'>", unsafe_allow_html=True)
     colored_header("Memory Bank", "Search past research", "blue-70")
-    q = st.text_input("Search memory")
-    if st.button("SCAN MEMORY"):
+    
+    col1, col2 = st.columns([4,1])
+    with col1:
+        q = st.text_input("Search memory", label_visibility="collapsed", placeholder="Search memory...")
+    with col2:
+        st.write("")
+        search_btn = st.button("Search", use_container_width=True)
+    
+    if search_btn and q:
         links = MemoryBank().get_related_research(q, limit=10)
         for item in links or []:
             with st.expander(item.get("query", "Untitled")):
@@ -231,4 +229,4 @@ with tab3:
     st.markdown("</div>", unsafe_allow_html=True)
 
 # Footer
-st.markdown("<div style='text-align:center;padding:100px;color:rgba(255,255,255,0.7);font-size:18px;'>Cyber Nexus v10 — Built for the Future • 2025</div>", unsafe_allow_html=True)
+st.markdown("<div style='text-align:center;padding:100px;color:rgba(255,255,255,0.7);font-size:18px;'>Cyber Nexus v10 – Built for the Future • 2025</div>", unsafe_allow_html=True)
