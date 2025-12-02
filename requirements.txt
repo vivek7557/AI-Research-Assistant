@@ -27,4 +27,8 @@ fpdf2
 requests
 loguru
 fpdf2
+streamlit-lottie
+streamlit-extras
+streamlit-card
+python-dotenv
 
