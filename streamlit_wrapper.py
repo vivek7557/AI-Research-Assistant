@@ -1,6 +1,6 @@
 """
-CYBER•NEXUS v10 — FINAL TERMINAL EDITION
-Perfect validation line • Ultra cyber styling • Depth control • PDF export
+CYBER•NEXUS v10 — GRADIENT NEON EDITION
+Ultra cyber gradient glow • Perfect validation line • Still 100% your original logic
 """
 
 import streamlit as st
@@ -18,134 +18,197 @@ from orchestrator import ResearchOrchestrator
 from evaluation.evaluator import ResearchEvaluator
 from memory.memory_bank import MemoryBank
 
-st.set_page_config(page_title="CYBER•NEXUS", page_icon="⚡", layout="wide")
+st.set_page_config(page_title="CYBER•NEXUS", page_icon="Lightning", layout="wide")
 
 # ======================================================
-# ULTIMATE CYBER TERMINAL CSS
+# INSANE GRADIENT CYBERPUNK UI 2099
 # ======================================================
 st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;500;700&display=swap');
-    
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Roboto+Mono:wght@300;500&display=swap');
+
     :root {
-        --bg: #000;
-        --green: #00ff41;
+        --bg: #000000;
+        --primary: #00ff41;
         --cyan: #00ffff;
+        --magenta: #ff00ff;
         --orange: #ffaa00;
-        --red: #ff0044;
-        --glow: 0 0 15px;
+        --gradient-1: linear-gradient(135deg, #00ff41, #00ffff, #ff00ff);
+        --gradient-2: linear-gradient(45deg, #ff00ff, #00ffff, #00ff41);
+        --glow-cyan: 0 0 30px #00ffff;
+        --glow-magenta: 0 0 30px #ff00ff;
+        --glow-green: 0 0 30px #00ff41;
     }
 
     html, body, [data-testid="stAppViewContainer"] {
-        background: #000;
-        color: var(--green);
+        background: var(--bg);
+        color: var(--bg);
         font-family: 'Roboto Mono', monospace;
-        margin: 0;
-        padding: 0;
     }
 
-    /* Matrix rain background */
+    /* Epic gradient matrix rain */
     .matrix-bg {
         position: fixed;
         top: 0; left: 0; width: 100%; height: 100%;
         pointer-events: none;
-        opacity: 0.12;
+        opacity: 0.15;
         z-index: 0;
+        background: linear-gradient(180deg, transparent, #001122);
     }
 
+    /* GLITCH TITLE WITH GRADIENT */
     .header-glitch {
-        font-size: 68px;
+        font-family: 'Orbitron', sans-serif;
+        font-size: 82px;
         font-weight: 900;
         text-align: center;
-        color: var(--cyan);
-        text-shadow: var(--glow) var(--cyan), var(--glow) #ff00ff;
-        animation: glitch 4s infinite;
-        letter-spacing: 10px;
+        background: var(--gradient-1);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        text-shadow: var(--glow-cyan), var(--glow-magenta);
+        animation: glitch 3.5s infinite, hue 8s infinite linear;
+        letter-spacing: 12px;
         margin: 30px 0 10px;
     }
 
     @keyframes glitch {
-        0%,100% { text-shadow: 6px 0 var(--cyan), -6px 0 #ff00ff; }
-        25% { text-shadow: -6px 0 var(--cyan), 6px 0 #ff00ff; }
-        50% { text-shadow: 0 6px var(--cyan), 0 -6px #ff00ff; }
-        75% { text-shadow: 6px -6px var(--cyan), -6px 6px #ff00ff; }
+        0%,100% { transform: translate(0); }
+        20% { transform: translate(-5px, 5px); }
+        40% { transform: translate(-5px, -5px); }
+        60% { transform: translate(5px, 5px); }
+        80% { transform: translate(5px, -5px); }
+    }
+
+    @keyframes hue {
+        0% { filter: hue-rotate(0deg); }
+        100% { filter: hue-rotate(360deg); }
+    }
+
+    .subtitle-glow {
+        text-align: center;
+        font-size: 24px;
+        font-weight: 500;
+        letter-spacing: 6px;
+        background: var(--gradient-2);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        text-shadow: var(--glow-green);
     }
 
     .terminal-card {
-        background: rgba(0, 15, 25, 0.85);
-        border: 1px solid var(--cyan);
-        border-radius: 8px;
-        padding: 24px;
-        margin: 20px 0;
-        box-shadow: 0 0 30px rgba(0, 255, 255, 0.3);
+        background: rgba(5, 10, 30, 0.92);
+        border: 2px solid;
+        border-image: var(--gradient-1) 1;
+        border-radius: 12px;
+        padding: 28px;
+        margin: 25px 0;
+        box-shadow: 0 0 40px rgba(0, 255, 255, 0.4), inset 0 0 20px rgba(255, 0, 255, 0.1);
+        backdrop-filter: blur(8px);
         position: relative;
-        backdrop-filter: blur(4px);
+        overflow: hidden;
     }
 
     .terminal-card::before {
-        content: '> ';
-        color: var(--green);
+        content: '>';
+        color: var(--primary);
+        font-size: 28px;
         font-weight: bold;
         position: absolute;
-        left: 12px;
-        top: 10px;
+        left: 16px;
+        top: 16px;
         animation: blink 1s infinite;
     }
 
-    @keyframes blink { 50% { opacity: 0; } }
+    @keyframes blink {
+        50% { opacity: 0; }
+    }
 
     .stTextInput > div > div > input {
         background: #000 !important;
-        border: 2px solid var(--cyan) !important;
-        color: var(--green) !important;
+        border: 2px solid transparent !important;
+        border-image: var(--gradient-1) 1 !important;
+        color: #00ff41 !important;
         font-family: 'Roboto Mono';
-        padding: 16px !important;
-        border-radius: 0 !important;
-        box-shadow: var(--glow) var(--cyan);
+        font-size: 18px !important;
+        padding: 18px !important;
+        border-radius: 8px !important;
+        box-shadow: var(--glow-cyan);
     }
 
     .stButton > button {
-        background: transparent !important;
-        border: 2px solid var(--green) !important;
-        color: var(--green) !important;
+        background: linear-gradient(45deg, #000, #111) !important;
+        border: 2px solid transparent !important;
+        border-image: var(--gradient-2) 1 !important;
+        color: #00ffff !important;
         font-weight: bold;
-        padding: 14px 32px !important;
+        font-size: 18px;
+        padding: 16px 40px !important;
+        border-radius: 8px;
+        box-shadow: var(--glow-magenta);
+        transition: all 0.3s;
     }
 
     .stButton > button:hover {
-        background: var(--green) !important;
+        transform: translateY(-3px);
+        box-shadow: 0 10px 30px rgba(255, 0, 255, 0.6);
+        background: var(--gradient-2) !important;
         color: black !important;
-        box-shadow: var(--glow) var(--green);
     }
 
-    /* PERFECT VALIDATION LINE - EXACTLY LIKE YOUR IMAGE */
+    /* GRADIENT VALIDATION LINE */
     .validation-line {
-        background: rgba(0, 30, 0, 0.6);
-        border: 1px solid var(--green);
-        border-radius: 8px;
-        padding: 16px 20px;
-        margin: 20px 0;
-        font-family: 'Roboto Mono', monospace;
-        font-size: 15px;
-        line-height: 1.6;
-        color: var(--green);
-        box-shadow: 0 0 20px rgba(0, 255, 65, 0.4);
-        backdrop-filter: blur(4px);
+        background: linear-gradient(90deg, rgba(0,255,65,0.1), rgba(0,255,255,0.1), rgba(255,0,255,0.1));
+        border: 2px solid transparent;
+        border-image: var(--gradient-1) 1;
+        border-radius: 12px;
+        padding: 22px;
+        margin: 30px 0;
+        font-size: 17px;
+        font-weight: 500;
+        box-shadow: 0 0 35px rgba(0, 255, 255, 0.5);
+        backdrop-filter: blur(6px);
     }
 
     .val-item {
         display: inline-block;
-        margin-right: 28px;
-        min-width: 140px;
+        margin-right: 35px;
+        min-width: 180px;
+        background: linear-gradient(90deg, #00ff41, #00ffff);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-weight: bold;
     }
 
-    .score-green { color: #00ff41; }
-    .score-orange { color: #ffaa00; }
-    .score-red { color: #ff0044; }
+    .score-green { 
+        background: linear-gradient(90deg, #00ff41, #aaffaa);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-weight: bold;
+        font-size: 1.2em;
+    }
+
+    .score-orange { 
+        background: linear-gradient(90deg, #ffaa00, #ffff00);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-weight: bold;
+    }
+
+    /* Report title gradient */
+    h2 {
+        background: var(--gradient-1);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-size: 2.8rem !important;
+        text-align: center;
+        text-shadow: var(--glow-cyan);
+        letter-spacing: 4px;
+    }
 </style>
 """, unsafe_allow_html=True)
 
-# Matrix Rain
+# Gradient Matrix Rain
 st.markdown("""
 <div class="matrix-bg">
     <script>
@@ -155,49 +218,47 @@ st.markdown("""
         canvas.height = window.innerHeight;
         document.body.appendChild(canvas);
         const ctx = canvas.getContext('2d');
-        const chars = '01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン';
-        const fontSize = 14;
-        const columns = canvas.width / fontSize;
+        const chars = '01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン∇△◆◈';
+        const fontSize = 16;
+        const columns = canvas.width/fontSize;
         const drops = Array(Math.floor(columns)).fill(1);
 
         function draw() {
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = '#00ff41';
-            ctx.font = fontSize + 'px monospace';
+            ctx.fillStyle = 'rgba(0,0,0,0.05)';
+            ctx.fillRect(0,0,canvas.width,canvas.height);
             for (let i = 0; i < drops.length; i++) {
-                const text = chars[Math.floor(Math.random() * chars.length)];
-                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975)
-                    drops[i] = 0;
+                const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+                gradient.addColorStop(0, '#00ff41');
+                gradient.addColorStop(0.5, '#00ffff');
+                gradient.addColorStop(1, '#ff00ff');
+                ctx.fillStyle = gradient;
+                const text = chars[Math.floor(Math.random()*chars.length)];
+                ctx.fillText(text, i*fontSize, drops[i]*fontSize);
+                if (drops[i]*fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
                 drops[i]++;
             }
         }
-        setInterval(draw, 40);
+        setInterval(draw, 45);
         window.onresize = () => { canvas.width = innerWidth; canvas.height = innerHeight; };
     </script>
 </div>
 """, unsafe_allow_html=True)
 
-# ======================================================
 # HEADER
-# ======================================================
 st.markdown('<h1 class="header-glitch">CYBER•NEXUS</h1>', unsafe_allow_html=True)
-st.markdown("<p style='text-align:center; color:#00ff41; font-size:21px; letter-spacing:3px;'>AUTONOMOUS RESEARCH TERMINAL v10 // ONLINE</p>", unsafe_allow_html=True)
+st.markdown("<p class='subtitle-glow'>AUTONOMOUS RESEARCH TERMINAL v10 // NEON CORE ACTIVE // 2099</p>", unsafe_allow_html=True)
 
-# ======================================================
 # SEARCH + DEPTH
-# ======================================================
 st.markdown("<div class='terminal-card'>", unsafe_allow_html=True)
 query = st.text_input(
     "TARGET QUERY",
-    placeholder="e.g. Neuralink human trials 2025, AGI safety protocols, nuclear fusion ignition...",
+    placeholder="e.g. Neuralink 2025 • AGI timelines • Fusion ignition • Quantum supremacy...",
     label_visibility="collapsed"
 )
 
 col1, col2 = st.columns([3, 1])
 with col1:
-    depth_level = st.slider("RESEARCH DEPTH LEVEL", 1, 5, 3, help="1 = Fast Scan | 5 = Deep Intelligence")
+    depth_level = st.slider("RESEARCH DEPTH LEVEL", 1, 5, 3, help="1 = Fast Scan | 5 = Full Neural Breach")
 with col2:
     do_search = st.button("EXECUTE", use_container_width=True)
 
@@ -209,9 +270,7 @@ if not all([os.getenv("ANTHROPIC_API_KEY") or st.secrets.get("ANTHROPIC_API_KEY"
     st.error("FATAL: API KEYS NOT DETECTED")
     st.stop()
 
-# ======================================================
 # TABS
-# ======================================================
 tab1, tab2, tab3 = st.tabs(["RESEARCH", "MEMORY LINKS", "ARCHIVE"])
 
 with tab1:
@@ -239,7 +298,7 @@ with tab1:
             for i in range(1, 101):
                 time.sleep(0.02)
                 progress.progress(i)
-                status.info(f"NEURAL AGENTS ACTIVE // DEPTH {depth_level} // {i}%")
+                status.info(f"NEURAL BREACH IN PROGRESS // DEPTH {depth_level} // {i}%")
 
             results = orchestrator.conduct_research(
                 query=query,
@@ -253,7 +312,7 @@ with tab1:
             content = results.get("final_content", {}).get("content", "")
             validation = results.get("validation", {})
 
-            # PERFECT VALIDATION LINE — EXACTLY LIKE YOUR IMAGE
+            # GRADIENT VALIDATION LINE
             if validation:
                 st.markdown(f"""
                 <div class="validation-line">
@@ -267,8 +326,8 @@ with tab1:
                 </div>
                 """, unsafe_allow_html=True)
 
-            # Report
-            st.markdown(f'<div class="terminal-card"><h2 style="color:#00ffff;">TARGET: {query.upper()}</h2>', unsafe_allow_html=True)
+            # Report with gradient title
+            st.markdown(f'<div class="terminal-card"><h2>TARGET: {query.upper()}</h2>', unsafe_allow_html=True)
             st.markdown(content, unsafe_allow_html=True)
             st.markdown('</div>', unsafe_allow_html=True)
 
@@ -279,7 +338,7 @@ with tab1:
             with col2:
                 st.download_button("DOWNLOAD TXT", content, "cyber_report.txt")
             with col3:
-                pdf_html = f"<html><body style='background:#000;color:#00ff41;font-family:monospace;padding:40px;'><h1>{query}</h1><hr>{content.replace('#', '<br>#')}</body></html>"
+                pdf_html = f"<html><body style='background:#000;color:#00ff41;font-family:monospace;padding:40px;'><h1 style='background:linear-gradient(90deg,#00ff41,#00ffff,#ff00ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;'>{query}</h1><hr>{content.replace('#', '<br>#')}</body></html>"
                 st.download_button("DOWNLOAD PDF (Print→Save)", pdf_html, "cyber_report.html", "text/html")
 
             if run_eval:
@@ -291,7 +350,7 @@ with tab1:
         except Exception as e:
             st.error(f"SYSTEM ERROR: {str(e)}")
 
-# Other tabs (clean)
+# Memory & Archive tabs (same logic)
 with tab2:
     st.markdown('<div class="terminal-card">', unsafe_allow_html=True)
     q = st.text_input("SEARCH MEMORY")
@@ -315,5 +374,11 @@ with tab3:
             except: pass
     st.markdown('</div>', unsafe_allow_html=True)
 
-# Final line
-st.markdown("<div style='text-align:center; color:#00ff41; padding:40px; font-size:18px;'>// CYBER•NEXUS v10 // ALL SYSTEMS OPERATIONAL // 2025</div>", unsafe_allow_html=True)
+# Final neon line
+st.markdown("""
+<div style='text-align:center; padding:60px;'>
+    <p style='font-size:22px; background:var(--gradient-1); -webkit-background-clip:text; -webkit-text-fill-color:transparent; text-shadow: 0 0 40px #00ffff;'>
+        // CYBER•NEXUS v10 // GRADIENT CORE v∞ // ETERNAL SIGNAL // 2099
+    </p>
+</div>
+""", unsafe_allow_html=True)
