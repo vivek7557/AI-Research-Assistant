@@ -394,9 +394,8 @@ with tab1:
         colored_header(f"Result: {query}", "", "blue-70")
         st.markdown(f"<div class='glass'>{content}</div>", unsafe_allow_html=True)
 
-        # React UI with Gradient Buttons
+        # Modern React UI with Gradient Cards
         st.write("")
-        st.markdown("### Download Options")
         
         # Prepare data for React component
         react_data = {
@@ -405,7 +404,7 @@ with tab1:
             "results": results
         }
         
-        # React Component with Gradient Buttons
+        # Enhanced React Component with Modern UI
         html_component = f"""
         <div id="root"></div>
         <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
@@ -413,123 +412,276 @@ with tab1:
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
         
         <script>
-        const {{ useState }} = React;
+        const {{ useState, useEffect }} = React;
         const data = {json.dumps(react_data)};
         
-        function GradientDownloadButtons() {{
+        function ModernDownloadUI() {{
             const [hoveredBtn, setHoveredBtn] = useState(null);
+            const [copied, setCopied] = useState(false);
+            const [downloading, setDownloading] = useState(null);
             
             const downloadJSON = () => {{
-                const blob = new Blob([JSON.stringify(data.results, null, 2)], {{ type: 'application/json' }});
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'result.json';
-                a.click();
+                setDownloading('json');
+                setTimeout(() => {{
+                    const blob = new Blob([JSON.stringify(data.results, null, 2)], {{ type: 'application/json' }});
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'research_result.json';
+                    a.click();
+                    setDownloading(null);
+                }}, 500);
             }};
             
             const downloadText = () => {{
-                const blob = new Blob([data.content], {{ type: 'text/plain' }});
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'report.txt';
-                a.click();
+                setDownloading('text');
+                setTimeout(() => {{
+                    const blob = new Blob([data.content], {{ type: 'text/plain' }});
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'research_report.txt';
+                    a.click();
+                    setDownloading(null);
+                }}, 500);
             }};
             
             const downloadPDF = () => {{
-                const {{ jsPDF }} = window.jspdf;
-                const doc = new jsPDF();
-                
-                doc.setFontSize(20);
-                doc.text(data.query, 20, 20);
-                
-                doc.setFontSize(12);
-                const lines = doc.splitTextToSize(data.content, 170);
-                doc.text(lines, 20, 40);
-                
-                doc.save('report.pdf');
+                setDownloading('pdf');
+                setTimeout(() => {{
+                    const {{ jsPDF }} = window.jspdf;
+                    const doc = new jsPDF();
+                    
+                    doc.setFontSize(22);
+                    doc.setFont(undefined, 'bold');
+                    doc.text(data.query, 20, 25);
+                    
+                    doc.setFontSize(11);
+                    doc.setFont(undefined, 'normal');
+                    const lines = doc.splitTextToSize(data.content, 170);
+                    doc.text(lines, 20, 45);
+                    
+                    doc.save('research_report.pdf');
+                    setDownloading(null);
+                }}, 500);
             }};
             
-            const buttons = [
+            const copyToClipboard = () => {{
+                navigator.clipboard.writeText(data.content);
+                setCopied(true);
+                setTimeout(() => setCopied(false), 2000);
+            }};
+            
+            const downloadOptions = [
                 {{
-                    label: 'JSON',
+                    id: 'json',
+                    title: 'Export JSON',
+                    description: 'Complete data structure',
                     onClick: downloadJSON,
                     gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                    hoverGradient: 'linear-gradient(135deg, #764ba2 0%, #667eea 100%)',
-                    icon: '📦'
+                    icon: '{{ }}',
+                    size: '24px'
                 }},
                 {{
-                    label: 'Text',
+                    id: 'text',
+                    title: 'Save as Text',
+                    description: 'Plain text format',
                     onClick: downloadText,
                     gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
-                    hoverGradient: 'linear-gradient(135deg, #f5576c 0%, #f093fb 100%)',
-                    icon: '📝'
+                    icon: 'TXT',
+                    size: '18px'
                 }},
                 {{
-                    label: 'PDF',
+                    id: 'pdf',
+                    title: 'Generate PDF',
+                    description: 'Formatted document',
                     onClick: downloadPDF,
                     gradient: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
-                    hoverGradient: 'linear-gradient(135deg, #fee140 0%, #fa709a 100%)',
-                    icon: '📄'
+                    icon: 'PDF',
+                    size: '18px'
                 }}
             ];
             
             return React.createElement('div', {{
                 style: {{
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(3, 1fr)',
-                    gap: '16px',
-                    marginTop: '20px'
+                    background: '#0a0a0a',
+                    padding: '40px 0',
+                    fontFamily: 'Inter, -apple-system, sans-serif'
                 }}
             }},
-                buttons.map((btn, idx) => 
-                    React.createElement('button', {{
-                        key: idx,
-                        onMouseEnter: () => setHoveredBtn(idx),
-                        onMouseLeave: () => setHoveredBtn(null),
-                        onClick: btn.onClick,
+                // Header Section
+                React.createElement('div', {{
+                    style: {{
+                        marginBottom: '32px',
+                        textAlign: 'center'
+                    }}
+                }},
+                    React.createElement('h2', {{
                         style: {{
-                            background: hoveredBtn === idx ? btn.hoverGradient : btn.gradient,
-                            border: 'none',
-                            borderRadius: '12px',
-                            padding: '20px 16px',
-                            color: 'white',
+                            fontSize: '32px',
+                            fontWeight: '700',
+                            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)',
+                            WebkitBackgroundClip: 'text',
+                            WebkitTextFillColor: 'transparent',
+                            marginBottom: '8px'
+                        }}
+                    }}, 'Export Research'),
+                    React.createElement('p', {{
+                        style: {{
                             fontSize: '15px',
+                            color: '#888888',
+                            fontWeight: '400'
+                        }}
+                    }}, 'Choose your preferred format')
+                ),
+                
+                // Download Cards Grid
+                React.createElement('div', {{
+                    style: {{
+                        display: 'grid',
+                        gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+                        gap: '20px',
+                        marginBottom: '32px'
+                    }}
+                }},
+                    downloadOptions.map((option, idx) => 
+                        React.createElement('div', {{
+                            key: option.id,
+                            onMouseEnter: () => setHoveredBtn(option.id),
+                            onMouseLeave: () => setHoveredBtn(null),
+                            onClick: option.onClick,
+                            style: {{
+                                background: hoveredBtn === option.id 
+                                    ? 'linear-gradient(135deg, #1a1a1a 0%, #222222 100%)'
+                                    : '#141414',
+                                border: hoveredBtn === option.id ? '1px solid #333333' : '1px solid #222222',
+                                borderRadius: '16px',
+                                padding: '28px 24px',
+                                cursor: 'pointer',
+                                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                                transform: hoveredBtn === option.id ? 'translateY(-4px)' : 'translateY(0)',
+                                boxShadow: hoveredBtn === option.id 
+                                    ? '0 20px 40px rgba(0,0,0,0.4)' 
+                                    : '0 4px 12px rgba(0,0,0,0.2)',
+                                position: 'relative',
+                                overflow: 'hidden'
+                            }}
+                        }},
+                            // Gradient overlay
+                            React.createElement('div', {{
+                                style: {{
+                                    position: 'absolute',
+                                    top: 0,
+                                    left: 0,
+                                    right: 0,
+                                    height: '4px',
+                                    background: option.gradient,
+                                    opacity: hoveredBtn === option.id ? 1 : 0.6,
+                                    transition: 'opacity 0.3s ease'
+                                }}
+                            }}),
+                            
+                            // Icon
+                            React.createElement('div', {{
+                                style: {{
+                                    width: '56px',
+                                    height: '56px',
+                                    borderRadius: '12px',
+                                    background: option.gradient,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    marginBottom: '16px',
+                                    fontSize: option.size,
+                                    fontWeight: '800',
+                                    color: 'white',
+                                    boxShadow: hoveredBtn === option.id 
+                                        ? '0 8px 24px rgba(0,0,0,0.3)' 
+                                        : '0 4px 12px rgba(0,0,0,0.2)',
+                                    transition: 'all 0.3s ease'
+                                }}
+                            }}, option.icon),
+                            
+                            // Title
+                            React.createElement('h3', {{
+                                style: {{
+                                    fontSize: '18px',
+                                    fontWeight: '600',
+                                    color: '#ffffff',
+                                    marginBottom: '6px'
+                                }}
+                            }}, option.title),
+                            
+                            // Description
+                            React.createElement('p', {{
+                                style: {{
+                                    fontSize: '14px',
+                                    color: '#888888',
+                                    fontWeight: '400',
+                                    marginBottom: '16px'
+                                }}
+                            }}, option.description),
+                            
+                            // Status
+                            downloading === option.id && React.createElement('div', {{
+                                style: {{
+                                    fontSize: '13px',
+                                    color: '#667eea',
+                                    fontWeight: '500'
+                                }}
+                            }}, '⬇ Downloading...')
+                        )
+                    )
+                ),
+                
+                // Quick Copy Button
+                React.createElement('div', {{
+                    style: {{
+                        display: 'flex',
+                        justifyContent: 'center'
+                    }}
+                }},
+                    React.createElement('button', {{
+                        onClick: copyToClipboard,
+                        style: {{
+                            background: copied ? '#1a2f1a' : 'transparent',
+                            border: copied ? '1px solid #2d4a2d' : '1px solid #2a2a2a',
+                            borderRadius: '12px',
+                            padding: '14px 32px',
+                            color: copied ? '#7ed87e' : '#ffffff',
+                            fontSize: '14px',
                             fontWeight: '600',
                             cursor: 'pointer',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            alignItems: 'center',
-                            gap: '8px',
                             transition: 'all 0.3s ease',
-                            transform: hoveredBtn === idx ? 'translateY(-3px)' : 'translateY(0)',
-                            boxShadow: hoveredBtn === idx 
-                                ? '0 12px 30px rgba(0,0,0,0.3)' 
-                                : '0 6px 15px rgba(0,0,0,0.2)',
-                            fontFamily: 'Inter, sans-serif',
-                            letterSpacing: '0.5px'
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '8px'
                         }}
                     }},
-                        React.createElement('span', {{ style: {{ fontSize: '24px' }} }}, btn.icon),
-                        React.createElement('span', null, btn.label)
+                        React.createElement('span', {{ style: {{ fontSize: '16px' }} }}, copied ? '✓' : '📋'),
+                        React.createElement('span', null, copied ? 'Copied to Clipboard!' : 'Copy to Clipboard')
                     )
                 )
             );
         }}
         
         ReactDOM.render(
-            React.createElement(GradientDownloadButtons),
+            React.createElement(ModernDownloadUI),
             document.getElementById('root')
         );
         </script>
         
         <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+        * {{
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }}
         </style>
         """
         
-        st.components.v1.html(html_component, height=150)
+        st.components.v1.html(html_component, height=520)
 
 # ======================================================
 # MEMORY & ARCHIVE TABS
