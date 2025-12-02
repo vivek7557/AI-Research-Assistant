@@ -1,10 +1,3 @@
-"""
-CYBER•NEXUS v10 — FINAL TERMINAL EDITION
-Perfect validation line • Ultra cyber styling • Depth control • PDF export
-"""
-streamlit_wrapper.py — ENHANCED VERSION
-React-inspired UI + animations + your existing logic
-"""
 
 import streamlit as st
 import os
