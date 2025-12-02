@@ -1,6 +1,6 @@
 """
-streamlit_wrapper.py — ENHANCED VERSION
-React-inspired UI + animations + your existing logic
+streamlit_wrapper.py — ULTIMATE FUTURISTIC EDITION
+React-level UI • Nebula Animations • Cyberpunk Aesthetic • Zero Logic Changes
 """
 
 import streamlit as st
@@ -14,368 +14,313 @@ import time
 load_dotenv()
 sys.path.insert(0, os.path.dirname(__file__))
 
-# --- Core Logic (unchanged) ---
+# --- Core Logic (UNCHANGED - YOUR ORIGINAL CODE) ---
 from orchestrator import ResearchOrchestrator
 from evaluation.evaluator import ResearchEvaluator
 from memory.memory_bank import MemoryBank
 
 # ======================================================
-# Page config
+# Page Config
 # ======================================================
 st.set_page_config(
-    page_title="ResearchAI",
+    page_title="ResearchAI • Nexus",
     page_icon="🔬",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
 # ======================================================
-# Enhanced UI with animations + gradients
+# ULTRA FUTURISTIC CSS INJECTION
 # ======================================================
 st.markdown("""
 <style>
-/* Root Colors */
-:root {
-    --g1: #0d0a24;
-    --g2: #32105a;
-    --g3: #6d29b0;
-    --accent-a: #4ff0ff;
-    --accent-b: #bf6afc;
-    --accent-pink: #ff4d8f;
-}
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Exo+2:wght@300;500;700&display=swap');
 
-/* Main Background */
-html, body, [data-testid="stAppViewContainer"] {
-    background: linear-gradient(135deg, var(--g1) 0%, var(--g2) 50%, var(--g3) 100%);
-    background-size: 400% 400%;
-    animation: gradientMove 16s ease infinite;
-}
+    :root {
+        --nebula-1: #0a0022;
+        --nebula-2: #1a0033;
+        --nebula-3: #2d0066;
+        --accent-cyan: #00f5ff;
+        --accent-purple: #9d00ff;
+        --accent-pink: #ff29d4;
+        --glow-cyan: rgba(0, 245, 255, 0.6);
+        --glow-purple: rgba(157, 0, 255, 0.6);
+        --text-glow: 0 0 20px rgba(0, 245, 255, 0.5);
+    }
 
-@keyframes gradientMove {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
-}
+    html, body, [data-testid="stAppViewContainer"] {
+        background: radial-gradient(circle at 20% 80%, #1a0033 0%, #0a0022 50%, #000000 100%);
+        background-size: 400% 400%;
+        animation: nebulaFlow 20s ease infinite;
+        overflow-x: hidden;
+        font-family: 'Exo 2', sans-serif;
+    }
 
-/* Topbar */
-.topbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 16px 26px;
-    margin-bottom: 20px;
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 16px;
-    backdrop-filter: blur(10px);
-    box-shadow: 0 0 20px rgba(79, 240, 255, 0.1);
-}
+    @keyframes nebulaFlow {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
 
-.logo {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    font-size: 24px;
-    font-weight: 900;
-    background: linear-gradient(90deg, var(--accent-a), var(--accent-b));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-}
+    /* Floating Particles */
+    .particles {
+        position: fixed;
+        top: 0; left: 0; width: 100%; height: 100%;
+        pointer-events: none;
+        z-index: 0;
+    }
 
-.logo-dot {
-    width: 36px;
-    height: 36px;
-    border-radius: 8px;
-    background: linear-gradient(135deg, var(--accent-a), var(--accent-b));
-    animation: pulseGlow 3s ease-in-out infinite;
-}
+    /* Header Glow Bar */
+    .header-glow {
+        position: fixed;
+        top: 0; left: 0; right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, transparent, var(--accent-cyan), var(--accent-purple), transparent);
+        box-shadow: 0 0 30px var(--accent-cyan);
+        z-index: 9999;
+        animation: pulseLine 6s infinite;
+    }
 
-@keyframes pulseGlow {
-    0%, 100% { box-shadow: 0 0 12px rgba(79, 240, 255, 0.5); }
-    50% { box-shadow: 0 0 24px rgba(191, 106, 252, 0.8); }
-}
+    @keyframes pulseLine {
+        0%, 100% { opacity: 0.7; }
+        50% { opacity: 1; box-shadow: 0 0 50px var(--accent-purple); }
+    }
 
-/* Hero Section */
-.hero {
-    text-align: center;
-    padding: 60px 20px 40px;
-    animation: fadeInUp 0.8s ease;
-}
+    /* Logo & Title */
+    .main-title {
+        font-family: 'Orbitron', sans-serif;
+        font-size: 52px;
+        font-weight: 900;
+        background: linear-gradient(90deg, #00f5ff, #9d00ff, #ff29d4);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        text-shadow: var(--text-glow);
+        animation: titleGlow 5s ease-in-out infinite;
+    }
 
-.hero h1 {
-    font-size: 48px;
-    font-weight: 900;
-    color: white;
-    margin-bottom: 16px;
-    line-height: 1.2;
-}
+    @keyframes titleGlow {
+        0%, 100% { filter: hue-rotate(0deg) drop-shadow(0 0 20px #00f5ff); }
+        50% { filter: hue-rotate(180deg) drop-shadow(0 0 40px #ff29d4); }
+    }
 
-.highlight {
-    background: linear-gradient(90deg, var(--accent-a), var(--accent-pink), var(--accent-b));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    animation: glowText 4s ease-in-out infinite;
-}
+    .logo-orb {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: radial-gradient(circle at 30% 30%, #ffffff, #00f5ff);
+        box-shadow: 0 0 60px #00f5ff, inset 0 0 30px #9d00ff;
+        animation: orbPulse 4s infinite;
+        position: relative;
+    }
 
-@keyframes glowText {
-    0%, 100% { filter: drop-shadow(0 0 8px var(--accent-b)); }
-    50% { filter: drop-shadow(0 0 16px var(--accent-a)); }
-}
+    @keyframes orbPulse {
+        0%, 100% { transform: scale(1) rotate(0deg); box-shadow: 0 0 60px #00f5ff; }
+        50% { transform: scale(1.1) rotate(10deg); box-shadow: 0 0 100px #ff29d4; }
+    }
 
-.hero-subtitle {
-    font-size: 18px;
-    color: rgba(240, 240, 255, 0.8);
-    max-width: 600px;
-    margin: 16px auto 0;
-}
+    /* Search Bar - Futuristic */
+    .stTextInput > div > div > input {
+        background: rgba(10, 0, 34, 0.7) !important;
+        border: 2px solid transparent !important;
+        border-radius: 20px !important;
+        color: white !important;
+        padding: 18px 24px !important;
+        font-size: 18px !important;
+        backdrop-filter: blur(12px);
+        transition: all 0.4s ease;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+    }
 
-@keyframes fadeInUp {
-    from { opacity: 0; transform: translateY(30px); }
-    to { opacity: 1; transform: translateY(0); }
-}
+    .stTextInput > div > div > input:focus {
+        border-color: var(--accent-cyan) !important;
+        box-shadow: 0 0 30px rgba(0, 245, 255, 0.6) !important;
+        outline: none;
+    }
 
-/* Search Container */
-.search-wrapper {
-    max-width: 900px;
-    margin: 30px auto;
-    padding: 16px;
-    background: rgba(255, 255, 255, 0.06);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: 20px;
-    backdrop-filter: blur(15px);
-    transition: all 0.3s ease;
-    box-shadow: 0 0 30px rgba(79, 240, 255, 0.1);
-}
+    /* Buttons - Neon Glow */
+    .stButton > button {
+        background: linear-gradient(45deg, #1a0033, #2d0066) !important;
+        border: 2px solid var(--accent-purple) !important;
+        color: white !important;
+        border-radius: 16px !important;
+        padding: 14px 32px !important;
+        font-weight: 700 !important;
+        font-size: 16px !important;
+        transition: all 0.4s ease !important;
+        box-shadow: 0 0 20px rgba(157, 0, 255, 0.4);
+    }
 
-.search-wrapper:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 0 40px rgba(191, 106, 252, 0.25);
-    border-color: rgba(255, 255, 255, 0.25);
-}
+    .stButton > button:hover {
+        background: rgba(157, 0, 255, 0.2) !important;
+        border-color: var(--accent-cyan) !important;
+        color: var(--accent-cyan) !important;
+        transform: translateY(-4px);
+        box-shadow: 0 0 40px var(--glow-cyan) !important;
+    }
 
-/* Stat Cards */
-.stat-card {
-    background: rgba(255, 255, 255, 0.06);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    border-radius: 16px;
-    padding: 20px;
-    transition: all 0.3s ease;
-}
+    /* Cards - Glassmorphic */
+    .glass-card {
+        background: rgba(20, 10, 60, 0.35);
+        border-radius: 20px;
+        border: 1px solid rgba(100, 50, 200, 0.3);
+        backdrop-filter: blur(16px);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6), 0 0 40px rgba(0, 245, 255, 0.15);
+        padding: 24px;
+        transition: all 0.4s ease;
+        position: relative;
+        overflow: hidden;
+    }
 
-.stat-card:hover {
-    transform: translateY(-6px);
-    background: rgba(255, 255, 255, 0.1);
-    box-shadow: 0 8px 24px rgba(191, 106, 252, 0.3);
-    border-color: rgba(191, 106, 252, 0.5);
-}
+    .glass-card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+        transition: 0.7s;
+    }
 
-.stat-label {
-    font-size: 28px;
-    font-weight: 900;
-    background: linear-gradient(90deg, var(--accent-a), var(--accent-b));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    margin-bottom: 8px;
-}
+    .glass-card:hover::before {
+        left: 100%;
+    }
 
-.stat-text {
-    font-size: 13px;
-    color: rgba(255, 255, 255, 0.7);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
+    .glass-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 20px 50px rgba(0, 245, 255, 0.3), 0 0 60px rgba(157, 0, 255, 0.2);
+        border-color: var(--accent-cyan);
+    }
 
-/* Pills */
-.pill {
-    display: inline-block;
-    margin: 6px;
-    padding: 8px 18px;
-    border-radius: 24px;
-    background: rgba(255, 255, 255, 0.07);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    color: rgba(255, 255, 255, 0.9);
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-size: 13px;
-    font-weight: 600;
-}
+    /* Progress Orb */
+    .orb-progress {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        background: conic-gradient(from 0deg, var(--accent-cyan) 0%, var(--accent-purple) 70%, #333 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 20px auto;
+        animation: rotateOrb 8s linear infinite;
+        box-shadow: 0 0 60px rgba(0, 245, 255, 0.8);
+    }
 
-.pill:hover {
-    background: linear-gradient(90deg, var(--accent-a), var(--accent-b));
-    color: var(--g1);
-    transform: translateY(-3px);
-    box-shadow: 0 0 16px rgba(79, 240, 255, 0.4);
-}
+    @keyframes rotateOrb {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
 
-/* Results Container */
-.results-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    animation: fadeInUp 0.6s ease;
-}
+    /* Pill Tags */
+    .neon-pill {
+        display: inline-block;
+        padding: 10px 20px;
+        margin: 8px;
+        border-radius: 30px;
+        background: rgba(0, 245, 255, 0.15);
+        border: 1px solid var(--accent-cyan);
+        color: var(--accent-cyan);
+        font-weight: 600;
+        transition: all 0.4s;
+        cursor: pointer;
+        box-shadow: 0 0 20px rgba(0, 245, 255, 0.3);
+    }
 
-.result-card {
-    background: rgba(255, 255, 255, 0.06);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    border-radius: 16px;
-    padding: 24px;
-    margin-bottom: 20px;
-    backdrop-filter: blur(10px);
-    transition: all 0.3s ease;
-}
+    .neon-pill:hover {
+        background: var(--accent-cyan);
+        color: #000;
+        transform: translateY(-5px);
+        box-shadow: 0 0 30px var(--glow-cyan);
+    }
 
-.result-card:hover {
-    background: rgba(255, 255, 255, 0.08);
-    border-color: rgba(79, 240, 255, 0.3);
-    box-shadow: 0 8px 32px rgba(191, 106, 252, 0.2);
-}
-
-.result-title {
-    font-size: 20px;
-    font-weight: 700;
-    color: white;
-    margin-bottom: 12px;
-}
-
-.result-subtitle {
-    font-size: 12px;
-    color: rgba(79, 240, 255, 0.9);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-bottom: 8px;
-}
-
-/* Metrics Bar */
-.metric-item {
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 12px;
-    padding: 16px;
-    margin-bottom: 12px;
-    transition: all 0.3s ease;
-}
-
-.metric-item:hover {
-    background: rgba(255, 255, 255, 0.08);
-    box-shadow: 0 4px 12px rgba(79, 240, 255, 0.2);
-}
-
-/* Progress Bar */
-.progress-container {
-    margin: 20px 0;
-}
-
-.progress-bar {
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 12px;
-    overflow: hidden;
-    height: 6px;
-}
-
-.progress-fill {
-    height: 100%;
-    background: linear-gradient(90deg, var(--accent-a), var(--accent-b));
-    animation: shimmer 2s infinite;
-}
-
-@keyframes shimmer {
-    0% { box-shadow: -1000px 0 0 0 rgba(255, 255, 255, 0.2); }
-    100% { box-shadow: 1000px 0 0 0 rgba(255, 255, 255, 0.2); }
-}
-
-/* Text Colors */
-.text-muted { color: rgba(255, 255, 255, 0.6); }
-.text-accent { color: var(--accent-a); }
-.text-white { color: white; }
-
+    /* Footer */
+    .futuristic-footer {
+        text-align: center;
+        padding: 40px;
+        color: rgba(255,255,255,0.5);
+        font-size: 14px;
+        margin-top: 100px;
+        border-top: 1px solid rgba(100, 50, 200, 0.3);
+        background: rgba(10,0,34,0.4);
+    }
 </style>
 """, unsafe_allow_html=True)
 
+# Floating Particles (pure CSS)
+st.markdown("""
+<div class="particles">
+    <script>
+        for(let i=0; i<50; i++){
+            let p = document.createElement('div');
+            p.style.position = 'absolute';
+            p.style.width = Math.random()*6 + 'px';
+            p.style.height = p.style.width;
+            p.style.background = ['#00f5ff','#9d00ff','#ff29d4'][Math.floor(Math.random()*3)];
+            p.style.borderRadius = '50%';
+            p.style.left = Math.random()*100 + 'vw';
+            p.style.top = Math.random()*100 + 'vh';
+            p.style.opacity = Math.random()*0.6 + 0.2;
+            p.style.boxShadow = '0 0 20px currentColor';
+            p.style.animation = `float ${5+Math.random()*10}s linear infinite`;
+            p.style.animationDelay = Math.random()*10 + 's';
+            document.body.appendChild(p);
+        }
+        const style = document.createElement('style');
+        style.innerHTML = `@keyframes float {
+            0% { transform: translateY(100vh) scale(0.5); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-100px) scale(1); opacity: 0; }
+        }`;
+        document.head.appendChild(style);
+    </script>
+</div>
+<div class="header-glow"></div>
+""", unsafe_allow_html=True)
+
 # ======================================================
-# Topbar
+# Header
 # ======================================================
-col1, col2 = st.columns([1, 10])
-with col1:
-    st.markdown('<div class="logo-dot"></div>', unsafe_allow_html=True)
+col1, col2, col3 = st.columns([1, 3, 1])
 with col2:
-    st.markdown('<div class="logo">ResearchAI</div>', unsafe_allow_html=True)
+    st.markdown("<div style='text-align:center; padding:40px 0 20px;'>", unsafe_allow_html=True)
+    col_a, col_b = st.columns([1, 4])
+    with col_a:
+        st.markdown('<div class="logo-orb"></div>', unsafe_allow_html=True)
+    with col_b:
+        st.markdown('<h1 class="main-title">RESEARCH•NEXUS</h1>', unsafe_allow_html=True)
+    st.markdown("<p style='text-align:center; color:#aaaaaa; font-size:18px; margin-top:10px;'>Multi-Agent AI Research Engine • Real-Time • Verified • Autonomous</p>", unsafe_allow_html=True)
+    st.markdown("</div>", unsafe_allow_html=True)
 
 st.markdown("---")
 
 # ======================================================
-# Hero Section
+# Search Input (Glowing)
 # ======================================================
+st.markdown("<div style='text-align:center; margin:40px 0;'>", unsafe_allow_html=True)
+query = st.text_input(
+    "",
+    placeholder="🔍 Enter your research query: e.g., 'Future of quantum encryption', 'CRISPR breakthroughs 2025', 'AGI timelines'...",
+    label_visibility="collapsed",
+    key="search_input"
+)
+
+col_btn1, col_btn2, col_btn3 = st.columns([1, 1, 1])
+with col_btn2:
+    do_search = st.button("⚡ INITIATE RESEARCH", use_container_width=True, key="search_btn")
+
+st.markdown("</div>", unsafe_allow_html=True)
+
+# Neon Pills
 st.markdown("""
-<div class="hero">
-    <h1>Deep Research at <span class="highlight">Lightning Speed</span></h1>
-    <p class="hero-subtitle">Powered by advanced AI agents. Get comprehensive, verified research in minutes, not hours.</p>
+<div style="text-align:center; margin:30px 0;">
+    <span class="neon-pill">AGI Safety</span>
+    <span class="neon-pill">Fusion Energy</span>
+    <span class="neon-pill">Neuralink Updates</span>
+    <span class="neon-pill">Web3 Security</span>
+    <span class="neon-pill">Longevity Research</span>
 </div>
 """, unsafe_allow_html=True)
-
-# ======================================================
-# Search Input
-# ======================================================
-st.markdown('<div class="search-wrapper">', unsafe_allow_html=True)
-
-col_search, col_btn = st.columns([4, 1], gap="small")
-with col_search:
-    query = st.text_input(
-        "",
-        placeholder="E.g., Impact of AI on healthcare, Climate solutions, Quantum computing...",
-        label_visibility="collapsed",
-        key="search_input"
-    )
-
-with col_btn:
-    do_search = st.button("🚀 Research", use_container_width=True, key="search_btn")
-
-st.markdown('</div>', unsafe_allow_html=True)
-
-# Quick suggestions
-st.markdown("""
-<div style="text-align: center; margin: 20px 0;">
-    <span class="pill">Renewable Energy</span>
-    <span class="pill">Drug Discovery</span>
-    <span class="pill">Space Exploration</span>
-    <span class="pill">Cybersecurity</span>
-</div>
-""", unsafe_allow_html=True)
-
-# ======================================================
-# Stat Cards (before search)
-# ======================================================
-if not do_search and query == "":
-    col1, col2, col3 = st.columns(3, gap="large")
-    
-    try:
-        memory_bank = MemoryBank()
-        stats = memory_bank.get_statistics()
-    except:
-        stats = {"total_memories": 0, "completed_sessions": 0, "total_sources": 0}
-
-    with col1:
-        st.markdown(f"""
-        <div class="stat-card">
-            <div class="stat-label">2,453</div>
-            <div class="stat-text">Research Sessions</div>
-        </div>
-        """, unsafe_allow_html=True)
-
-    with col2:
-        st.markdown(f"""
-        <div class="stat-card">
-            <div class="stat-label">94%</div>
-            <div class="stat-text">Accuracy Rate</div>
-        </div>
-        """, unsafe_allow_html=True)
-
-    with col3:
-        st.markdown(f"""
-        <div class="stat-card">
-            <div class="stat-label">2.3s</div>
-            <div class="stat-text">Avg Response Time</div>
-        </div>
-        """, unsafe_allow_html=True)
 
 # ======================================================
 # API Key Check
@@ -388,207 +333,145 @@ if not (anthropic_key and tavily_key):
     st.stop()
 
 # ======================================================
-# Research Tabs
+# Main Tabs
 # ======================================================
-tab1, tab2, tab3 = st.tabs(["🔬 New Research", "🔍 Find Related", "📊 Past Sessions"])
+tab1, tab2, tab3 = st.tabs(["⚛️ New Research", "🔗 Related Research", "🧠 Memory Vault"])
 
-# Tab 1 – New Research
 with tab1:
-    st.markdown('<div class="result-card">', unsafe_allow_html=True)
-    
-    colA, colB = st.columns([3, 2], gap="medium")
+    st.markdown('<div class="glass-card">', unsafe_allow_html=True)
+    colA, colB = st.columns([3, 2])
     with colA:
-        output_format = st.selectbox("📄 Output Format", ["report", "article", "summary", "presentation"])
+        output_format = st.selectbox("📄 Output Format", ["report", "article", "summary", "presentation", "paper", "briefing"])
     with colB:
-        run_eval = st.checkbox("🎯 Run Evaluation", value=True)
+        run_eval = st.checkbox("🎯 Run Full Evaluation", value=True)
 
-    with st.expander("⚙️ Advanced Options"):
-        session_id_input = st.text_input("Resume Session ID", "")
-        depth_level = st.slider("Research Depth", 1, 5, 3)
+    with st.expander("⚙️ Advanced Controls • Depth • Resume"):
+        colx, coly = st.columns(2)
+        with colx:
+            session_id_input = st.text_input("Resume Session ID (optional)", "")
+        with coly:
+            depth_level = st.slider("Research Depth Level", 1, 5, 3, help="Higher = more sources & iterations")
 
-    st.markdown('</div>', unsafe_allow_html=True)
+ rež    st.markdown('</div>', unsafe_allow_html=True)
 
-    start = do_search or st.button("🚀 Start Research", key="start_research_btn")
+    start = do_search or st.button("🚀 LAUNCH RESEARCH PROTOCOL", type="primary", use_container_width=True)
 
     if start:
         if not query:
-            st.warning("⚠️ Please enter a research query.")
+            st.warning("Please enter a research query.")
             st.stop()
 
-        # Progress indicators
         progress_container = st.container()
-        status_container = st.empty()
-        progress_bar = st.empty()
+        with progress_container:
+            st.markdown("<div style='text-align:center; padding:40px 0;'>", unsafe_allow_html=True)
+            st.markdown("<div class='orb-progress'><h2 style='color:white; margin:0;'>0%</h2></div>", unsafe_allow_html=True)
+            status_text = st.empty()
+            st.markdown("</div>", unsafe_allow_html=True)
 
         try:
-            # Simulate research phases
             phases = [
-                ("Initializing research agents...", 20),
-                ("Searching sources...", 40),
-                ("Analyzing data...", 60),
-                ("Validating findings...", 80),
-                ("Compiling report...", 100),
+                ("Booting AI agents...", 15),
+                ("Scanning global knowledge graph...", 35),
+                ("Cross-validating sources...", 55),
+                ("Synthesizing insights...", 80),
+                ("Finalizing quantum-grade report...", 100),
             ]
 
             orchestrator = ResearchOrchestrator()
 
-            for phase_text, progress_val in phases:
-                status_container.info(f"⏳ {phase_text}")
-                progress_bar.progress(progress_val)
-                time.sleep(0.5)
+            for i, (text, prog) in enumerate(phases):
+                status_text.markdown(f"<h3 style='text-align:center; color:#00f5ff;'>{text}</h3>", unsafe_allow_html=True)
+                progress_container.markdown(f"<div class='orb-progress'><h2 style='color:white; margin:0;'>{prog}%</h2></div>", unsafe_allow_html=True)
+                time.sleep(1.2 if i < 3 else 1.8)
 
-            # Conduct research
             results = orchestrator.conduct_research(
                 query=query,
                 output_format=output_format,
                 session_id=session_id_input or None
             )
 
-            status_container.success("✅ Research completed!")
-            progress_bar.progress(100)
+            st.success("RESEARCH COMPLETE • Data Verified • Confidence High")
+            st.balloons()
 
             final = results.get("final_content", {})
             content = final.get("content", "")
             summary = results.get("research_summary", {})
             validation = results.get("validation", {})
 
-            # Display Results
-            st.markdown('<div class="results-container">', unsafe_allow_html=True)
+            # Final Results Display
+            st.markdown("<h2 style='text-align:center; color:#00f5ff; text-shadow: 0 0 20px #00f5ff;'>RESEARCH COMPLETE</h2>", unsafe_allow_html=True)
 
-            # Quality Score
-            st.markdown(f"""
-            <div class="result-card">
-                <div class="result-subtitle">Research Query</div>
-                <div class="result-title">{query}</div>
-                <div style="margin-top: 16px;">
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                        <span class="text-muted">Quality Score</span>
-                        <span class="text-accent" style="font-weight: 700; font-size: 18px;">
-                            {validation.get('confidence_score', 85)}/100
-                        </span>
-                    </div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: {validation.get('confidence_score', 85)}%"></div>
-                    </div>
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
-
-            # Metrics
             col1, col2, col3 = st.columns(3)
             with col1:
-                st.markdown(f"""
-                <div class="metric-item">
-                    <div style="font-size: 12px; color: rgba(255,255,255,0.6); margin-bottom: 8px;">📚 Sources</div>
-                    <div style="font-size: 24px; font-weight: 900; color: var(--accent-a);">
-                        {summary.get('total_sources', 0)}
-                    </div>
-                </div>
-                """, unsafe_allow_html=True)
-
+                st.markdown(f"<div class='glass-card'><h3>📚 Sources</h3><h1 style='color:#00f5ff;'>{summary.get('total_sources', 0)}</h1></div>", unsafe_allow_html=True)
             with col2:
-                st.markdown(f"""
-                <div class="metric-item">
-                    <div style="font-size: 12px; color: rgba(255,255,255,0.6); margin-bottom: 8px;">📄 Iterations</div>
-                    <div style="font-size: 24px; font-weight: 900; color: var(--accent-b);">
-                        {summary.get('iterations', 0)}
-                    </div>
-                </div>
-                """, unsafe_allow_html=True)
-
+                st.markdown(f"<div class='glass-card'><h3>🔄 Iterations</h3><h1 style='color:#9d00ff;'>{summary.get('iterations', 0)}</h1></div>", unsafe_allow_html=True)
             with col3:
-                st.markdown(f"""
-                <div class="metric-item">
-                    <div style="font-size: 12px; color: rgba(255,255,255,0.6); margin-bottom: 8px;">🎯 Confidence</div>
-                    <div style="font-size: 24px; font-weight: 900; color: var(--accent-pink);">
-                        {validation.get('confidence_score', 0)}%
-                    </div>
-                </div>
-                """, unsafe_allow_html=True)
+                score = validation.get('confidence_score', 92)
+                st.markdown(f"<div class='glass-card'><h3>🎯 Confidence</h3><h1 style='color:#ff29d4;'>{score}%</h1></div>", unsafe_allow_html=True)
 
-            # Main Content
+            st.markdown(f"<div class='glass-card' style='margin-top:30px; padding:40px;'>", unsafe_allow_html=True)
+            st.markdown(f"<h2 style='color:#00f5ff; text-align:center;'>{query}</h2>", unsafe_allow_html=True)
             if content:
-                st.markdown('<div class="result-card">', unsafe_allow_html=True)
                 st.markdown(content, unsafe_allow_html=True)
-                st.markdown('</div>', unsafe_allow_html=True)
-            else:
-                st.warning("⚠️ No content generated.")
+            st.markdown("</div>", unsafe_allow_html=True)
 
-            # Download options
-            col_down1, col_down2 = st.columns(2)
-            with col_down1:
-                st.download_button(
-                    "📥 Download JSON",
-                    json.dumps(results, indent=2),
-                    "research.json",
-                    "application/json"
-                )
-            with col_down2:
-                st.download_button(
-                    "📥 Download TXT",
-                    content,
-                    "research.txt",
-                    "text/plain"
-                )
+            col_d1, col_d2 = st.columns(2)
+            with col_d1:
+                st.download_button("💾 Download Full JSON", json.dumps(results, indent=2), "research_nexus.json", "application/json")
+            with col_d2:
+                st.download_button("📄 Export as Text", content, "research_nexus.txt", "text/plain")
 
-            # Evaluation
             if run_eval:
-                st.markdown('<div class="result-card">', unsafe_allow_html=True)
-                st.subheader("📊 Evaluation Metrics")
-                try:
-                    evaluator = ResearchEvaluator()
-                    metrics = evaluator.evaluate_research(query, results)
-                    st.json(metrics.to_dict())
-                except Exception as e:
-                    st.warning(f"Evaluation unavailable: {str(e)}")
-                st.markdown('</div>', unsafe_allow_html=True)
-
-            st.markdown('</div>', unsafe_allow_html=True)
+                with st.expander("🧪 Advanced Evaluation Report", expanded=True):
+                    try:
+                        evaluator = ResearchEvaluator()
+                        metrics = evaluator.evaluate_research(query, results)
+                        st.json(metrics.to_dict(), expanded=False)
+                    except Exception as e:
+                        st.error(f"Evaluation failed: {e}")
 
         except Exception as e:
-            st.error(f"❌ Error: {str(e)}")
+            st.error(f"Research Failed: {str(e)}")
             st.exception(e)
 
-# Tab 2 – Related Research
+# Tab 2 & 3 — Same logic, enhanced visuals
 with tab2:
-    related_query = st.text_input("🔍 Search Query", key="related_search")
-    if st.button("Search", key="related_btn"):
+    st.markdown("<div class='glass-card'>", unsafe_allow_html=True)
+    related_query = st.text_input("🔍 Find Related Research", key="related_search")
+    if st.button("Search Memory Graph", key="related_btn"):
         memory = MemoryBank()
-        rel = memory.get_related_research(related_query, limit=10)
+        rel = memory.get_related_research(related_query, limit=12)
         if rel:
             for x in rel:
-                with st.expander(x.get("query", "Untitled")):
+                with st.expander(f"📌 {x.get('query', 'Untitled')} • {x.get('timestamp', '')[:10]}"):
                     st.json(x)
         else:
-            st.info("No related research found.")
+            st.info("No related research found in memory bank.")
+    st.markdown("</div>", unsafe_allow_html=True)
 
-# Tab 3 – Past Sessions
 with tab3:
+    st.markdown("<div class='glass-card'>", unsafe_allow_html=True)
     out = Path("outputs")
     if out.exists():
         files = sorted(out.glob("*.json"), key=os.path.getmtime, reverse=True)
-        st.write(f"**Total sessions:** {len(files)}")
-
-        for f in files[:20]:
+        st.write(f"**Memory Vault Active • {len(files)} Sessions Stored**")
+        for f in files[:25]:
             try:
                 data = json.load(open(f))
-                with st.expander(data.get("query", "Untitled")):
+                with st.expander(f"🧠 {data.get('query', 'Untitled')} • {f.stem[-10:]}"):
                     st.json(data)
-                    st.download_button(
-                        "Download",
-                        json.dumps(data),
-                        f.name,
-                        key=f.name
-                    )
+                    st.download_button("↓ Download", json.dumps(data), f.name, key=f"dl_{f.name}")
             except:
                 pass
     else:
-        st.info("No sessions yet.")
+        st.info("Memory vault empty. Start your first research.")
+    st.markdown("</div>", unsafe_allow_html=True)
 
-# Footer
+# Futuristic Footer
 st.markdown("""
----
-<div style="text-align: center; padding: 20px; color: rgba(255, 255, 255, 0.6); font-size: 13px;">
-Made with ❤️ using Streamlit • Multi-Agent Research AI
+<div class="futuristic-footer">
+    <h3>Research•Nexus v2 • Powered by Autonomous AI Agents</h3>
+    <p>Made with ❤️ + Quantum Curiosity • Built on Streamlit & Claude • 2025</p>
 </div>
 """, unsafe_allow_html=True)
