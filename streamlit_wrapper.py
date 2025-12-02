@@ -1,15 +1,20 @@
 """
-CYBER•NEXUS v10 — THE DEFINITIVE 2025 EDITION
-The most beautiful AI research interface ever built in Streamlit
+CYBER•NEXUS v10 — THE ULTIMATE 2025 EDITION
+Now with streamlit-lottie + streamlit-extras + glassmorphism
 """
 
 import streamlit as st
+from streamlit_lottie import st_lottie
+from streamlit_extras.colored_header import colored_header
+from streamlit_extras.add_vertical_space import add_vertical_space
+from streamlit_card import card
+import requests
 import os
 import sys
-from pathlib import Path
-from dotenv import load_dotenv
 import json
 import time
+from pathlib import Path
+from dotenv import load_dotenv
 
 load_dotenv()
 sys.path.insert(0, os.path.dirname(__file__))
@@ -18,282 +23,225 @@ from orchestrator import ResearchOrchestrator
 from evaluation.evaluator import ResearchEvaluator
 from memory.memory_bank import MemoryBank
 
+# ======================================================
+# PAGE CONFIG & BEST UI EVER
+# ======================================================
 st.set_page_config(page_title="Cyber Nexus", page_icon="Gem", layout="wide")
 
+# Load Lottie animation
+@st.cache_data
+def load_lottie(url: str):
+    r = requests.get(url)
+    if r.status_code != 200:
+        return None
+    return r.json()
+
+lottie_ai = load_lottie("https://assets9.lottiefiles.com/packages/lf20_kkflmtur.json")
+
 # ======================================================
-# THE MOST BEAUTIFUL UI OF 2025 — PURE ELEGANCE
+# GORGEOUS CSS — 2025 PREMIUM
 # ======================================================
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
-
-    :root {
-        --bg: #0f0f1e;
-        --card: rgba(20, 20, 40, 0.65);
-        --accent: #8b5cf6;
-        --text: #e0e7ff;
-        --muted: #94a3b8;
-        --radius: 32px;
-    }
-
-    [data-testid="stAppViewContainer"] {
-        background: linear-gradient(160deg, #0a0a1a 0%, #1a0033 50%, #0f0f1e 100%);
-        background-attachment: fixed;
+    
+    .main {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         font-family: 'Inter', sans-serif;
-        color: var(--text);
     }
-
-    .main-title {
+    .stApp {
+        background: transparent;
+    }
+    .big-title {
         font-size: 88px;
         font-weight: 800;
         text-align: center;
-        background: linear-gradient(90deg, #c084fc, #818cf8, #5eead4);
+        background: linear-gradient(90deg, #a8edea, #fed6e3);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
-        margin: 80px 0 16px;
+        margin: 40px 0 10px 0;
         letter-spacing: -3px;
-        line-height: 1.1;
     }
-
     .subtitle {
         text-align: center;
-        font-size: 26px;
+        font-size: 24px;
+        color: rgba(255,255,255,0.85);
         font-weight: 400;
-        color: var(--muted);
-        margin-bottom: 70px;
-        letter-spacing: 0.5px;
+        margin-bottom: 60px;
     }
-
-    .glass-card {
-        background: var(--card);
-        backdrop-filter: blur(24px);
-        -webkit-backdrop-filter: blur(24px);
-        border-radius: var(--radius);
-        border: 1px solid rgba(139, 92, 246, 0.15);
+    .glass {
+        background: rgba(255, 255, 255, 0.12);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-radius: 32px;
+        border: 1px solid rgba(255, 255, 255, 0.18);
         padding: 40px;
-        margin: 30px 0;
-        box-shadow: 0 20px 60px rgba(0,0,0,0.4);
-        transition: all 0.4s ease;
-    }
-
-    .glass-card:hover {
-        border-color: rgba(139, 92, 246, 0.3);
-        box-shadow: 0 30px 80px rgba(139, 92, 246, 0.15);
-    }
-
-    .stTextInput > div > div > input {
-        height: 76px;
-        border-radius: 28px;
-        border: 2px solid rgba(139, 92, 246, 0.3);
-        padding: 0 36px;
-        font-size: 21px;
-        font-weight: 500;
-        background: rgba(30, 30, 60, 0.6);
-        color: white;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-        transition: all 0.3s;
-    }
-
-    .stTextInput > div > div > input:focus {
-        border-color: #8b5cf6;
-        box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.25);
-    }
-
-    .stTextInput > div > div > input::placeholder {
-        color: #94a3b8;
-    }
-
-    /* Perfect gradient button */
-    .stButton > button {
-        height: 76px;
-        border-radius: 28px;
-        border: none;
-        font-size: 20px;
-        font-weight: 700;
-        color: white;
-        background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 50%, #ec4899 100%);
-        box-shadow: 0 15px 40px rgba(139, 92, 246, 0.4);
-        transition: all 0.4s ease;
-        letter-spacing: 1px;
-    }
-
-    .stButton > button:hover {
-        transform: translateY(-6px);
-        box-shadow: 0 25px 60px rgba(139, 92, 246, 0.5);
-    }
-
-    /* Stunning validation cards */
-    .metrics-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-        gap: 24px;
-        margin: 50px 0;
-    }
-
-    .metric-card {
-        background: rgba(139, 92, 246, 0.12);
-        backdrop-filter: blur(16px);
-        border-radius: 28px;
-        padding: 36px 24px;
-        text-align: center;
-        border: 1px solid rgba(139, 92, 246, 0.2);
-        box-shadow: 0 15px 40px rgba(0,0,0,0.25);
-    }
-
-    .metric-label {
-        font-size: 17px;
-        color: var(--muted);
-        font-weight: 500;
-        margin-bottom: 12px;
-    }
-
-    .metric-value {
-        font-size: 48px;
-        font-weight: 800;
-        color: white;
-        line-height: 1;
-    }
-
-    h2 {
-        font-size: 52px;
-        font-weight: 800;
-        text-align: center;
-        color: white;
-        margin: 80px 0 40px;
-        letter-spacing: -1px;
-    }
-
-    .stMarkdown {
-        font-size: 18px !important;
-        line-height: 1.8;
-        color: #e0e7ff;
+        margin: 20px 0;
+        box-shadow: 0 20px 50px rgba(0,0,0,0.3);
     }
 </style>
 """, unsafe_allow_html=True)
 
-# The most beautiful header ever
-st.markdown('<h1 class="main-title">Cyber Nexus</h1>', unsafe_allow_html=True)
-st.markdown("<p class='subtitle'>The Future of Autonomous Research • 2025</p>", unsafe_allow_html=True)
-
 # ======================================================
-# YOUR ORIGINAL CODE — LOGIC 100% UNCHANGED
+# HEADER WITH LOTTIE ANIMATION
 # ======================================================
-st.markdown("<div class='glass-card'>", unsafe_allow_html=True)
-query = st.text_input(
-    "What would you like to research?",
-    placeholder="e.g. Neuralink progress 2025, AGI timelines, quantum computing breakthroughs...",
-    label_visibility="collapsed"
-)
+st.markdown('<h1 class="big-title">Cyber Nexus</h1>', unsafe_allow_html=True)
+st.markdown('<p class="subtitle">Next-Gen Autonomous Research Intelligence</p>', unsafe_allow_html=True)
 
-col1, col2 = st.columns([3, 1])
-with col1:
-    depth_level = st.slider("Research Depth", 1, 5, 3, help="Higher = more comprehensive")
+col1, col2, col3 = st.columns([1,2,1])
 with col2:
-    do_search = st.button("BEGIN RESEARCH", use_container_width=True)
+    st_lottie(lottie_ai, height=280, key="ai_brain")
 
-st.markdown("</div>", unsafe_allow_html=True)
+add_vertical_space(3)
 
-# API Check
+# ======================================================
+# INPUT CARD
+# ======================================================
+with st.container():
+    st.markdown("<div class='glass'>", unsafe_allow_html=True)
+    colored_header(
+        label="Begin Your Research",
+        description="Ask anything — the AI will dive deep",
+        color_name="violet-70"
+    )
+    
+    query = st.text_input(
+        "What would you like to explore?",
+        placeholder="e.g. Neuralink 2025 trials, AGI safety, quantum supremacy...",
+        label_visibility="collapsed"
+    )
+    
+    col1, col2 = st.columns([3,1])
+    with col1:
+        depth_level = st.slider("Research Depth", 1, 5, 3, help="Higher = more thorough")
+    with col2:
+        st.write("")
+        st.write("")
+        do_search = st.button("START RESEARCH", use_container_width=True, type="primary")
+    
+    st.markdown("</div>", unsafe_allow_html=True)
+
+# API check
 if not all([os.getenv("ANTHROPIC_API_KEY") or st.secrets.get("ANTHROPIC_API_KEY"),
             os.getenv("TAVILY_API_KEY") or st.secrets.get("TAVILY_API_KEY")]):
-    st.error("API keys missing")
+    st.error("API Keys Missing — Check .env or secrets")
     st.stop()
 
+# ======================================================
+# TABS
+# ======================================================
 tab1, tab2, tab3 = st.tabs(["RESEARCH", "MEMORY", "ARCHIVE"])
 
 with tab1:
-    st.markdown('<div class="glass-card">', unsafe_allow_html=True)
-    colA, colB = st.columns([3, 2])
-    with colA:
-        output_format = st.selectbox("Output Format", ["report", "article", "summary", "presentation", "paper"])
-    with colB:
-        run_eval = st.checkbox("Run Evaluation", value=True)
-
-    with st.expander("Advanced Options"):
-        session_id_input = st.text_input("Resume Session ID (optional)")
-    st.markdown('</div>', unsafe_allow_html=True)
+    with st.container():
+        st.markdown("<div class='glass'>", unsafe_allow_html=True)
+        
+        col1, col2 = st.columns([3,2])
+        with col1:
+            output_format = st.selectbox("Format", ["report", "article", "summary", "presentation", "paper"])
+        with col2:
+            run_eval = st.checkbox("Run Evaluation", value=True)
+        
+        with st.expander("Advanced"):
+            session_id = st.text_input("Resume Session ID")
+        
+        st.markdown("</div>", unsafe_allow_html=True)
 
     if do_search or st.button("INITIATE RESEARCH", type="primary", use_container_width=True):
-        if not query.strip():
-            st.warning("Please enter a query")
+        if not query:
+            st.warning("Enter a query first")
             st.stop()
 
-        progress = st.progress(0)
-        status = st.empty()
+        with st.spinner("Deploying neural agents..."):
+            progress = st.progress(0
+            status = st.empty()
+            
+            try:
+                orchestrator = ResearchOrchestrator()
+                for i in range(1, 101):
+                    time.sleep(0.03)
+                    progress.progress(i)
+                    status.caption(f"Analyzing... {i}%")
+                
+                results = orchestrator.conduct_research(
+                    query=query,
+                    output_format=output_format,
+                    session_id=session_id or None
+                )
+                
+                st.success("Research Complete")
+                st.balloons()
+                
+                content = results.get("final_content", {}).get("content", "")
+                validation = results.get("validation", {})
 
-        try:
-            orchestrator = ResearchOrchestrator()
-            for i in range(1, 101):
-                time.sleep(0.03)
-                progress.progress(i)
-                status.caption(f"Analyzing... {i}%")
+                # Beautiful validation using streamlit-extras
+                if validation:
+                    colored_header("Validation Scores", "", "blue-70")
+                    cols = st.columns(len(validation))
+                    metrics = [
+                        ("Quality", validation.get('quality_score', 100)),
+                        ("Relevance", validation.get('relevance_score', 0)),
+                        ("Accuracy", validation.get('confidence_score', 0)),
+                        ("Citations", validation.get('citation_quality', 0)),
+                        ("Overall", validation.get('overall_score', 76.5)),
+                    ]
+                    for col, (label, score) in zip(cols, metrics):
+                        with col:
+                            card(
+                                title=str(score),
+                                text=label,
+                                styles={
+                                    "card": {
+                                        "background": "rgba(139, 92, 246, 0.15)",
+                                        "padding": "24px",
+                                        "border-radius": "20px",
+                                        "text-align": "center",
+                                        "box-shadow": "0 10px 30px rgba(0,0,0,0.2)"
+                                    },
+                                    "text": {"font-size": "18px", "color": "#e0e7ff"},
+                                    "title": {"font-size": "42px", "font-weight": "800", "color": "white"}
+                                }
+                            )
 
-            results = orchestrator.conduct_research(
-                query=query,
-                output_format=output_format,
-                session_id=session_id_input or None
-            )
+                # Result
+                colored_header(f"Research: {query}", "", "violet-70")
+                st.markdown(f"<div class='glass'>{content}</div>", unsafe_allow_html=True)
 
-            st.success("Research Complete")
-            st.balloons()
+                # Downloads
+                c1, c2, c3 = st.columns(3)
+                with c1:
+                    st.download_button("JSON", json.dumps(results, indent=2), "result.json")
+                with c2:
+                    st.download_button("Text", content, "report.txt")
+                with c3:
+                    st.download_button("PDF", f"<h1>{query}</h1>{content}", "report.html", "text/html")
 
-            content = results.get("final_content", {}).get("content", "")
-            validation = results.get("validation", {})
+                if run_eval:
+                    with st.expander("Detailed Evaluation"):
+                        evaluator = ResearchEvaluator()
+                        st.json(evaluator.evaluate_research(query, results).to_dict())
 
-            # Beautiful static metrics
-            if validation:
-                st.markdown("<div class='metrics-grid'>", unsafe_allow_html=True)
-                metrics = [
-                    ("Quality", validation.get('quality_score', 100)),
-                    ("Relevance", validation.get('relevance_score', 0)),
-                    ("Accuracy", validation.get('confidence_score', 0)),
-                    ("Citations", validation.get('citation_quality', 0)),
-                    ("Overall", validation.get('overall_score', 76.5)),
-                ]
-                for label, score in metrics:
-                    st.markdown(f"""
-                    <div class="metric-card">
-                        <div class="metric-label">{label}</div>
-                        <div class="metric-value">{score if isinstance(score, int) else f"{score:.1f}"}</div>
-                    </div>
-                    """, unsafe_allow_html=True)
-                st.markdown("</div>", unsafe_allow_html=True)
+            except Exception as e:
+                st.error(f"Error: {e}")
 
-            st.markdown(f"<h2>{query}</h2>", unsafe_allow_html=True)
-            st.markdown(f"<div class='glass-card'>{content}</div>", unsafe_allow_html=True)
-
-            col1, col2, col3 = st.columns(3)
-            with col1:
-                st.download_button("Download JSON", json.dumps(results, indent=2), "research.json")
-            with col2:
-                st.download_button("Download Text", content, "report.txt")
-            with col3:
-                pdf = f"<html><body style='background:#0f0f1e;color:#e0e7ff;font-family:Inter;padding:80px;line-height:1.8;'><h1 style='text-align:center;color:#8b5cf6'>{query}</h1><hr>{content.replace('#', '<h2 style=\"color:#8b5cf6;margin-top:60px;\">')}</h2></body></html>"
-                st.download_button("Download PDF", pdf, "report.html", "text/html")
-
-            if run_eval:
-                with st.expander("Detailed Evaluation"):
-                    evaluator = ResearchEvaluator()
-                    st.json(evaluator.evaluate_research(query, results).to_dict())
-
-        except Exception as e:
-            st.error(f"Error: {str(e)}")
-
-# Clean tabs
+# Memory & Archive tabs
 with tab2:
-    st.markdown('<div class="glass-card">', unsafe_allow_html=True)
-    q = st.text_input("Search memory bank")
+    st.markdown("<div class='glass'>", unsafe_allow_html=True)
+    colored_header("Memory Bank", "Search past research", "blue-70")
+    q = st.text_input("Search memory")
     if st.button("SCAN"):
         mem = MemoryBank()
         links = mem.get_related_research(q, limit=10)
         for l in links or []:
             with st.expander(l.get("query", "Research")):
                 st.json(l)
-    st.markdown('</div>', unsafe_allow_html=True)
+    st.markdown("</div>", unsafe_allow_html=True)
 
 with tab3:
-    st.markdown('<div class="glass-card">', unsafe_allow_html=True)
+    st.markdown("<div class='glass'>", unsafe_allow_html=True)
+    colored_header("Archive", "Previous sessions", "green-70")
     out = Path("outputs")
     if out.exists():
         for f in sorted(out.glob("*.json"), key=os.path.getmtime, reverse=True)[:20]:
@@ -301,12 +249,13 @@ with tab3:
                 data = json.load(open(f))
                 with st.expander(data.get("query", "Untitled")):
                     st.json(data)
-            except: pass
-    st.markdown('</div>', unsafe_allow_html=True)
+            except:
+                pass
+    st.markdown("</div>", unsafe_allow_html=True)
 
-# Final signature
+# Final touch
 st.markdown("""
-<div style='text-align:center; padding:100px 20px; color:#64748b; font-size:18px; font-weight:500;'>
-    Cyber Nexus v10 — Built for the Future
+<div style='text-align:center; padding:100px 20px; color:rgba(255,255,255,0.7); font-size:18px; text-align:center;'>
+    Cyber Nexus v10 — Powered by Intelligence • 2025
 </div>
 """, unsafe_allow_html=True)
