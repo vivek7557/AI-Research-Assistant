@@ -52,222 +52,248 @@ def load_lottie():
 lottie = load_lottie()
 
 # ======================================================
-# ENHANCED VISUAL CSS
+# MODERN DARK UI CSS
 # ======================================================
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
     
-    /* Main Background with Animated Gradient */
+    /* Dark Modern Background */
     .main { 
-        background: linear-gradient(-45deg, #1a1a2e, #16213e, #0f3460, #533483);
-        background-size: 400% 400%;
-        animation: gradientShift 15s ease infinite;
+        background: #0a0a0a;
         font-family: 'Inter', sans-serif;
     }
     
-    @keyframes gradientShift {
-        0% { background-position: 0% 50%; }
-        50% { background-position: 100% 50%; }
-        100% { background-position: 0% 50%; }
-    }
-    
-    /* Title with Glow Effect */
+    /* Modern Title */
     .big-title {
         font-size: 88px; 
         font-weight: 900; 
         text-align: center;
-        background: linear-gradient(90deg, #a8edea, #fed6e3, #a8edea);
-        background-size: 200% auto;
-        -webkit-background-clip: text; 
-        -webkit-text-fill-color: transparent;
+        color: #ffffff;
         margin: 40px 0 10px; 
         letter-spacing: -3px;
-        animation: shimmer 3s linear infinite;
-        filter: drop-shadow(0 0 30px rgba(168, 237, 234, 0.5));
     }
     
-    @keyframes shimmer {
-        to { background-position: 200% center; }
-    }
-    
-    /* Subtitle with Typing Effect */
+    /* Subtitle */
     .subtitle { 
         text-align: center; 
         font-size: 24px; 
-        color: rgba(255,255,255,0.9); 
+        color: #888888; 
         margin-bottom: 60px;
-        font-weight: 300;
-        letter-spacing: 2px;
+        font-weight: 400;
+        letter-spacing: 0.5px;
     }
     
-    /* Enhanced Glass Effect */
+    /* Modern Card/Glass Effect */
     .glass {
-        background: rgba(255,255,255,0.05);
-        backdrop-filter: blur(30px);
-        border-radius: 32px;
-        border: 1px solid rgba(255,255,255,0.1);
+        background: #141414;
+        border-radius: 24px;
+        border: 1px solid #222222;
         padding: 40px; 
         margin: 20px 0;
-        box-shadow: 0 20px 60px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1);
-        position: relative;
-        overflow: hidden;
+        box-shadow: 0 4px 24px rgba(0,0,0,0.4);
     }
     
-    .glass::before {
-        content: '';
-        position: absolute;
-        top: -50%;
-        left: -50%;
-        width: 200%;
-        height: 200%;
-        background: radial-gradient(circle, rgba(255,255,255,0.03) 0%, transparent 70%);
-        animation: rotate 20s linear infinite;
-    }
-    
-    @keyframes rotate {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-    }
-    
-    /* Input Fields */
+    /* Input Fields - Modern Dark */
     .stTextInput input {
-        background: rgba(255,255,255,0.08) !important;
-        border: 1px solid rgba(255,255,255,0.15) !important;
-        border-radius: 16px !important;
-        color: white !important;
+        background: #1a1a1a !important;
+        border: 1px solid #2a2a2a !important;
+        border-radius: 12px !important;
+        color: #ffffff !important;
         font-size: 16px !important;
-        padding: 16px 20px !important;
-        transition: all 0.3s ease !important;
+        padding: 14px 18px !important;
+        transition: all 0.2s ease !important;
     }
     
     .stTextInput input:focus {
-        background: rgba(255,255,255,0.12) !important;
-        border: 1px solid rgba(168, 237, 234, 0.5) !important;
-        box-shadow: 0 0 20px rgba(168, 237, 234, 0.2) !important;
+        background: #222222 !important;
+        border: 1px solid #3a3a3a !important;
+        box-shadow: 0 0 0 3px rgba(255,255,255,0.05) !important;
     }
     
-    /* Slider Enhancement */
+    .stTextInput input::placeholder {
+        color: #666666 !important;
+    }
+    
+    /* Slider - Modern Style */
     .stSlider {
         padding: 20px 0;
     }
     
-    /* Button Styles with Gradient */
+    .stSlider > div > div > div > div {
+        background: #ff4757 !important;
+    }
+    
+    .stSlider > div > div > div {
+        background: #2a2a2a !important;
+    }
+    
+    /* Modern Buttons */
     .stButton button {
-        border-radius: 16px !important;
+        border-radius: 12px !important;
         font-weight: 600 !important;
-        letter-spacing: 1px !important;
-        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+        letter-spacing: 0.3px !important;
+        transition: all 0.2s ease !important;
         border: none !important;
-        position: relative !important;
-        overflow: hidden !important;
-    }
-    
-    .stButton button::before {
-        content: '';
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        width: 0;
-        height: 0;
-        border-radius: 50%;
-        background: rgba(255,255,255,0.2);
-        transform: translate(-50%, -50%);
-        transition: width 0.6s, height 0.6s;
-    }
-    
-    .stButton button:hover::before {
-        width: 300px;
-        height: 300px;
+        padding: 12px 28px !important;
+        font-size: 15px !important;
     }
     
     .stButton button:hover {
-        transform: translateY(-4px) !important;
-        box-shadow: 0 15px 35px rgba(0,0,0,0.3) !important;
+        transform: translateY(-1px) !important;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.3) !important;
     }
     
-    /* Primary Button Gradient */
+    /* Primary Button - Red Accent */
     .stButton button[kind="primary"] {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+        background: linear-gradient(135deg, #ff4757 0%, #ff6b7a 100%) !important;
+        color: white !important;
     }
     
-    /* Progress Bar */
+    .stButton button[kind="primary"]:hover {
+        background: linear-gradient(135deg, #ff6b7a 0%, #ff4757 100%) !important;
+    }
+    
+    /* Secondary/Clear Button */
+    .stButton button[kind="secondary"], 
+    .stButton button:not([kind="primary"]) {
+        background: transparent !important;
+        border: 1px solid #2a2a2a !important;
+        color: #ffffff !important;
+    }
+    
+    .stButton button[kind="secondary"]:hover,
+    .stButton button:not([kind="primary"]):hover {
+        background: #1a1a1a !important;
+        border: 1px solid #3a3a3a !important;
+    }
+    
+    /* Progress Bar - Modern */
     .stProgress > div > div {
-        background: linear-gradient(90deg, #667eea, #764ba2, #f093fb) !important;
-        background-size: 200% 100% !important;
-        animation: progressGlow 2s ease infinite !important;
+        background: linear-gradient(90deg, #667eea, #764ba2) !important;
+        border-radius: 4px !important;
     }
     
-    @keyframes progressGlow {
-        0%, 100% { background-position: 0% 50%; }
-        50% { background-position: 100% 50%; }
+    .stProgress > div {
+        background: #1a1a1a !important;
+        border-radius: 4px !important;
     }
     
-    /* Tabs Enhancement */
+    /* Tabs - Modern Dark */
     .stTabs [data-baseweb="tab-list"] {
-        gap: 8px;
-        background: rgba(255,255,255,0.05);
-        border-radius: 20px;
-        padding: 8px;
+        gap: 4px;
+        background: transparent;
+        border-bottom: 1px solid #222222;
     }
     
     .stTabs [data-baseweb="tab"] {
-        border-radius: 14px;
-        color: rgba(255,255,255,0.7);
+        border-radius: 0;
+        color: #666666;
         font-weight: 600;
-        transition: all 0.3s ease;
+        padding: 12px 24px;
+        border: none;
+        background: transparent;
     }
     
     .stTabs [aria-selected="true"] {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
-        color: white !important;
+        background: transparent !important;
+        color: #ff4757 !important;
+        border-bottom: 2px solid #ff4757 !important;
     }
     
-    /* Select Box */
+    /* Select Box - Modern */
     .stSelectbox > div > div {
-        background: rgba(255,255,255,0.08) !important;
-        border: 1px solid rgba(255,255,255,0.15) !important;
-        border-radius: 16px !important;
+        background: #1a1a1a !important;
+        border: 1px solid #2a2a2a !important;
+        border-radius: 12px !important;
         color: white !important;
     }
     
-    /* Expander */
+    .stSelectbox svg {
+        fill: #666666 !important;
+    }
+    
+    /* Expander - Modern Dark */
     .streamlit-expanderHeader {
-        background: rgba(255,255,255,0.05) !important;
+        background: #1a1a1a !important;
+        border: 1px solid #2a2a2a !important;
         border-radius: 12px !important;
-        color: rgba(255,255,255,0.9) !important;
+        color: #ffffff !important;
         font-weight: 600 !important;
+        padding: 14px 18px !important;
+    }
+    
+    .streamlit-expanderHeader:hover {
+        background: #222222 !important;
+    }
+    
+    .streamlit-expanderContent {
+        background: #141414 !important;
+        border: 1px solid #2a2a2a !important;
+        border-top: none !important;
+        border-radius: 0 0 12px 12px !important;
     }
     
     /* Success/Warning Messages */
-    .stSuccess, .stWarning {
-        border-radius: 16px !important;
-        backdrop-filter: blur(10px) !important;
+    .stSuccess {
+        background: #1a2f1a !important;
+        border: 1px solid #2d4a2d !important;
+        border-radius: 12px !important;
+        color: #7ed87e !important;
+    }
+    
+    .stWarning {
+        background: #2f2a1a !important;
+        border: 1px solid #4a432d !important;
+        border-radius: 12px !important;
+        color: #d8c77e !important;
+    }
+    
+    .stError {
+        background: #2f1a1a !important;
+        border: 1px solid #4a2d2d !important;
+        border-radius: 12px !important;
+        color: #d87e7e !important;
     }
     
     /* Iframe for React Component */
     iframe {
-        border-radius: 16px;
-        border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 12px;
+        border: 1px solid #222222;
     }
     
-    /* Scrollbar */
+    /* Modern Scrollbar */
     ::-webkit-scrollbar {
-        width: 10px;
-        height: 10px;
+        width: 8px;
+        height: 8px;
     }
     
     ::-webkit-scrollbar-track {
-        background: rgba(255,255,255,0.05);
+        background: #0a0a0a;
     }
     
     ::-webkit-scrollbar-thumb {
-        background: linear-gradient(180deg, #667eea, #764ba2);
-        border-radius: 10px;
+        background: #2a2a2a;
+        border-radius: 4px;
     }
     
     ::-webkit-scrollbar-thumb:hover {
-        background: linear-gradient(180deg, #764ba2, #667eea);
+        background: #3a3a3a;
+    }
+    
+    /* Labels and Text */
+    label, .stMarkdown {
+        color: #cccccc !important;
+    }
+    
+    /* Headers */
+    h1, h2, h3, h4, h5, h6 {
+        color: #ffffff !important;
+    }
+    
+    /* Caption text */
+    .stCaption {
+        color: #888888 !important;
     }
 </style>
 """, unsafe_allow_html=True)
