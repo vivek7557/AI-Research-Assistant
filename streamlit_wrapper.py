@@ -1,3 +1,31 @@
+# mount/src/ai-research-assistant/streamlit_wrapper.py
+import streamlit as st
+
+# 1️⃣  MUST be first
+st.set_page_config(
+    page_title="Cyber Nexus",
+    page_icon="💎",
+    layout="wide",
+    initial_sidebar_state="collapsed"
+)
+
+# 2️⃣  NOW it is safe to import your own modules
+import os
+import sys
+import time
+import json
+from pathlib import Path
+from dotenv import load_dotenv
+
+load_dotenv()
+sys.path.insert(0, os.path.dirname(__file__))
+
+from orchestrator import ResearchOrchestrator
+from evaluation.evaluator import ResearchEvaluator
+from memory.memory_bank import MemoryBank
+
+# …rest of the file unchanged…
+
 # ======================================================
 #  NEW – STREAMLIT-NATIVE UI  (replaces everything above)
 # ======================================================
