@@ -1,4 +1,3 @@
-
 """
 CYBER•NEXUS v10 — FINAL TERMINAL EDITION
 Perfect validation line • Ultra cyber styling • Depth control • PDF export
@@ -20,7 +19,7 @@ from orchestrator import ResearchOrchestrator
 from evaluation.evaluator import ResearchEvaluator
 from memory.memory_bank import MemoryBank
 
-st.set_page_config(page_title="CYBER•NEXUS", page_icon="⚡", layout="wide")
+st.set_page_config(page_title="CYBER•NEXUS", page_icon="Lightning", layout="wide")
 
 # ======================================================
 # ULTIMATE CYBER TERMINAL CSS + READABILITY BOOST
@@ -122,77 +121,80 @@ st.markdown("""
     /* ULTRA READABLE CYBER TEXT */
     .cyber-title {
         color: var(--cyan);
-        font-size: 2.4rem;
+        font-size: 2.6rem;
         font-weight: 700;
         text-align: center;
-        letter-spacing: 6px;
+        letter-spacing: 8px;
         text-shadow: var(--glow-cyan);
-        margin: 30px 0 20px;
+        margin: 40px 0 30px;
         padding: 16px;
-        border-bottom: 2px solid var(--cyan);
-        border-top: 2px solid var(--cyan);
+        border-bottom: 3px solid var(--cyan);
+        border-top: 3px solid var(--cyan);
     }
 
     .cyber-subtitle {
         color: var(--orange);
-        font-size: 1.5rem;
-        font-weight: 500;
-        letter-spacing: 4px;
-        margin: 30px 0 15px;
-        padding-left: 10px;
-        border-left: 4px solid var(--orange);
+        font-size: 1.7rem;
+        font-weight: 600;
+        letter-spacing: 5px;
+        margin: 35px 0 18px;
+        padding-left: 12px;
+        border-left: 5px solid var(--orange);
     }
 
     .cyber-text {
-        font-size: 1.15rem;
-        line-height: 2;
+        font-size: 1.2rem;
+        line-height: 2.1;
         color: #00ff41;
-        padding: 10px 15px;
-        background: rgba(0, 30,0,0.2);
-        border-left: 3px solid var(--green);
-        margin: 18px 0;
+        padding: 14px 18px;
+        background: rgba(0, 40,0,0.25);
+        border-left: 4px solid var(--green);
+        margin: 20px 0;
+        border-radius: 0 8px 8px 0;
     }
 
     .cyber-quote {
         font-style: italic;
         color: #00ffff;
-        border-left: 4px solid var(--cyan);
-        padding: 16px 20px;
-        background: rgba(0,255,255,0.05);
-        margin: 25px 0;
-        font-size: 1.1rem;
+        border-left: 5px solid var(--cyan);
+        padding: 20px 25px;
+        background: rgba(0,255,255,0.08);
+        margin: 30px 0;
+        font-size: 1.15rem;
+        border-radius: 0 10px 10px 0;
     }
 
     .cyber-list {
-        padding-left: 30px;
-        line-height: 2.2;
+        padding-left: 35px;
+        line-height: 2.4;
         color: var(--green);
     }
 
     .cyber-list li::marker {
         color: var(--cyan);
         font-weight: bold;
+        font-size: 1.3em;
     }
 
     .validation-line {
-        background: rgba(0, 40, 0, 0.7);
-        border: 1px solid var(--green);
-        border-radius: 10px;
-        padding: 20px;
-        margin: 30px 0;
-        font-size: 16px;
-        box-shadow: 0 0 25px rgba(0, 255, 65, 0.5);
-        backdrop-filter: blur(5px);
+        background: rgba(0, 50, 0, 0.8);
+        border: 2px solid var(--green);
+        border-radius: 12px;
+        padding: 22px;
+        margin: 35px 0;
+        font-size: 17px;
+        box-shadow: 0 0 30px rgba(0, 255, 65, 0.6);
+        backdrop-filter: blur(6px);
     }
 
     .val-item {
         display: inline-block;
-        margin-right: 32px;
-        min-width: 160px;
-        font-weight: 500;
+        margin-right: 38px;
+        min-width: 180px;
+        font-weight: 600;
     }
 
-    .score-green { color: #00ff41; font-weight: bold; }
+    .score-green { color: #00ff41; font-weight: bold; font-size: 1.1em; }
     .score-orange { color: #ffaa00; font-weight: bold; }
     .score-red { color: #ff0044; font-weight: bold; }
 </style>
@@ -236,7 +238,7 @@ st.markdown("""
 # HEADER
 # ======================================================
 st.markdown('<h1 class="header-glitch">CYBER•NEXUS</h1>', unsafe_allow_html=True)
-st.markdown("<p style='text-align:center; color:#00ff41; font-size:21px; letter-spacing:3px;'>AUTONOMOUS RESEARCH TERMINAL v10 // ONLINE // NEURAL CORE ACTIVE</p>", unsafe_allow_html=True)
+st.markdown("<p style='text-align:center; color:#00ff41; font-size:22px; letter-spacing:4px;'>AUTONOMOUS RESEARCH TERMINAL v10 // QUANTUM CORE ONLINE</p>", unsafe_allow_html=True)
 
 # ======================================================
 # INPUT + DEPTH
@@ -244,13 +246,13 @@ st.markdown("<p style='text-align:center; color:#00ff41; font-size:21px; letter-
 st.markdown("<div class='terminal-card'>", unsafe_allow_html=True)
 query = st.text_input(
     "TARGET QUERY",
-    placeholder="e.g. Neuralink human trials 2025, AGI safety protocols, nuclear fusion ignition...",
+    placeholder="e.g. Neuralink human trials 2025 → AGI timelines → Nuclear fusion breakthrough...",
     label_visibility="collapsed"
 )
 
 col1, col2 = st.columns([3, 1])
 with col1:
-    depth_level = st.slider("RESEARCH DEPTH LEVEL", 1, 5, 3, help="1 = Fast Scan | 5 = Deep Intelligence")
+    depth_level = st.slider("RESEARCH DEPTH LEVEL", 1, 5, 3, help="1 = Surface Scan | 5 = Full Neural Dive")
 with col2:
     do_search = st.button("EXECUTE", use_container_width=True)
 
@@ -290,9 +292,9 @@ with tab1:
         try:
             orchestrator = ResearchOrchestrator()
             for i in range(1, 101):
-                time.sleep(0.02)
+                time.sleep(0.015)
                 progress.progress(i)
-                status.info(f"NEURAL AGENTS ACTIVE // DEPTH {depth_level} // SCANNING {i}%")
+                status.info(f"NEURAL AGENTS ACTIVE // DEPTH {depth_level}// SCANNING {i}% COMPLETE")
 
             results = orchestrator.conduct_research(
                 query=query,
@@ -300,13 +302,13 @@ with tab1:
                 session_id=session_id_input or None
             )
 
-            st.success("RESEARCH COMPLETE // DATA INTEGRITY VERIFIED // SIGNAL STRENGTH: MAXIMUM")
+            st.success("RESEARCH COMPLETE // DATA INTEGRITY: 100% // SIGNAL LOCKED)
             st.balloons()
 
             content = results.get("final_content", {}).get("content", "")
             validation = results.get("validation", {})
 
-            # === PERFECT VALIDATION LINE (UNCHANGED) ===
+            # === PERFECT VALIDATION LINE ===
             if validation:
                 st.markdown(f"""
                 <div class="validation-line">
@@ -320,41 +322,33 @@ with tab1:
                 </div>
                 """, unsafe_allow_html=True)
 
-            # =============================================
-            # ULTRA-ATTRACTIVE CYBER REPORT DISPLAY
-            # =============================================
+            # === ULTRA-ATTRACTIVE CYBER REPORT ===
             st.markdown(f'<div class="cyber-title">TARGET LOCKED: {query.upper()}</div>', unsafe_allow_html=True)
 
-            # Smart formatting: enhance markdown with cyber classes
+            # Enhanced formatting
             enhanced_content = content
 
-            # Headers
             enhanced_content = enhanced_content.replace("## ", "<br><div class='cyber-subtitle'>")
             enhanced_content = enhanced_content.replace("\n## ", "</div><br><div class='cyber-subtitle'>")
-            enhanced_content = enhanced_content + "</div>" if enhanced_content.count("<div class='cyber-subtitle'>") > 0 else enhanced_content
+            enhanced_content = enhanced_content.count("<div class='cyber-subtitle'>") > 0 else enhanced_content
 
-            # Paragraphs & quotes
             enhanced_content = enhanced_content.replace("\n\n", "</p><p class='cyber-text'>")
             enhanced_content = "<p class='cyber-text'>" + enhanced_content + "</p>"
 
-            # Blockquotes
             enhanced_content = enhanced_content.replace("> ", "<div class='cyber-quote'>")
             enhanced_content = enhanced_content.replace("\n>", "<br>")
-
-            # Lists
             enhanced_content = enhanced_content.replace("\n- ", "\n• ")
             enhanced_content = enhanced_content.replace("\n• ", "<li>")
             if "<li>" in enhanced_content:
                 enhanced_content = enhanced_content.replace("<p class='cyber-text'>", "<div class='cyber-text'><ul class='cyber-list'>", 1)
                 enhanced_content = enhanced_content.replace("</p>", "</ul></div>", 1)
 
-            # Final wrap in card
             st.markdown(f'''
             <div class="terminal-card">
                 {enhanced_content}
-                <br>
-                <p style="color:#00ffff; text-align:center; font-style:italic;">
-                    // END OF TRANSMISSION // RESEARCH COMPLETE // {time.strftime("%Y-%m-%d %H:%M:%S")} UTC
+                <br><br>
+                <p style="color:#00ffff; text-align:center; font-style:italic; font-size:1.2rem;">
+                    // END OF TRANSMISSION // {time.strftime("%Y-%m-%d %H:%M:%S")} UTC // CYBER•NEXUS v10
                 </p>
             </div>
             ''', unsafe_allow_html=True)
@@ -364,22 +358,22 @@ with tab1:
             with col1:
                 st.download_button("DOWNLOAD FULL JSON", json.dumps(results, indent=2, ensure_ascii=False), f"cyber_nexus_{int(time.time())}.json")
             with col2:
-                st.download_button("DOWNLOAD PLAIN TEXT", content, "cyber_report.txt")
+                st.download_button("DOWNLOAD PLAIN TXT", content, "cyber_report.txt")
             with col3:
-                pdf_html = f"<html><head><meta charset='utf-8'><title>{query}</title><style>body{{background:#000;color:#00ff41;font-family:monospace;padding:50px;line-height:2;}}</style></head><body><h1>{query}</h1><pre>{content}</pre></body></html>"
+                pdf_html = f"<html><head><meta charset='utf-8'><title>{query}</title><style>body{{background:#000;color:#00ff41;font-family:monospace;padding:50px;line-height:2;}}</style></head><body><h1 style='color:#00ffff;text-align:center;'>{query}</h1><pre style='font-size:16px;'>{content}</pre></body></html>"
                 st.download_button("DOWNLOAD AS PDF (Print→Save)", pdf_html, "cyber_report.html", "text/html")
 
             if run_eval:
                 with st.expander("DETAILED VALIDATION LOG // FULL METRICS"):
                     evaluator = ResearchEvaluator()
                     metrics = evaluator.evaluate_research(query, results)
-                    st.json(metrics.to_dict(), expanded=False)
+                    st.json(metrics.to_dict())
 
         except Exception as e:
             st.error(f"CRITICAL SYSTEM FAILURE // ERROR: {str(e)}")
             st.exception(e)
 
-# MEMORY LINKS TAB
+# MEMORY LINKS
 with tab2:
     st.markdown('<div class="terminal-card">', unsafe_allow_html=True)
     q = st.text_input("SEARCH MEMORY BANK")
@@ -391,7 +385,7 @@ with tab2:
                 st.json(l, expanded=False)
     st.markdown('</div>', unsafe_allow_html=True)
 
-# ARCHIVE TAB
+# ARCHIVE
 with tab3:
     st.markdown('<div class="terminal-card">', unsafe_allow_html=True)
     out = Path("outputs")
@@ -402,16 +396,15 @@ with tab3:
                 data = json.load(open(f, encoding="utf-8"))
                 with st.expander(f"{data.get('query', 'NO QUERY')} — {os.path.getmtime(f):%Y-%m-%d %H:%M}"):
                     st.json(data, expanded=False)
-            except Exception as e:
-                st.write(f"Corrupted node: {e}")
+            except:
+                st.write(f"Corrupted node: {f.name}")
     else:
-        st.info("ARCHIVE EMPTY // NO PAST SESSIONS DETECTED")
+        st.info("ARCHIVE EMPTY // NO PAST SESSIONS")
     st.markdown('</div>', unsafe_allow_html=True)
 
 # Final line
 st.markdown("""
-<div style='text-align:center; color:#00ff41; padding:50px; font-size:19px; text-shadow: 0 0 20px #00ff41;'>
+<div style='text-align:center; color:#00ff41; padding:60px; font-size:20px; text-shadow: 0 0 25px #00ff41;'>
     // CYBER•NEXUS v10 // QUANTUM NEURAL CORE v9.9 // ALL SYSTEMS NOMINAL // 2025–∞
 </div>
 """, unsafe_allow_html=True)
-</DOCUMENT>
