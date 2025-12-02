@@ -1,228 +1,137 @@
-# mount/src/ai-research-assistant/streamlit_wrapper.py
 import streamlit as st
-
-# 1️⃣  MUST be first
-st.set_page_config(
-    page_title="Cyber Nexus",
-    page_icon="💎",
-    layout="wide",
-    initial_sidebar_state="collapsed"
-)
-
-# 2️⃣  NOW it is safe to import your own modules
-import os
-import sys
+import logging
+from agents.job_scraper_agent import fetch_real_jobs
+from agents.recommendation_agent import RecommendationAgent
+from tools.cv_upload_tool import read_uploaded_file
+from agents.skill_extractor import extract_skills
+from memory.long_term_memory import MemoryBank
 import time
-import json
-from pathlib import Path
-from dotenv import load_dotenv
 
-load_dotenv()
-sys.path.insert(0, os.path.dirname(__file__))
-
-from orchestrator import ResearchOrchestrator
-from evaluation.evaluator import ResearchEvaluator
-from memory.memory_bank import MemoryBank
-
-# …rest of the file unchanged…
-
-# ======================================================
-#  NEW – STREAMLIT-NATIVE UI  (replaces everything above)
-# ======================================================
 st.set_page_config(
-    page_title="Cyber Nexus",
-    page_icon="💎",
+    page_title="AI Job Concierge",
+    page_icon="💼",
     layout="wide",
-    initial_sidebar_state="collapsed"
+    initial_sidebar_state="expanded"
 )
 
-# ----------  CSS (same dark vibe, no JS)  -------------
+logger = logging.getLogger("ui")
+
+# ---------------------------
+#  UI STYLES
+# ---------------------------
 st.markdown("""
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
-
-.main {
-    background: #0a0a0a;
-    font-family: 'Inter', sans-serif;
-}
-
-.glass {
-    background: #141414;
-    border-radius: 24px;
-    border: 1px solid #222222;
-    padding: 40px;
-    margin: 20px 0;
-    box-shadow: 0 4px 24px rgba(0,0,0,0.4);
-}
-
-.big-title {
-    font-size: 88px;
-    font-weight: 900;
-    text-align: center;
-    color: #ffffff;
-    margin: 40px 0 10px;
-    letter-spacing: -3px;
-}
-
-.subtitle {
-    text-align: center;
-    font-size: 24px;
-    color: #888888;
-    margin-bottom: 60px;
-    font-weight: 400;
-    letter-spacing: 0.5px;
-}
-
-.stButton button {
-    border-radius: 12px;
-    font-weight: 600;
-    letter-spacing: 0.3px;
-    transition: all 0.2s ease;
-    border: none;
-    padding: 12px 28px;
-    font-size: 15px;
-}
-
-.stButton button:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
-}
-
-.stButton button[kind="primary"] {
-    background: linear-gradient(135deg, #ff4757 0%, #ff6b7a 100%) !important;
-    color: white !important;
-}
-
-.stButton button[kind="primary"]:hover {
-    background: linear-gradient(135deg, #ff6b7a 0%, #ff4757 100%) !important;
-}
-
-.stTextInput input, .stTextArea textarea {
-    background: #1a1a1a !important;
-    border: 1px solid #2a2a2a !important;
-    border-radius: 12px !important;
-    color: white !important;
-    font-size: 16px !important;
-    padding: 14px 18px !important;
-}
-
-.stSlider > div > div > div > div {
-    background: #ff4757 !important;
-}
-
-.stTabs [aria-selected="true"] {
-    color: #ff4757 !important;
-    border-bottom: 2px solid #ff4757 !important;
-}
-</style>
+    <style>
+    .big-title { font-size: 40px; font-weight: bold; padding-bottom: 10px; }
+    .sub { font-size: 20px; opacity: 0.85; margin-bottom: 20px; }
+    .card {
+        background: #ffffff08; 
+        padding: 20px; 
+        border-radius: 15px; 
+        backdrop-filter: blur(10px); 
+        border: 1px solid #ffffff30;
+        margin-bottom: 25px;
+    }
+    .job-title { font-size: 22px; font-weight: 700; }
+    .job-company { font-size: 18px; opacity: 0.85; }
+    .chip {
+        display: inline-block;
+        padding: 6px 12px;
+        background: #4a4a4a;
+        color: white;
+        border-radius: 15px;
+        margin: 3px;
+        font-size: 13px;
+    }
+    .score-bar {
+        height: 12px;
+        border-radius: 6px;
+        background: #444;
+        margin-top: 8px;
+    }
+    </style>
 """, unsafe_allow_html=True)
 
-# ----------  HEADER  ----------
-st.markdown('<h1 class="big-title">Cyber Nexus</h1>', unsafe_allow_html=True)
-st.markdown('<p class="subtitle">Autonomous Research Intelligence • 2025</p>', unsafe_allow_html=True)
+# ---------------------------
+# Title
+# ---------------------------
+st.markdown("<div class='big-title'>💼 AI Job Concierge</div>", unsafe_allow_html=True)
+st.markdown("<div class='sub'>Upload resume → Extract skills → Fetch real jobs → Rank using AI embeddings</div>", unsafe_allow_html=True)
 
-# ----------  INPUT  ----------
-with st.container():
-    st.markdown("<div class='glass'>", unsafe_allow_html=True)
-    query = st.text_input(
-        "What do you want to know?",
-        placeholder="e.g. Neuralink 2025, AGI timelines, fusion breakthrough..."
-    )
+# Memory
+mb = MemoryBank()
 
-    c1, c2, c3 = st.columns([2, 1, 1])
-    with c1:
-        depth_level = st.slider("Research Depth", 1, 5, 3)
-    with c2:
-        start_research = st.button("Start Research", type="primary", use_container_width=True)
-    with c3:
-        if st.button("Clear", use_container_width=True):
-            st.rerun()
-    st.markdown("</div>", unsafe_allow_html=True)
+# Sidebar
+with st.sidebar:
+    st.header("⚙️ Settings")
+    user_id = st.text_input("User ID (optional)")
 
-# ----------  API KEY GUARD  -------------
-if not (st.secrets.get("ANTHROPIC_API_KEY") or os.getenv("ANTHROPIC_API_KEY")) or \
-   not (st.secrets.get("TAVILY_API_KEY") or os.getenv("TAVILY_API_KEY")):
-    st.error("Missing API keys. Add to Streamlit Secrets or .env")
-    st.stop()
+    if st.button("Create Sample Profile"):
+        sample = {"name": "Demo User", "preferences": {"role": "ML Engineer", "location": "India"}}
+        uid = mb.save_profile(user_id, sample)
+        st.success(f"Profile Created: {uid}")
 
-# ----------  TABS  ----------
-tab1, tab2, tab3 = st.tabs(["RESEARCH", "MEMORY", "ARCHIVE"])
+# ---------------------------
+# Resume Upload
+# ---------------------------
+col1, col2 = st.columns(2)
 
-# ----------  RESEARCH  ----------
-with tab1:
-    with st.container():
-        st.markdown("<div class='glass'>", unsafe_allow_html=True)
-        output_format = st.selectbox("Output Format", ["report", "article", "summary", "presentation", "paper"])
-        session_id = st.text_input("Resume Session ID (optional)")
-        st.markdown("</div>", unsafe_allow_html=True)
+with col1:
+    st.subheader("📄 Upload Resume")
+    uploaded = st.file_uploader("Upload your resume file", type=["pdf", "txt", "docx"])
 
-    if start_research and query.strip():
-        with st.spinner("Deploying neural agents..."):
-            progress = st.progress(0)
-            for i in range(100):
-                time.sleep(0.03)
-                progress.progress(i + 1)
+with col2:
+    resume_text = st.text_area("Or paste resume text manually")
 
-            results = ResearchOrchestrator().conduct_research(
-                query=query,
-                output_format=output_format,
-                session_id=session_id or None
+if uploaded:
+    resume_text = read_uploaded_file(uploaded)
+    st.success("Resume loaded successfully!")
+
+# ---------------------------
+# Skill Extraction
+# ---------------------------
+if resume_text:
+    st.markdown("### 🧠 Extracted Skills")
+    skills = extract_skills(resume_text)
+    if len(skills) > 0:
+        chip_html = "".join([f"<span class='chip'>{s}</span>" for s in skills])
+        st.markdown(chip_html, unsafe_allow_html=True)
+    else:
+        st.info("No major skills detected — try adding more content.")
+
+# ---------------------------
+# Job Search
+# ---------------------------
+st.markdown("### 🔍 Job Search")
+query = st.text_input("Search Jobs", value="Machine Learning Engineer")
+threshold = st.slider("Recommendation Threshold", 0.0, 1.0, 0.20)
+
+if st.button("Fetch Jobs"):
+    if not resume_text:
+        st.error("Upload or paste resume first.")
+    else:
+        with st.spinner("Fetching real jobs from Indeed, Naukri, LinkedIn..."):
+            jobs = fetch_real_jobs(query, top_k=10)
+            time.sleep(1)
+
+        st.success(f"Fetched {len(jobs)} jobs!")
+
+        rec_agent = RecommendationAgent()
+        results = rec_agent.recommend_once(resume_text, query, threshold)
+
+        st.markdown("## 🎯 Top Recommended Jobs")
+
+        for job in results:
+            st.markdown("<div class='card'>", unsafe_allow_html=True)
+            st.markdown(f"<div class='job-title'>{job['title']}</div>", unsafe_allow_html=True)
+            st.markdown(f"<div class='job-company'>{job['company']}</div>", unsafe_allow_html=True)
+            st.write(job["description"][:300] + "...")
+            st.markdown(f"[Apply →]({job['url']})")
+
+            score_pct = int(job["score"] * 100)
+            st.markdown(f"Score: **{score_pct}%**")
+
+            st.markdown(
+                f"<div class='score-bar' style='width:{score_pct}%; background:#00c853;'></div>",
+                unsafe_allow_html=True
             )
-            progress.empty()
-
-        st.success("Research Complete")
-        st.balloons()
-
-        content = results.get("final_content", {}).get("content", "")
-        st.markdown("<div class='glass'>", unsafe_allow_html=True)
-        st.markdown(content)
-        st.markdown("</div>", unsafe_allow_html=True)
-
-        # ----  simple download row  ----
-        col_a, col_b, col_c, col_d = st.columns(4)
-        with col_a:
-            st.download_button("📋 Copy", data=content, file_name=None, mime="text/plain")
-        with col_b:
-            st.download_button("💾 JSON", data=json.dumps(results, indent=2), file_name="research.json", mime="application/json")
-        with col_c:
-            st.download_button("📝 TXT", data=content, file_name="research.txt", mime="text/plain")
-        with col_d:
-            # basic PDF (utf-8 text only)
-            try:
-                from fpdf import FPDF
-                pdf = FPDF()
-                pdf.add_page()
-                pdf.set_font("Arial", size=11)
-                for line in content.split("\n"):
-                    pdf.multi_cell(0, 5, line.encode("latin-1", "replace").decode("latin-1"))
-                st.download_button("📄 PDF", data=pdf.output(dest="S"), file_name="research.pdf", mime="application/pdf")
-            except Exception:
-                st.download_button("📄 PDF", data=content, file_name="research.txt", mime="text/plain")
-
-# ----------  MEMORY  ----------
-with tab2:
-    st.markdown("<div class='glass'>", unsafe_allow_html=True)
-    q = st.text_input("Search memory", placeholder="Search memory...")
-    if st.button("Search") and q:
-        links = MemoryBank().get_related_research(q, limit=10)
-        for item in links or []:
-            with st.expander(item.get("query", "Untitled")):
-                st.json(item)
-    st.markdown("</div>", unsafe_allow_html=True)
-
-# ----------  ARCHIVE  ----------
-with tab3:
-    st.markdown("<div class='glass'>", unsafe_allow_html=True)
-    out = Path("outputs")
-    if out.exists():
-        for f in sorted(out.glob("*.json"), key=os.path.getmtime, reverse=True)[:20]:
-            try:
-                data = json.load(open(f))
-                with st.expander(data.get("query", "Untitled")):
-                    st.json(data)
-            except Exception:
-                pass
-    st.markdown("</div>", unsafe_allow_html=True)
-
-# ----------  FOOTER  ----------
-st.markdown("<div style='text-align:center;padding:100px;color:rgba(255,255,255,0.7);font-size:18px;'>Cyber Nexus v10 – Built for the Future • 2025</div>", unsafe_allow_html=True)
+            st.markdown("</div>", unsafe_allow_html=True)
