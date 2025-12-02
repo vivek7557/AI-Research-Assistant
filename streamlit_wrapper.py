@@ -1,6 +1,6 @@
 """
-CYBER•NEXUS v10 – MINIMALIST VERSION
-Clean UI with simplified buttons
+CYBER•NEXUS v10 – MINIMALIST VERSION WITH REACT UI
+Clean UI with gradient buttons and PDF export
 """
 
 import streamlit as st
@@ -83,6 +83,9 @@ st.markdown("""
     .stButton button:hover {
         transform: translateY(-2px);
         box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    }
+    iframe {
+        border-radius: 16px;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -183,15 +186,142 @@ with tab1:
         colored_header(f"Result: {query}", "", "blue-70")
         st.markdown(f"<div class='glass'>{content}</div>", unsafe_allow_html=True)
 
-        # Minimalist Downloads
+        # React UI with Gradient Buttons
         st.write("")
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            st.download_button("📄 JSON", json.dumps(results, indent=2), "result.json", use_container_width=True)
-        with col2:
-            st.download_button("📝 Text", content, "report.txt", use_container_width=True)
-        with col3:
-            st.download_button("🌐 HTML", f"<h1>{query}</h1>{content}", "report.html", "text/html", use_container_width=True)
+        st.markdown("### Download Options")
+        
+        # Prepare data for React component
+        react_data = {
+            "query": query,
+            "content": content,
+            "results": results
+        }
+        
+        # React Component with Gradient Buttons
+        html_component = f"""
+        <div id="root"></div>
+        <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+        <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+        
+        <script>
+        const {{ useState }} = React;
+        const data = {json.dumps(react_data)};
+        
+        function GradientDownloadButtons() {{
+            const [hoveredBtn, setHoveredBtn] = useState(null);
+            
+            const downloadJSON = () => {{
+                const blob = new Blob([JSON.stringify(data.results, null, 2)], {{ type: 'application/json' }});
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'result.json';
+                a.click();
+            }};
+            
+            const downloadText = () => {{
+                const blob = new Blob([data.content], {{ type: 'text/plain' }});
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'report.txt';
+                a.click();
+            }};
+            
+            const downloadPDF = () => {{
+                const {{ jsPDF }} = window.jspdf;
+                const doc = new jsPDF();
+                
+                doc.setFontSize(20);
+                doc.text(data.query, 20, 20);
+                
+                doc.setFontSize(12);
+                const lines = doc.splitTextToSize(data.content, 170);
+                doc.text(lines, 20, 40);
+                
+                doc.save('report.pdf');
+            }};
+            
+            const buttons = [
+                {{
+                    label: 'JSON',
+                    onClick: downloadJSON,
+                    gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                    hoverGradient: 'linear-gradient(135deg, #764ba2 0%, #667eea 100%)',
+                    icon: '📦'
+                }},
+                {{
+                    label: 'Text',
+                    onClick: downloadText,
+                    gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+                    hoverGradient: 'linear-gradient(135deg, #f5576c 0%, #f093fb 100%)',
+                    icon: '📝'
+                }},
+                {{
+                    label: 'PDF',
+                    onClick: downloadPDF,
+                    gradient: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
+                    hoverGradient: 'linear-gradient(135deg, #fee140 0%, #fa709a 100%)',
+                    icon: '📄'
+                }}
+            ];
+            
+            return React.createElement('div', {{
+                style: {{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(3, 1fr)',
+                    gap: '16px',
+                    marginTop: '20px'
+                }}
+            }},
+                buttons.map((btn, idx) => 
+                    React.createElement('button', {{
+                        key: idx,
+                        onMouseEnter: () => setHoveredBtn(idx),
+                        onMouseLeave: () => setHoveredBtn(null),
+                        onClick: btn.onClick,
+                        style: {{
+                            background: hoveredBtn === idx ? btn.hoverGradient : btn.gradient,
+                            border: 'none',
+                            borderRadius: '12px',
+                            padding: '20px 16px',
+                            color: 'white',
+                            fontSize: '15px',
+                            fontWeight: '600',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            gap: '8px',
+                            transition: 'all 0.3s ease',
+                            transform: hoveredBtn === idx ? 'translateY(-3px)' : 'translateY(0)',
+                            boxShadow: hoveredBtn === idx 
+                                ? '0 12px 30px rgba(0,0,0,0.3)' 
+                                : '0 6px 15px rgba(0,0,0,0.2)',
+                            fontFamily: 'Inter, sans-serif',
+                            letterSpacing: '0.5px'
+                        }}
+                    }},
+                        React.createElement('span', {{ style: {{ fontSize: '24px' }} }}, btn.icon),
+                        React.createElement('span', null, btn.label)
+                    )
+                )
+            );
+        }}
+        
+        ReactDOM.render(
+            React.createElement(GradientDownloadButtons),
+            document.getElementById('root')
+        );
+        </script>
+        
+        <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        </style>
+        """
+        
+        st.components.v1.html(html_component, height=150)
 
 # ======================================================
 # MEMORY & ARCHIVE TABS
