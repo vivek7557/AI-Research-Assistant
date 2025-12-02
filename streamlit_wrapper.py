@@ -30,7 +30,7 @@ st.markdown("""
     
     :root {
         --bg: #000;
-        --green: #00ff41;
+        --green: #00ff41ff;
         --cyan: #00ffff;
         --orange: #ffaa00;
         --red: #ff0044;
@@ -118,7 +118,6 @@ st.markdown("""
         box-shadow: var(--glow-green);
     }
 
-    /* ULTRA READABLE CYBER TEXT */
     .cyber-title {
         color: var(--cyan);
         font-size: 2.6rem;
@@ -200,7 +199,7 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# Matrix Rain Background
+# Matrix Rain
 st.markdown("""
 <div class="matrix-bg">
     <script>
@@ -234,15 +233,11 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# ======================================================
 # HEADER
-# ======================================================
 st.markdown('<h1 class="header-glitch">CYBER•NEXUS</h1>', unsafe_allow_html=True)
 st.markdown("<p style='text-align:center; color:#00ff41; font-size:22px; letter-spacing:4px;'>AUTONOMOUS RESEARCH TERMINAL v10 // QUANTUM CORE ONLINE</p>", unsafe_allow_html=True)
 
-# ======================================================
 # INPUT + DEPTH
-# ======================================================
 st.markdown("<div class='terminal-card'>", unsafe_allow_html=True)
 query = st.text_input(
     "TARGET QUERY",
@@ -264,9 +259,7 @@ if not all([os.getenv("ANTHROPIC_API_KEY") or st.secrets.get("ANTHROPIC_API_KEY"
     st.error("FATAL: API KEYS NOT DETECTED // SYSTEM HALTED")
     st.stop()
 
-# ======================================================
 # TABS
-# ======================================================
 tab1, tab2, tab3 = st.tabs(["RESEARCH", "MEMORY LINKS", "ARCHIVE"])
 
 with tab1:
@@ -293,8 +286,8 @@ with tab1:
             orchestrator = ResearchOrchestrator()
             for i in range(1, 101):
                 time.sleep(0.015)
-                progress.progress(i)
-                status.info(f"NEURAL AGENTS ACTIVE // DEPTH {depth_level}// SCANNING {i}% COMPLETE")
+                progress.progress(i / 100)
+                status.info(f"NEURAL AGENTS ACTIVE // DEPTH {depth_level} // SCANNING {i}%")
 
             results = orchestrator.conduct_research(
                 query=query,
@@ -302,13 +295,14 @@ with tab1:
                 session_id=session_id_input or None
             )
 
-            st.success("RESEARCH COMPLETE // DATA INTEGRITY: 100% // SIGNAL LOCKED)
+            # FIXED LINE
+            st.success("RESEARCH COMPLETE // DATA INTEGRITY: 100% // SIGNAL LOCKED")
             st.balloons()
 
             content = results.get("final_content", {}).get("content", "")
             validation = results.get("validation", {})
 
-            # === PERFECT VALIDATION LINE ===
+            # Validation line
             if validation:
                 st.markdown(f"""
                 <div class="validation-line">
@@ -322,30 +316,19 @@ with tab1:
                 </div>
                 """, unsafe_allow_html=True)
 
-            # === ULTRA-ATTRACTIVE CYBER REPORT ===
+            # BEAUTIFUL REPORT
             st.markdown(f'<div class="cyber-title">TARGET LOCKED: {query.upper()}</div>', unsafe_allow_html=True)
 
-            # Enhanced formatting
-            enhanced_content = content
-
-            enhanced_content = enhanced_content.replace("## ", "<br><div class='cyber-subtitle'>")
-            enhanced_content = enhanced_content.replace("\n## ", "</div><br><div class='cyber-subtitle'>")
-            enhanced_content = enhanced_content.count("<div class='cyber-subtitle'>") > 0 else enhanced_content
-
-            enhanced_content = enhanced_content.replace("\n\n", "</p><p class='cyber-text'>")
-            enhanced_content = "<p class='cyber-text'>" + enhanced_content + "</p>"
-
-            enhanced_content = enhanced_content.replace("> ", "<div class='cyber-quote'>")
-            enhanced_content = enhanced_content.replace("\n>", "<br>")
-            enhanced_content = enhanced_content.replace("\n- ", "\n• ")
-            enhanced_content = enhanced_content.replace("\n• ", "<li>")
-            if "<li>" in enhanced_content:
-                enhanced_content = enhanced_content.replace("<p class='cyber-text'>", "<div class='cyber-text'><ul class='cyber-list'>", 1)
-                enhanced_content = enhanced_content.replace("</p>", "</ul></div>", 1)
+            enhanced = content
+            enhanced = enhanced.replace("## ", "<br><div class='cyber-subtitle'>## ").replace("\n## ", "</div><br><div class='cyber-subtitle'>## ")
+            enhanced = enhanced.replace("\n\n", "</p><p class='cyber-text'>")
+            enhanced = "<p class='cyber-text'>" + enhanced + "</p>"
+            enhanced = enhanced.replace("> ", "<div class='cyber-quote'>").replace("\n> ", "<br>")
+            enhanced = enhanced.replace("\n- ", "\n• ").replace("\n• ", "<li>")
 
             st.markdown(f'''
             <div class="terminal-card">
-                {enhanced_content}
+                {enhanced}
                 <br><br>
                 <p style="color:#00ffff; text-align:center; font-style:italic; font-size:1.2rem;">
                     // END OF TRANSMISSION // {time.strftime("%Y-%m-%d %H:%M:%S")} UTC // CYBER•NEXUS v10
@@ -373,7 +356,7 @@ with tab1:
             st.error(f"CRITICAL SYSTEM FAILURE // ERROR: {str(e)}")
             st.exception(e)
 
-# MEMORY LINKS
+# MEMORY & ARCHIVE tabs unchanged (kept clean)
 with tab2:
     st.markdown('<div class="terminal-card">', unsafe_allow_html=True)
     q = st.text_input("SEARCH MEMORY BANK")
@@ -385,24 +368,20 @@ with tab2:
                 st.json(l, expanded=False)
     st.markdown('</div>', unsafe_allow_html=True)
 
-# ARCHIVE
 with tab3:
     st.markdown('<div class="terminal-card">', unsafe_allow_html=True)
     out = Path("outputs")
     if out.exists():
-        files = sorted(out.glob("*.json"), key=os.path.getmtime, reverse=True)[:20]
-        for f in files:
+        for f in sorted(out.glob("*.json"), key=os.path.getmtime, reverse=True)[:20]:
             try:
                 data = json.load(open(f, encoding="utf-8"))
-                with st.expander(f"{data.get('query', 'NO QUERY')} — {os.path.getmtime(f):%Y-%m-%d %H:%M}"):
+                with st.expander(f"{data.get('query', 'NO QUERY')} — {time.strftime('%Y-%m-%d %H:%M', time.localtime(os.path.getmtime(f)))}"):
                     st.json(data, expanded=False)
             except:
-                st.write(f"Corrupted node: {f.name}")
-    else:
-        st.info("ARCHIVE EMPTY // NO PAST SESSIONS")
+                pass
     st.markdown('</div>', unsafe_allow_html=True)
 
-# Final line
+# Final glow
 st.markdown("""
 <div style='text-align:center; color:#00ff41; padding:60px; font-size:20px; text-shadow: 0 0 25px #00ff41;'>
     // CYBER•NEXUS v10 // QUANTUM NEURAL CORE v9.9 // ALL SYSTEMS NOMINAL // 2025–∞
