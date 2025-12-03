@@ -1,6 +1,6 @@
 """
-streamlit_wrapper.py — ENHANCED VERSION
-React-inspired UI + animations + your existing logic
+streamlit_wrapper.py – ENHANCED VERSION
+React-inspired UI + animations + PDF download + Dark/Light theme
 """
 
 import streamlit as st
@@ -29,12 +29,16 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+# Initialize theme in session state
+if 'theme' not in st.session_state:
+    st.session_state.theme = 'dark'
+
 # ======================================================
-# Enhanced UI with animations + gradients
+# Enhanced UI with animations + gradients + Theme Support
 # ======================================================
-st.markdown("""
+theme_styles = """
 <style>
-/* Root Colors */
+/* Root Colors - Dark Theme */
 :root {
     --g1: #0d0a24;
     --g2: #32105a;
@@ -42,6 +46,43 @@ st.markdown("""
     --accent-a: #4ff0ff;
     --accent-b: #bf6afc;
     --accent-pink: #ff4d8f;
+    --bg-primary: #0a0a0a;
+    --bg-secondary: rgba(255, 255, 255, 0.06);
+    --text-primary: #ffffff;
+    --text-secondary: rgba(255, 255, 255, 0.7);
+    --border-color: rgba(255, 255, 255, 0.12);
+}
+
+/* Light Theme Colors */
+.light-theme {
+    --g1: #f8f9fa;
+    --g2: #e9ecef;
+    --g3: #dee2e6;
+    --accent-a: #0066cc;
+    --accent-b: #7c3aed;
+    --accent-pink: #dc2626;
+    --bg-primary: #ffffff;
+    --bg-secondary: rgba(0, 0, 0, 0.03);
+    --text-primary: #1a1a1a;
+    --text-secondary: rgba(0, 0, 0, 0.6);
+    --border-color: rgba(0, 0, 0, 0.1);
+}
+
+/* Apply theme to body */
+body.light-theme,
+html.light-theme,
+[data-testid="stAppViewContainer"].light-theme {
+    --g1: #f8f9fa;
+    --g2: #e9ecef;
+    --g3: #dee2e6;
+    --accent-a: #0066cc;
+    --accent-b: #7c3aed;
+    --accent-pink: #dc2626;
+    --bg-primary: #ffffff;
+    --bg-secondary: rgba(0, 0, 0, 0.03);
+    --text-primary: #1a1a1a;
+    --text-secondary: rgba(0, 0, 0, 0.6);
+    --border-color: rgba(0, 0, 0, 0.1);
 }
 
 /* Main Background */
@@ -49,12 +90,34 @@ html, body, [data-testid="stAppViewContainer"] {
     background: linear-gradient(135deg, var(--g1) 0%, var(--g2) 50%, var(--g3) 100%);
     background-size: 400% 400%;
     animation: gradientMove 16s ease infinite;
+    color: var(--text-primary);
 }
 
 @keyframes gradientMove {
     0% { background-position: 0% 50%; }
     50% { background-position: 100% 50%; }
     100% { background-position: 0% 50%; }
+}
+
+/* Theme Toggle Button */
+.theme-toggle {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 10px 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.theme-toggle:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
 }
 
 /* Topbar */
@@ -64,8 +127,8 @@ html, body, [data-testid="stAppViewContainer"] {
     align-items: center;
     padding: 16px 26px;
     margin-bottom: 20px;
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
     border-radius: 16px;
     backdrop-filter: blur(10px);
     box-shadow: 0 0 20px rgba(79, 240, 255, 0.1);
@@ -105,7 +168,7 @@ html, body, [data-testid="stAppViewContainer"] {
 .hero h1 {
     font-size: 48px;
     font-weight: 900;
-    color: white;
+    color: var(--text-primary);
     margin-bottom: 16px;
     line-height: 1.2;
 }
@@ -124,7 +187,7 @@ html, body, [data-testid="stAppViewContainer"] {
 
 .hero-subtitle {
     font-size: 18px;
-    color: rgba(240, 240, 255, 0.8);
+    color: var(--text-secondary);
     max-width: 600px;
     margin: 16px auto 0;
 }
@@ -139,8 +202,8 @@ html, body, [data-testid="stAppViewContainer"] {
     max-width: 900px;
     margin: 30px auto;
     padding: 16px;
-    background: rgba(255, 255, 255, 0.06);
-    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
     border-radius: 20px;
     backdrop-filter: blur(15px);
     transition: all 0.3s ease;
@@ -150,13 +213,13 @@ html, body, [data-testid="stAppViewContainer"] {
 .search-wrapper:hover {
     transform: translateY(-4px);
     box-shadow: 0 0 40px rgba(191, 106, 252, 0.25);
-    border-color: rgba(255, 255, 255, 0.25);
+    border-color: var(--accent-a);
 }
 
 /* Stat Cards */
 .stat-card {
-    background: rgba(255, 255, 255, 0.06);
-    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
     border-radius: 16px;
     padding: 20px;
     transition: all 0.3s ease;
@@ -164,9 +227,9 @@ html, body, [data-testid="stAppViewContainer"] {
 
 .stat-card:hover {
     transform: translateY(-6px);
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--bg-secondary);
     box-shadow: 0 8px 24px rgba(191, 106, 252, 0.3);
-    border-color: rgba(191, 106, 252, 0.5);
+    border-color: var(--accent-b);
 }
 
 .stat-label {
@@ -180,7 +243,7 @@ html, body, [data-testid="stAppViewContainer"] {
 
 .stat-text {
     font-size: 13px;
-    color: rgba(255, 255, 255, 0.7);
+    color: var(--text-secondary);
     text-transform: uppercase;
     letter-spacing: 1px;
 }
@@ -191,9 +254,9 @@ html, body, [data-testid="stAppViewContainer"] {
     margin: 6px;
     padding: 8px 18px;
     border-radius: 24px;
-    background: rgba(255, 255, 255, 0.07);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    color: rgba(255, 255, 255, 0.9);
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
     cursor: pointer;
     transition: all 0.3s ease;
     font-size: 13px;
@@ -202,7 +265,7 @@ html, body, [data-testid="stAppViewContainer"] {
 
 .pill:hover {
     background: linear-gradient(90deg, var(--accent-a), var(--accent-b));
-    color: var(--g1);
+    color: #ffffff;
     transform: translateY(-3px);
     box-shadow: 0 0 16px rgba(79, 240, 255, 0.4);
 }
@@ -215,8 +278,8 @@ html, body, [data-testid="stAppViewContainer"] {
 }
 
 .result-card {
-    background: rgba(255, 255, 255, 0.06);
-    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
     border-radius: 16px;
     padding: 24px;
     margin-bottom: 20px;
@@ -225,21 +288,21 @@ html, body, [data-testid="stAppViewContainer"] {
 }
 
 .result-card:hover {
-    background: rgba(255, 255, 255, 0.08);
-    border-color: rgba(79, 240, 255, 0.3);
+    background: var(--bg-secondary);
+    border-color: var(--accent-a);
     box-shadow: 0 8px 32px rgba(191, 106, 252, 0.2);
 }
 
 .result-title {
     font-size: 20px;
     font-weight: 700;
-    color: white;
+    color: var(--text-primary);
     margin-bottom: 12px;
 }
 
 .result-subtitle {
     font-size: 12px;
-    color: rgba(79, 240, 255, 0.9);
+    color: var(--accent-a);
     text-transform: uppercase;
     letter-spacing: 1px;
     margin-bottom: 8px;
@@ -247,8 +310,8 @@ html, body, [data-testid="stAppViewContainer"] {
 
 /* Metrics Bar */
 .metric-item {
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
     border-radius: 12px;
     padding: 16px;
     margin-bottom: 12px;
@@ -256,7 +319,7 @@ html, body, [data-testid="stAppViewContainer"] {
 }
 
 .metric-item:hover {
-    background: rgba(255, 255, 255, 0.08);
+    background: var(--bg-secondary);
     box-shadow: 0 4px 12px rgba(79, 240, 255, 0.2);
 }
 
@@ -266,7 +329,7 @@ html, body, [data-testid="stAppViewContainer"] {
 }
 
 .progress-bar {
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--bg-secondary);
     border-radius: 12px;
     overflow: hidden;
     height: 6px;
@@ -284,12 +347,36 @@ html, body, [data-testid="stAppViewContainer"] {
 }
 
 /* Text Colors */
-.text-muted { color: rgba(255, 255, 255, 0.6); }
+.text-muted { color: var(--text-secondary); }
 .text-accent { color: var(--accent-a); }
-.text-white { color: white; }
+.text-white { color: var(--text-primary); }
 
 </style>
-""", unsafe_allow_html=True)
+"""
+
+st.markdown(theme_styles, unsafe_allow_html=True)
+
+# Theme toggle in sidebar
+with st.sidebar:
+    st.markdown("### ⚙️ Settings")
+    theme_option = st.radio(
+        "Theme",
+        ["🌙 Dark", "☀️ Light"],
+        index=0 if st.session_state.theme == 'dark' else 1
+    )
+    
+    if "Dark" in theme_option:
+        st.session_state.theme = 'dark'
+    else:
+        st.session_state.theme = 'light'
+        # Apply light theme class
+        st.markdown("""
+        <script>
+            document.body.classList.add('light-theme');
+            document.documentElement.classList.add('light-theme');
+            document.querySelector('[data-testid="stAppViewContainer"]').classList.add('light-theme');
+        </script>
+        """, unsafe_allow_html=True)
 
 # ======================================================
 # Topbar
@@ -479,7 +566,7 @@ with tab1:
             with col1:
                 st.markdown(f"""
                 <div class="metric-item">
-                    <div style="font-size: 12px; color: rgba(255,255,255,0.6); margin-bottom: 8px;">📚 Sources</div>
+                    <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 8px;">📚 Sources</div>
                     <div style="font-size: 24px; font-weight: 900; color: var(--accent-a);">
                         {summary.get('total_sources', 0)}
                     </div>
@@ -489,7 +576,7 @@ with tab1:
             with col2:
                 st.markdown(f"""
                 <div class="metric-item">
-                    <div style="font-size: 12px; color: rgba(255,255,255,0.6); margin-bottom: 8px;">📄 Iterations</div>
+                    <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 8px;">🔄 Iterations</div>
                     <div style="font-size: 24px; font-weight: 900; color: var(--accent-b);">
                         {summary.get('iterations', 0)}
                     </div>
@@ -499,7 +586,7 @@ with tab1:
             with col3:
                 st.markdown(f"""
                 <div class="metric-item">
-                    <div style="font-size: 12px; color: rgba(255,255,255,0.6); margin-bottom: 8px;">🎯 Confidence</div>
+                    <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 8px;">🎯 Confidence</div>
                     <div style="font-size: 24px; font-weight: 900; color: var(--accent-pink);">
                         {validation.get('confidence_score', 0)}%
                     </div>
@@ -514,8 +601,8 @@ with tab1:
             else:
                 st.warning("⚠️ No content generated.")
 
-            # Download options
-            col_down1, col_down2 = st.columns(2)
+            # Download options with PDF
+            col_down1, col_down2, col_down3 = st.columns(3)
             with col_down1:
                 st.download_button(
                     "📥 Download JSON",
@@ -529,6 +616,38 @@ with tab1:
                     content,
                     "research.txt",
                     "text/plain"
+                )
+            with col_down3:
+                # PDF Download Button
+                pdf_html = f"""
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <meta charset="utf-8">
+                    <title>{query}</title>
+                    <style>
+                        body {{ font-family: Arial, sans-serif; padding: 40px; line-height: 1.6; }}
+                        h1 {{ color: #333; border-bottom: 3px solid #667eea; padding-bottom: 10px; }}
+                        .metadata {{ background: #f5f5f5; padding: 15px; border-radius: 8px; margin: 20px 0; }}
+                    </style>
+                </head>
+                <body>
+                    <h1>{query}</h1>
+                    <div class="metadata">
+                        <p><strong>Quality Score:</strong> {validation.get('confidence_score', 85)}/100</p>
+                        <p><strong>Sources:</strong> {summary.get('total_sources', 0)}</p>
+                        <p><strong>Confidence:</strong> {validation.get('confidence_score', 0)}%</p>
+                    </div>
+                    <div>{content}</div>
+                </body>
+                </html>
+                """
+                st.download_button(
+                    "📄 Download PDF",
+                    pdf_html,
+                    "research.html",
+                    "text/html",
+                    help="Download as HTML (can be converted to PDF)"
                 )
 
             # Evaluation
@@ -588,7 +707,7 @@ with tab3:
 # Footer
 st.markdown("""
 ---
-<div style="text-align: center; padding: 20px; color: rgba(255, 255, 255, 0.6); font-size: 13px;">
+<div style="text-align: center; padding: 20px; color: var(--text-secondary); font-size: 13px;">
 Made with ❤️ using Streamlit • Multi-Agent Research AI
 </div>
 """, unsafe_allow_html=True)
