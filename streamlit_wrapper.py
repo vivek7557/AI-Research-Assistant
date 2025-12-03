@@ -1,4 +1,4 @@
-"""
+# Main Content"""
 streamlit_wrapper.py – ENHANCED VERSION
 React-inspired UI + animations + PDF download + Dark/Light theme
 """
@@ -55,34 +55,34 @@ theme_styles = """
 
 /* Light Theme Colors */
 .light-theme {
-    --g1: #f8f9fa;
-    --g2: #e9ecef;
-    --g3: #dee2e6;
-    --accent-a: #0066cc;
+    --g1: #ffffff;
+    --g2: #fafbfc;
+    --g3: #f0f4f8;
+    --accent-a: #2563eb;
     --accent-b: #7c3aed;
-    --accent-pink: #dc2626;
+    --accent-pink: #ec4899;
     --bg-primary: #ffffff;
-    --bg-secondary: rgba(0, 0, 0, 0.03);
-    --text-primary: #1a1a1a;
-    --text-secondary: rgba(0, 0, 0, 0.6);
-    --border-color: rgba(0, 0, 0, 0.1);
+    --bg-secondary: #f8fafc;
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --border-color: #e2e8f0;
 }
 
 /* Apply theme to body */
 body.light-theme,
 html.light-theme,
 [data-testid="stAppViewContainer"].light-theme {
-    --g1: #f8f9fa;
-    --g2: #e9ecef;
-    --g3: #dee2e6;
-    --accent-a: #0066cc;
+    --g1: #ffffff;
+    --g2: #fafbfc;
+    --g3: #f0f4f8;
+    --accent-a: #2563eb;
     --accent-b: #7c3aed;
-    --accent-pink: #dc2626;
+    --accent-pink: #ec4899;
     --bg-primary: #ffffff;
-    --bg-secondary: rgba(0, 0, 0, 0.03);
-    --text-primary: #1a1a1a;
-    --text-secondary: rgba(0, 0, 0, 0.6);
-    --border-color: rgba(0, 0, 0, 0.1);
+    --bg-secondary: #f8fafc;
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --border-color: #e2e8f0;
 }
 
 /* Main Background */
@@ -166,11 +166,12 @@ html, body, [data-testid="stAppViewContainer"] {
 }
 
 .hero h1 {
-    font-size: 48px;
+    font-size: 56px;
     font-weight: 900;
     color: var(--text-primary);
-    margin-bottom: 16px;
-    line-height: 1.2;
+    margin-bottom: 20px;
+    line-height: 1.1;
+    letter-spacing: -1px;
 }
 
 .highlight {
@@ -178,6 +179,7 @@ html, body, [data-testid="stAppViewContainer"] {
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     animation: glowText 4s ease-in-out infinite;
+    font-weight: 900;
 }
 
 @keyframes glowText {
@@ -186,10 +188,12 @@ html, body, [data-testid="stAppViewContainer"] {
 }
 
 .hero-subtitle {
-    font-size: 18px;
+    font-size: 20px;
     color: var(--text-secondary);
-    max-width: 600px;
-    margin: 16px auto 0;
+    max-width: 700px;
+    margin: 20px auto 0;
+    font-weight: 500;
+    line-height: 1.6;
 }
 
 @keyframes fadeInUp {
@@ -592,8 +596,6 @@ with tab1:
                     </div>
                 </div>
                 """, unsafe_allow_html=True)
-
-            # Main Content
             if content:
                 st.markdown('<div class="result-card">', unsafe_allow_html=True)
                 st.markdown(content, unsafe_allow_html=True)
