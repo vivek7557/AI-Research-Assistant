@@ -515,6 +515,39 @@ with tab1:
                 st.markdown('<div class="card">', unsafe_allow_html=True)
                 st.markdown(content)
                 st.markdown('</div>', unsafe_allow_html=True)
+            
+            # Citations & Sources
+            sources = results.get("sources", [])
+            if sources:
+                st.markdown('<div class="card">', unsafe_allow_html=True)
+                st.markdown("### 📚 Sources & Citations")
+                st.markdown('<div style="margin-top: 16px;">', unsafe_allow_html=True)
+                
+                for idx, source in enumerate(sources, 1):
+                    title = source.get("title", "Untitled")
+                    url = source.get("url", "#")
+                    snippet = source.get("snippet", "")
+                    
+                    st.markdown(f"""
+                    <div style="background: var(--bg-input); border: 1px solid var(--border); 
+                         border-radius: 8px; padding: 16px; margin-bottom: 12px;">
+                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
+                            <div style="font-weight: 600; color: var(--text-primary); flex: 1;">
+                                [{idx}] {title}
+                            </div>
+                        </div>
+                        <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 8px;">
+                            {snippet[:150]}...
+                        </div>
+                        <a href="{url}" target="_blank" style="font-size: 13px; color: var(--accent); 
+                           text-decoration: none; font-weight: 500;">
+                            🔗 View Source →
+                        </a>
+                    </div>
+                    """, unsafe_allow_html=True)
+                
+                st.markdown('</div>', unsafe_allow_html=True)
+                st.markdown('</div>', unsafe_allow_html=True)
 
             # Downloads
             col1, col2, col3 = st.columns(3)
