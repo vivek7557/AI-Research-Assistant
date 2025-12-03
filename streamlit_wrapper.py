@@ -1,4 +1,6 @@
-
+"""
+ResearchAI - Modern Minimal UI
+"""
 
 import streamlit as st
 import os
@@ -11,459 +13,407 @@ import time
 load_dotenv()
 sys.path.insert(0, os.path.dirname(__file__))
 
-# --- Core Logic (unchanged) ---
 from orchestrator import ResearchOrchestrator
 from evaluation.evaluator import ResearchEvaluator
 from memory.memory_bank import MemoryBank
 
 # ======================================================
-# Page config
+# Page Config
 # ======================================================
 st.set_page_config(
     page_title="ResearchAI",
     page_icon="🔬",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="collapsed"
 )
 
-# Initialize theme in session state
+# Theme state
 if 'theme' not in st.session_state:
     st.session_state.theme = 'dark'
 
 # ======================================================
-# Enhanced UI with animations + gradients + Theme Support
+# Modern Minimal UI
 # ======================================================
-theme_styles = """
+st.markdown("""
 <style>
-/* Root Colors - Dark Theme */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+/* Base Theme Variables */
 :root {
-    --g1: #0d0a24;
-    --g2: #32105a;
-    --g3: #6d29b0;
-    --accent-a: #4ff0ff;
-    --accent-b: #bf6afc;
-    --accent-pink: #ff4d8f;
-    --bg-primary: #0a0a0a;
-    --bg-secondary: rgba(255, 255, 255, 0.06);
+    --bg-main: #000000;
+    --bg-card: #0a0a0a;
+    --bg-input: #111111;
     --text-primary: #ffffff;
-    --text-secondary: rgba(255, 255, 255, 0.7);
-    --border-color: rgba(255, 255, 255, 0.12);
+    --text-secondary: #888888;
+    --border: #1a1a1a;
+    --accent: #3b82f6;
+    --accent-hover: #2563eb;
 }
 
-/* Light Theme Colors */
-.light-theme {
-    --g1: #ffffff;
-    --g2: #fafbfc;
-    --g3: #f0f4f8;
-    --accent-a: #2563eb;
-    --accent-b: #7c3aed;
-    --accent-pink: #ec4899;
-    --bg-primary: #ffffff;
-    --bg-secondary: #f8fafc;
-    --text-primary: #0f172a;
-    --text-secondary: #475569;
-    --border-color: #e2e8f0;
+.light-mode {
+    --bg-main: #ffffff;
+    --bg-card: #fafafa;
+    --bg-input: #f5f5f5;
+    --text-primary: #000000;
+    --text-secondary: #666666;
+    --border: #e5e5e5;
+    --accent: #3b82f6;
+    --accent-hover: #2563eb;
 }
 
-/* Apply theme to body */
-body.light-theme,
-html.light-theme,
-[data-testid="stAppViewContainer"].light-theme {
-    --g1: #ffffff;
-    --g2: #fafbfc;
-    --g3: #f0f4f8;
-    --accent-a: #2563eb;
-    --accent-b: #7c3aed;
-    --accent-pink: #ec4899;
-    --bg-primary: #ffffff;
-    --bg-secondary: #f8fafc;
-    --text-primary: #0f172a;
-    --text-secondary: #475569;
-    --border-color: #e2e8f0;
+/* Global Styles */
+* {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
-/* Main Background */
-html, body, [data-testid="stAppViewContainer"] {
-    background: linear-gradient(135deg, var(--g1) 0%, var(--g2) 50%, var(--g3) 100%);
-    background-size: 400% 400%;
-    animation: gradientMove 16s ease infinite;
+[data-testid="stAppViewContainer"] {
+    background: var(--bg-main);
     color: var(--text-primary);
 }
 
-@keyframes gradientMove {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
+[data-testid="stHeader"] {
+    background: transparent;
 }
 
-/* Theme Toggle Button */
-.theme-toggle {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    z-index: 9999;
-    background: var(--bg-secondary);
-    border: 1px solid var(--border-color);
-    border-radius: 12px;
-    padding: 10px 16px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-size: 20px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+/* Hide Streamlit Elements */
+#MainMenu, footer, header {
+    visibility: hidden;
 }
 
-.theme-toggle:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
-}
-
-/* Topbar */
-.topbar {
+/* Top Navigation */
+.top-nav {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 16px 26px;
-    margin-bottom: 20px;
-    background: var(--bg-secondary);
-    border: 1px solid var(--border-color);
-    border-radius: 16px;
-    backdrop-filter: blur(10px);
-    box-shadow: 0 0 20px rgba(79, 240, 255, 0.1);
+    padding: 24px 48px;
+    border-bottom: 1px solid var(--border);
 }
 
-.logo {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    font-size: 24px;
-    font-weight: 900;
-    background: linear-gradient(90deg, var(--accent-a), var(--accent-b));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-}
-
-.logo-dot {
-    width: 36px;
-    height: 36px;
-    border-radius: 8px;
-    background: linear-gradient(135deg, var(--accent-a), var(--accent-b));
-    animation: pulseGlow 3s ease-in-out infinite;
-}
-
-@keyframes pulseGlow {
-    0%, 100% { box-shadow: 0 0 12px rgba(79, 240, 255, 0.5); }
-    50% { box-shadow: 0 0 24px rgba(191, 106, 252, 0.8); }
-}
-
-/* Hero Section */
-.hero {
-    text-align: center;
-    padding: 60px 20px 40px;
-    animation: fadeInUp 0.8s ease;
-}
-
-.hero h1 {
-    font-size: 56px;
-    font-weight: 900;
-    color: var(--text-primary);
-    margin-bottom: 20px;
-    line-height: 1.1;
-    letter-spacing: -1px;
-}
-
-.highlight {
-    background: linear-gradient(90deg, var(--accent-a), var(--accent-pink), var(--accent-b));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    animation: glowText 4s ease-in-out infinite;
-    font-weight: 900;
-}
-
-@keyframes glowText {
-    0%, 100% { filter: drop-shadow(0 0 8px var(--accent-b)); }
-    50% { filter: drop-shadow(0 0 16px var(--accent-a)); }
-}
-
-.hero-subtitle {
-    font-size: 20px;
-    color: var(--text-secondary);
-    max-width: 700px;
-    margin: 20px auto 0;
-    font-weight: 500;
-    line-height: 1.6;
-}
-
-@keyframes fadeInUp {
-    from { opacity: 0; transform: translateY(30px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-/* Search Container */
-.search-wrapper {
-    max-width: 900px;
-    margin: 30px auto;
-    padding: 16px;
-    background: var(--bg-secondary);
-    border: 1px solid var(--border-color);
-    border-radius: 20px;
-    backdrop-filter: blur(15px);
-    transition: all 0.3s ease;
-    box-shadow: 0 0 30px rgba(79, 240, 255, 0.1);
-}
-
-.search-wrapper:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 0 40px rgba(191, 106, 252, 0.25);
-    border-color: var(--accent-a);
-}
-
-/* Stat Cards */
-.stat-card {
-    background: var(--bg-secondary);
-    border: 1px solid var(--border-color);
-    border-radius: 16px;
-    padding: 20px;
-    transition: all 0.3s ease;
-}
-
-.stat-card:hover {
-    transform: translateY(-6px);
-    background: var(--bg-secondary);
-    box-shadow: 0 8px 24px rgba(191, 106, 252, 0.3);
-    border-color: var(--accent-b);
-}
-
-.stat-label {
-    font-size: 28px;
-    font-weight: 900;
-    background: linear-gradient(90deg, var(--accent-a), var(--accent-b));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    margin-bottom: 8px;
-}
-
-.stat-text {
-    font-size: 13px;
-    color: var(--text-secondary);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
-
-/* Pills */
-.pill {
-    display: inline-block;
-    margin: 6px;
-    padding: 8px 18px;
-    border-radius: 24px;
-    background: var(--bg-secondary);
-    border: 1px solid var(--border-color);
-    color: var(--text-primary);
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-size: 13px;
-    font-weight: 600;
-}
-
-.pill:hover {
-    background: linear-gradient(90deg, var(--accent-a), var(--accent-b));
-    color: #ffffff;
-    transform: translateY(-3px);
-    box-shadow: 0 0 16px rgba(79, 240, 255, 0.4);
-}
-
-/* Results Container */
-.results-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    animation: fadeInUp 0.6s ease;
-}
-
-.result-card {
-    background: var(--bg-secondary);
-    border: 1px solid var(--border-color);
-    border-radius: 16px;
-    padding: 24px;
-    margin-bottom: 20px;
-    backdrop-filter: blur(10px);
-    transition: all 0.3s ease;
-}
-
-.result-card:hover {
-    background: var(--bg-secondary);
-    border-color: var(--accent-a);
-    box-shadow: 0 8px 32px rgba(191, 106, 252, 0.2);
-}
-
-.result-title {
+.logo-text {
     font-size: 20px;
     font-weight: 700;
     color: var(--text-primary);
-    margin-bottom: 12px;
+    letter-spacing: -0.5px;
 }
 
-.result-subtitle {
-    font-size: 12px;
-    color: var(--accent-a);
-    text-transform: uppercase;
-    letter-spacing: 1px;
+.theme-switcher {
+    padding: 8px 16px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text-secondary);
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.theme-switcher:hover {
+    background: var(--bg-input);
+    color: var(--text-primary);
+}
+
+/* Hero Section */
+.hero-section {
+    max-width: 800px;
+    margin: 80px auto 60px;
+    text-align: center;
+}
+
+.hero-title {
+    font-size: 56px;
+    font-weight: 800;
+    line-height: 1.1;
+    margin-bottom: 20px;
+    color: var(--text-primary);
+    letter-spacing: -2px;
+}
+
+.hero-gradient {
+    background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 50%, #ec4899 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.hero-subtitle {
+    font-size: 18px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    font-weight: 400;
+}
+
+/* Search Box */
+.search-container {
+    max-width: 700px;
+    margin: 0 auto 40px;
+}
+
+.stTextInput input {
+    background: var(--bg-input) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: 12px !important;
+    padding: 16px 20px !important;
+    color: var(--text-primary) !important;
+    font-size: 15px !important;
+    transition: all 0.2s ease !important;
+}
+
+.stTextInput input:focus {
+    border-color: var(--accent) !important;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
+}
+
+.stTextInput input::placeholder {
+    color: var(--text-secondary) !important;
+}
+
+/* Buttons */
+.stButton button {
+    background: var(--accent) !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 10px !important;
+    padding: 12px 28px !important;
+    font-size: 15px !important;
+    font-weight: 600 !important;
+    transition: all 0.2s ease !important;
+}
+
+.stButton button:hover {
+    background: var(--accent-hover) !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3) !important;
+}
+
+/* Cards */
+.card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 32px;
+    margin-bottom: 20px;
+    transition: all 0.2s ease;
+}
+
+.card:hover {
+    border-color: var(--text-secondary);
+}
+
+/* Stats Grid */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    max-width: 900px;
+    margin: 0 auto 60px;
+}
+
+.stat-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    text-align: center;
+    transition: all 0.2s ease;
+}
+
+.stat-card:hover {
+    border-color: var(--accent);
+    transform: translateY(-2px);
+}
+
+.stat-value {
+    font-size: 32px;
+    font-weight: 800;
+    color: var(--accent);
     margin-bottom: 8px;
 }
 
-/* Metrics Bar */
-.metric-item {
-    background: var(--bg-secondary);
-    border: 1px solid var(--border-color);
-    border-radius: 12px;
-    padding: 16px;
-    margin-bottom: 12px;
-    transition: all 0.3s ease;
+.stat-label {
+    font-size: 13px;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
 }
 
-.metric-item:hover {
-    background: var(--bg-secondary);
-    box-shadow: 0 4px 12px rgba(79, 240, 255, 0.2);
+/* Tabs */
+.stTabs [data-baseweb="tab-list"] {
+    gap: 8px;
+    border-bottom: 1px solid var(--border);
+    padding: 0 48px;
 }
 
-/* Progress Bar */
-.progress-container {
-    margin: 20px 0;
+.stTabs [data-baseweb="tab"] {
+    background: transparent !important;
+    border: none !important;
+    padding: 16px 20px !important;
+    color: var(--text-secondary) !important;
+    font-weight: 600 !important;
+    font-size: 14px !important;
 }
 
-.progress-bar {
-    background: var(--bg-secondary);
-    border-radius: 12px;
-    overflow: hidden;
-    height: 6px;
+.stTabs [aria-selected="true"] {
+    color: var(--text-primary) !important;
+    border-bottom: 2px solid var(--accent) !important;
 }
 
-.progress-fill {
-    height: 100%;
-    background: linear-gradient(90deg, var(--accent-a), var(--accent-b));
-    animation: shimmer 2s infinite;
+/* Select Box */
+.stSelectbox > div > div {
+    background: var(--bg-input) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: 10px !important;
+    color: var(--text-primary) !important;
 }
 
-@keyframes shimmer {
-    0% { box-shadow: -1000px 0 0 0 rgba(255, 255, 255, 0.2); }
-    100% { box-shadow: 1000px 0 0 0 rgba(255, 255, 255, 0.2); }
+/* Checkbox */
+.stCheckbox {
+    color: var(--text-primary) !important;
 }
 
-/* Text Colors */
-.text-muted { color: var(--text-secondary); }
-.text-accent { color: var(--accent-a); }
-.text-white { color: var(--text-primary); }
+/* Expander */
+.streamlit-expanderHeader {
+    background: var(--bg-input) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: 10px !important;
+    color: var(--text-primary) !important;
+    font-weight: 600 !important;
+}
 
+/* Progress */
+.stProgress > div > div {
+    background: var(--accent) !important;
+}
+
+/* Metrics Display */
+.metrics-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin: 24px 0;
+}
+
+.metric-box {
+    background: var(--bg-input);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+}
+
+.metric-value {
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--accent);
+}
+
+.metric-label {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-top: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Content Area */
+.content-wrapper {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 48px;
+}
+
+/* Download Buttons Container */
+.download-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin: 24px 0;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-main);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--text-secondary);
+}
 </style>
-"""
-
-st.markdown(theme_styles, unsafe_allow_html=True)
-
-# Theme toggle in sidebar
-with st.sidebar:
-    st.markdown("### ⚙️ Settings")
-    theme_option = st.radio(
-        "Theme",
-        ["🌙 Dark", "☀️ Light"],
-        index=0 if st.session_state.theme == 'dark' else 1
-    )
-    
-    if "Dark" in theme_option:
-        st.session_state.theme = 'dark'
-    else:
-        st.session_state.theme = 'light'
-        # Apply light theme class
-        st.markdown("""
-        <script>
-            document.body.classList.add('light-theme');
-            document.documentElement.classList.add('light-theme');
-            document.querySelector('[data-testid="stAppViewContainer"]').classList.add('light-theme');
-        </script>
-        """, unsafe_allow_html=True)
+""", unsafe_allow_html=True)
 
 # ======================================================
-# Topbar
+# Top Navigation
 # ======================================================
-col1, col2 = st.columns([1, 10])
+col1, col2 = st.columns([6, 1])
 with col1:
-    st.markdown('<div class="logo-dot"></div>', unsafe_allow_html=True)
+    st.markdown('<div class="logo-text">ResearchAI</div>', unsafe_allow_html=True)
 with col2:
-    st.markdown('<div class="logo">ResearchAI</div>', unsafe_allow_html=True)
+    if st.button("🌓 Theme"):
+        st.session_state.theme = 'light' if st.session_state.theme == 'dark' else 'dark'
+        st.rerun()
 
-st.markdown("---")
+if st.session_state.theme == 'light':
+    st.markdown('<script>document.body.classList.add("light-mode");</script>', unsafe_allow_html=True)
 
 # ======================================================
 # Hero Section
 # ======================================================
 st.markdown("""
-<div class="hero">
-    <h1>Deep Research at <span class="highlight">Lightning Speed</span></h1>
-    <p class="hero-subtitle">Powered by advanced AI agents. Get comprehensive, verified research in minutes, not hours.</p>
+<div class="hero-section">
+    <h1 class="hero-title">
+        Research Made <span class="hero-gradient">Simple</span>
+    </h1>
+    <p class="hero-subtitle">
+        AI-powered research platform that delivers comprehensive insights in seconds
+    </p>
 </div>
 """, unsafe_allow_html=True)
 
 # ======================================================
 # Search Input
 # ======================================================
-st.markdown('<div class="search-wrapper">', unsafe_allow_html=True)
-
-col_search, col_btn = st.columns([4, 1], gap="small")
-with col_search:
+st.markdown('<div class="search-container">', unsafe_allow_html=True)
+col1, col2 = st.columns([5, 1])
+with col1:
     query = st.text_input(
         "",
-        placeholder="E.g., Impact of AI on healthcare, Climate solutions, Quantum computing...",
-        label_visibility="collapsed",
-        key="search_input"
+        placeholder="What would you like to research?",
+        label_visibility="collapsed"
     )
-
-with col_btn:
-    do_search = st.button("🚀 Research", use_container_width=True, key="search_btn")
-
+with col2:
+    st.write("")
+    do_search = st.button("Search", use_container_width=True)
 st.markdown('</div>', unsafe_allow_html=True)
 
-# Quick suggestions
-st.markdown("""
-<div style="text-align: center; margin: 20px 0;">
-    <span class="pill">Renewable Energy</span>
-    <span class="pill">Drug Discovery</span>
-    <span class="pill">Space Exploration</span>
-    <span class="pill">Cybersecurity</span>
-</div>
-""", unsafe_allow_html=True)
-
 # ======================================================
-# Stat Cards (before search)
+# Stats (before search)
 # ======================================================
 if not do_search and query == "":
-    col1, col2, col3 = st.columns(3, gap="large")
-    
-    try:
-        memory_bank = MemoryBank()
-        stats = memory_bank.get_statistics()
-    except:
-        stats = {"total_memories": 0, "completed_sessions": 0, "total_sources": 0}
-
-    with col1:
-        st.markdown(f"""
+    st.markdown("""
+    <div class="stats-grid">
         <div class="stat-card">
-            <div class="stat-label">2,453</div>
-            <div class="stat-text">Research Sessions</div>
+            <div class="stat-value">2.4K+</div>
+            <div class="stat-label">Research Sessions</div>
         </div>
-        """, unsafe_allow_html=True)
-
-    with col2:
-        st.markdown(f"""
         <div class="stat-card">
-            <div class="stat-label">94%</div>
-            <div class="stat-text">Accuracy Rate</div>
+            <div class="stat-value">94%</div>
+            <div class="stat-label">Accuracy Rate</div>
         </div>
-        """, unsafe_allow_html=True)
-
-    with col3:
-        st.markdown(f"""
         <div class="stat-card">
-            <div class="stat-label">2.3s</div>
-            <div class="stat-text">Avg Response Time</div>
+            <div class="stat-value">2.3s</div>
+            <div class="stat-label">Avg Response</div>
         </div>
-        """, unsafe_allow_html=True)
+    </div>
+    """, unsafe_allow_html=True)
 
 # ======================================================
 # API Key Check
@@ -472,152 +422,117 @@ anthropic_key = os.getenv("ANTHROPIC_API_KEY") or st.secrets.get("ANTHROPIC_API_
 tavily_key = os.getenv("TAVILY_API_KEY") or st.secrets.get("TAVILY_API_KEY", "")
 
 if not (anthropic_key and tavily_key):
-    st.error("⚠️ Missing API keys. Add ANTHROPIC_API_KEY and TAVILY_API_KEY to .env or secrets.")
+    st.error("⚠️ Missing API keys")
     st.stop()
 
 # ======================================================
-# Research Tabs
+# Main Content Area
 # ======================================================
-tab1, tab2, tab3 = st.tabs(["🔬 New Research", "🔍 Find Related", "📊 Past Sessions"])
+st.markdown('<div class="content-wrapper">', unsafe_allow_html=True)
 
-# Tab 1 – New Research
+tab1, tab2, tab3 = st.tabs(["Research", "Related", "History"])
+
 with tab1:
-    st.markdown('<div class="result-card">', unsafe_allow_html=True)
+    st.markdown('<div class="card">', unsafe_allow_html=True)
     
-    colA, colB = st.columns([3, 2], gap="medium")
-    with colA:
-        output_format = st.selectbox("📄 Output Format", ["report", "article", "summary", "presentation"])
-    with colB:
-        run_eval = st.checkbox("🎯 Run Evaluation", value=True)
+    col1, col2 = st.columns([2, 1])
+    with col1:
+        output_format = st.selectbox("Output Format", ["report", "article", "summary", "presentation"])
+    with col2:
+        run_eval = st.checkbox("Run Evaluation", value=True)
 
-    with st.expander("⚙️ Advanced Options"):
-        session_id_input = st.text_input("Resume Session ID", "")
+    with st.expander("Advanced Options"):
+        session_id_input = st.text_input("Session ID (optional)")
         depth_level = st.slider("Research Depth", 1, 5, 3)
 
     st.markdown('</div>', unsafe_allow_html=True)
 
-    start = do_search or st.button("🚀 Start Research", key="start_research_btn")
+    start = do_search or st.button("🚀 Start Research")
 
     if start:
         if not query:
-            st.warning("⚠️ Please enter a research query.")
+            st.warning("Please enter a query")
             st.stop()
 
-        # Progress indicators
-        progress_container = st.container()
-        status_container = st.empty()
-        progress_bar = st.empty()
+        status = st.empty()
+        progress = st.progress(0)
 
         try:
-            # Simulate research phases
             phases = [
-                ("Initializing research agents...", 20),
-                ("Searching sources...", 40),
-                ("Analyzing data...", 60),
-                ("Validating findings...", 80),
-                ("Compiling report...", 100),
+                ("Initializing...", 20),
+                ("Searching...", 40),
+                ("Analyzing...", 60),
+                ("Validating...", 80),
+                ("Compiling...", 100),
             ]
 
             orchestrator = ResearchOrchestrator()
 
-            for phase_text, progress_val in phases:
-                status_container.info(f"⏳ {phase_text}")
-                progress_bar.progress(progress_val)
-                time.sleep(0.5)
+            for text, val in phases:
+                status.info(f"⏳ {text}")
+                progress.progress(val)
+                time.sleep(0.4)
 
-            # Conduct research
             results = orchestrator.conduct_research(
                 query=query,
                 output_format=output_format,
                 session_id=session_id_input or None
             )
 
-            status_container.success("✅ Research completed!")
-            progress_bar.progress(100)
+            status.success("✅ Complete")
+            progress.progress(100)
 
-            final = results.get("final_content", {})
-            content = final.get("content", "")
+            content = results.get("final_content", {}).get("content", "")
             summary = results.get("research_summary", {})
             validation = results.get("validation", {})
 
-            # Display Results
-            st.markdown('<div class="results-container">', unsafe_allow_html=True)
-
-            # Quality Score
+            # Results Display
+            st.markdown('<div class="card">', unsafe_allow_html=True)
+            st.markdown(f"### {query}")
+            
+            # Metrics
             st.markdown(f"""
-            <div class="result-card">
-                <div class="result-subtitle">Research Query</div>
-                <div class="result-title">{query}</div>
-                <div style="margin-top: 16px;">
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                        <span class="text-muted">Quality Score</span>
-                        <span class="text-accent" style="font-weight: 700; font-size: 18px;">
-                            {validation.get('confidence_score', 85)}/100
-                        </span>
-                    </div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: {validation.get('confidence_score', 85)}%"></div>
-                    </div>
+            <div class="metrics-row">
+                <div class="metric-box">
+                    <div class="metric-value">{summary.get('total_sources', 0)}</div>
+                    <div class="metric-label">Sources</div>
+                </div>
+                <div class="metric-box">
+                    <div class="metric-value">{summary.get('iterations', 0)}</div>
+                    <div class="metric-label">Iterations</div>
+                </div>
+                <div class="metric-box">
+                    <div class="metric-value">{validation.get('confidence_score', 0)}%</div>
+                    <div class="metric-label">Confidence</div>
                 </div>
             </div>
             """, unsafe_allow_html=True)
+            
+            st.markdown('</div>', unsafe_allow_html=True)
 
-            # Metrics
+            # Content
+            if content:
+                st.markdown('<div class="card">', unsafe_allow_html=True)
+                st.markdown(content)
+                st.markdown('</div>', unsafe_allow_html=True)
+
+            # Downloads
             col1, col2, col3 = st.columns(3)
             with col1:
-                st.markdown(f"""
-                <div class="metric-item">
-                    <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 8px;">📚 Sources</div>
-                    <div style="font-size: 24px; font-weight: 900; color: var(--accent-a);">
-                        {summary.get('total_sources', 0)}
-                    </div>
-                </div>
-                """, unsafe_allow_html=True)
-
-            with col2:
-                st.markdown(f"""
-                <div class="metric-item">
-                    <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 8px;">🔄 Iterations</div>
-                    <div style="font-size: 24px; font-weight: 900; color: var(--accent-b);">
-                        {summary.get('iterations', 0)}
-                    </div>
-                </div>
-                """, unsafe_allow_html=True)
-
-            with col3:
-                st.markdown(f"""
-                <div class="metric-item">
-                    <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 8px;">🎯 Confidence</div>
-                    <div style="font-size: 24px; font-weight: 900; color: var(--accent-pink);">
-                        {validation.get('confidence_score', 0)}%
-                    </div>
-                </div>
-                """, unsafe_allow_html=True)
-            if content:
-                st.markdown('<div class="result-card">', unsafe_allow_html=True)
-                st.markdown(content, unsafe_allow_html=True)
-                st.markdown('</div>', unsafe_allow_html=True)
-            else:
-                st.warning("⚠️ No content generated.")
-
-            # Download options with PDF
-            col_down1, col_down2, col_down3 = st.columns(3)
-            with col_down1:
                 st.download_button(
-                    "📥 Download JSON",
+                    "📥 JSON",
                     json.dumps(results, indent=2),
                     "research.json",
-                    "application/json"
+                    use_container_width=True
                 )
-            with col_down2:
+            with col2:
                 st.download_button(
-                    "📥 Download TXT",
+                    "📥 Text",
                     content,
                     "research.txt",
-                    "text/plain"
+                    use_container_width=True
                 )
-            with col_down3:
-                # PDF Download Button
+            with col3:
                 pdf_html = f"""
                 <!DOCTYPE html>
                 <html>
@@ -625,88 +540,63 @@ with tab1:
                     <meta charset="utf-8">
                     <title>{query}</title>
                     <style>
-                        body {{ font-family: Arial, sans-serif; padding: 40px; line-height: 1.6; }}
-                        h1 {{ color: #333; border-bottom: 3px solid #667eea; padding-bottom: 10px; }}
-                        .metadata {{ background: #f5f5f5; padding: 15px; border-radius: 8px; margin: 20px 0; }}
+                        body {{ font-family: system-ui; padding: 40px; line-height: 1.6; }}
+                        h1 {{ color: #1a1a1a; }}
                     </style>
                 </head>
                 <body>
                     <h1>{query}</h1>
-                    <div class="metadata">
-                        <p><strong>Quality Score:</strong> {validation.get('confidence_score', 85)}/100</p>
-                        <p><strong>Sources:</strong> {summary.get('total_sources', 0)}</p>
-                        <p><strong>Confidence:</strong> {validation.get('confidence_score', 0)}%</p>
-                    </div>
+                    <p><strong>Confidence:</strong> {validation.get('confidence_score', 85)}%</p>
                     <div>{content}</div>
                 </body>
                 </html>
                 """
                 st.download_button(
-                    "📄 Download PDF",
+                    "📄 PDF",
                     pdf_html,
                     "research.html",
-                    "text/html",
-                    help="Download as HTML (can be converted to PDF)"
+                    use_container_width=True
                 )
 
-            # Evaluation
             if run_eval:
-                st.markdown('<div class="result-card">', unsafe_allow_html=True)
-                st.subheader("📊 Evaluation Metrics")
+                st.markdown('<div class="card">', unsafe_allow_html=True)
+                st.markdown("### Evaluation")
                 try:
                     evaluator = ResearchEvaluator()
                     metrics = evaluator.evaluate_research(query, results)
                     st.json(metrics.to_dict())
                 except Exception as e:
-                    st.warning(f"Evaluation unavailable: {str(e)}")
+                    st.warning(f"Evaluation unavailable: {e}")
                 st.markdown('</div>', unsafe_allow_html=True)
 
-            st.markdown('</div>', unsafe_allow_html=True)
-
         except Exception as e:
-            st.error(f"❌ Error: {str(e)}")
-            st.exception(e)
+            st.error(f"Error: {e}")
 
-# Tab 2 – Related Research
 with tab2:
-    related_query = st.text_input("🔍 Search Query", key="related_search")
-    if st.button("Search", key="related_btn"):
+    search_q = st.text_input("Search related research")
+    if st.button("Search Related"):
         memory = MemoryBank()
-        rel = memory.get_related_research(related_query, limit=10)
-        if rel:
-            for x in rel:
-                with st.expander(x.get("query", "Untitled")):
-                    st.json(x)
+        related = memory.get_related_research(search_q, limit=10)
+        if related:
+            for item in related:
+                with st.expander(item.get("query", "Untitled")):
+                    st.json(item)
         else:
-            st.info("No related research found.")
+            st.info("No results")
 
-# Tab 3 – Past Sessions
 with tab3:
     out = Path("outputs")
     if out.exists():
         files = sorted(out.glob("*.json"), key=os.path.getmtime, reverse=True)
-        st.write(f"**Total sessions:** {len(files)}")
-
+        st.write(f"**{len(files)} sessions**")
         for f in files[:20]:
             try:
                 data = json.load(open(f))
                 with st.expander(data.get("query", "Untitled")):
                     st.json(data)
-                    st.download_button(
-                        "Download",
-                        json.dumps(data),
-                        f.name,
-                        key=f.name
-                    )
             except:
                 pass
     else:
-        st.info("No sessions yet.")
+        st.info("No history")
 
-# Footer
-st.markdown("""
----
-<div style="text-align: center; padding: 20px; color: var(--text-secondary); font-size: 13px;">
-Made with ❤️ using Streamlit • Multi-Agent Research AI
-</div>
-""", unsafe_allow_html=True)
+st.markdown('</div>', unsafe_allow_html=True)
