@@ -48,6 +48,11 @@ st.markdown("""
     --border: #1a1a1a;
     --accent: #3b82f6;
     --accent-hover: #2563eb;
+    --accent-purple: #8b5cf6;
+    --accent-pink: #ec4899;
+    --accent-green: #10b981;
+    --accent-orange: #f59e0b;
+    --accent-cyan: #06b6d4;
 }
 
 .light-mode {
@@ -59,6 +64,11 @@ st.markdown("""
     --border: #e5e5e5;
     --accent: #3b82f6;
     --accent-hover: #2563eb;
+    --accent-purple: #8b5cf6;
+    --accent-pink: #ec4899;
+    --accent-green: #10b981;
+    --accent-orange: #f59e0b;
+    --accent-cyan: #06b6d4;
 }
 
 /* Global Styles */
@@ -129,7 +139,7 @@ st.markdown("""
 }
 
 .hero-gradient {
-    background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 50%, #ec4899 100%);
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-purple) 50%, var(--accent-pink) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
@@ -493,16 +503,16 @@ with tab1:
             # Metrics
             st.markdown(f"""
             <div class="metrics-row">
-                <div class="metric-box">
-                    <div class="metric-value">{summary.get('total_sources', 0)}</div>
+                <div class="metric-box" style="border-left: 3px solid var(--accent-cyan);">
+                    <div class="metric-value" style="color: var(--accent-cyan);">{summary.get('total_sources', 0)}</div>
                     <div class="metric-label">Sources</div>
                 </div>
-                <div class="metric-box">
-                    <div class="metric-value">{summary.get('iterations', 0)}</div>
+                <div class="metric-box" style="border-left: 3px solid var(--accent-purple);">
+                    <div class="metric-value" style="color: var(--accent-purple);">{summary.get('iterations', 0)}</div>
                     <div class="metric-label">Iterations</div>
                 </div>
-                <div class="metric-box">
-                    <div class="metric-value">{validation.get('confidence_score', 0)}%</div>
+                <div class="metric-box" style="border-left: 3px solid var(--accent-green);">
+                    <div class="metric-value" style="color: var(--accent-green);">{validation.get('confidence_score', 0)}%</div>
                     <div class="metric-label">Confidence</div>
                 </div>
             </div>
@@ -519,44 +529,85 @@ with tab1:
             # Citations & Sources
             citations = results.get("citations", [])
             sources = results.get("sources", [])
+            references = results.get("references", [])
             
-            # Display both citation formats
-            if citations or sources:
-                st.markdown('<div class="card">', unsafe_allow_html=True)
-                st.markdown("### 📚 Citations")
+            # Display all citation formats
+            if citations or sources or references:
+                st.markdown('<div class="card" style="border-left: 4px solid var(--accent-orange);">', unsafe_allow_html=True)
+                st.markdown("### 📚 Citations & References")
                 
                 # Original citation format (if available)
                 if citations:
                     st.markdown("**This report cites the following sources:**")
+                    st.markdown('<div style="margin: 16px 0; padding-left: 8px;">', unsafe_allow_html=True)
                     for citation in citations:
-                        st.markdown(f"• {citation}")
-                    st.markdown("")
+                        st.markdown(f"""
+                        <div style="margin: 8px 0; padding: 12px; background: var(--bg-input); 
+                             border-radius: 6px; border-left: 3px solid var(--accent-purple);">
+                            • {citation}
+                        </div>
+                        """, unsafe_allow_html=True)
+                    st.markdown('</div>', unsafe_allow_html=True)
                 
-                # Detailed sources with links
+                # References section
+                if references:
+                    st.markdown("---")
+                    st.markdown("**References:**")
+                    st.markdown('<div style="margin: 16px 0; padding-left: 8px;">', unsafe_allow_html=True)
+                    for ref in references:
+                        st.markdown(f"""
+                        <div style="margin: 8px 0; padding: 12px; background: var(--bg-input); 
+                             border-radius: 6px; border-left: 3px solid var(--accent-cyan);">
+                            • {ref}
+                        </div>
+                        """, unsafe_allow_html=True)
+                    st.markdown('</div>', unsafe_allow_html=True)
+                
+                # Detailed sources with external links
                 if sources:
-                    st.markdown("**Source Details & Links:**")
+                    st.markdown("---")
+                    st.markdown("**External Source Links:**")
                     st.markdown('<div style="margin-top: 16px;">', unsafe_allow_html=True)
+                    
+                    colors = [
+                        var(--accent),
+                        var(--accent-purple),
+                        var(--accent-pink),
+                        var(--accent-green),
+                        var(--accent-cyan),
+                        var(--accent-orange)
+                    ]
                     
                     for idx, source in enumerate(sources, 1):
                         title = source.get("title", "Untitled")
                         url = source.get("url", "#")
                         snippet = source.get("snippet", "")
+                        color = colors[idx % len(colors)]
                         
                         st.markdown(f"""
                         <div style="background: var(--bg-input); border: 1px solid var(--border); 
-                             border-radius: 8px; padding: 16px; margin-bottom: 12px;">
+                             border-left: 4px solid {color};
+                             border-radius: 8px; padding: 16px; margin-bottom: 12px;
+                             transition: all 0.2s ease;">
                             <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
                                 <div style="font-weight: 600; color: var(--text-primary); flex: 1;">
-                                    [{idx}] {title}
+                                    <span style="color: {color}; font-weight: 800;">[{idx}]</span> {title}
                                 </div>
                             </div>
-                            <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 8px;">
-                                {snippet[:150]}...
+                            <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 12px; line-height: 1.5;">
+                                {snippet[:200]}...
                             </div>
-                            <a href="{url}" target="_blank" style="font-size: 13px; color: var(--accent); 
-                               text-decoration: none; font-weight: 500;">
-                                🔗 View Source →
-                            </a>
+                            <div style="display: flex; gap: 12px; align-items: center;">
+                                <a href="{url}" target="_blank" style="font-size: 13px; color: {color}; 
+                                   text-decoration: none; font-weight: 600; display: flex; align-items: center; gap: 4px;">
+                                    🔗 View Source
+                                </a>
+                                <span style="color: var(--border);">•</span>
+                                <a href="{url}" target="_blank" style="font-size: 12px; color: var(--text-secondary); 
+                                   text-decoration: none;">
+                                    {url[:50]}...
+                                </a>
+                            </div>
                         </div>
                         """, unsafe_allow_html=True)
                     
